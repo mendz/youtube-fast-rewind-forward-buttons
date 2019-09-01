@@ -8,5 +8,4 @@ SVG icons are from: [Zondicons](http://www.zondicons.com/icons.html).
 
 ### Todo:
 
-- Fix Tooltip position above the buttons.
 - Add extension to the store.

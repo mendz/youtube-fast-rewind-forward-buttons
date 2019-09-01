@@ -25,8 +25,6 @@ function mouseEnter() {
   const tooltipContainer = textWrapper.parentNode;
   const textSpan = textWrapper.querySelector('span.ytp-tooltip-text');
 
-  console.log('this.offsetLeft:', this);
-  console.log('this.offsetLeft:', this.offsetLeft);
   // change values
   tooltipContainer.classList.add('ytp-tooltip');
   tooltipContainer.classList.add('ytp-bottom');
@@ -34,7 +32,7 @@ function mouseEnter() {
   tooltipContainer.style.display = 'block';
   tooltipContainer.style.maxWidth = '300px';
   tooltipContainer.style.top = '600px';
-  tooltipContainer.style.left = this.offsetLeft;
+  tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
   tooltipContainer.setAttribute('aria-hidden', false);
   textSpan.innerHTML = this.title;
 
