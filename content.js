@@ -10,6 +10,14 @@ function createButton({ svg, title }) {
   return button;
 }
 
+function simulateKey(keyCode) {
+  const event = new KeyboardEvent('keydown', {
+    keyCode,
+    which: keyCode,
+  });
+  document.dispatchEvent(event);
+}
+
 // handle click events
 function rewind({ seconds = 5, video }) {
   video.currentTime -= parseFloat(seconds);
