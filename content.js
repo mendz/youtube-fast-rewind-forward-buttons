@@ -35,13 +35,24 @@ function mouseEnter() {
   const tooltipContainer = textWrapper.parentNode;
   const textSpan = textWrapper.querySelector('span.ytp-tooltip-text');
 
+  // elements height for calculate the top of the button
+  const playerContainerHeight = document.querySelector('div#player-container')
+    .clientHeight;
+  const bottomControlsHeight = document.querySelector('div.ytp-chrome-bottom')
+    .clientHeight;
+  const buttonHeight = this.clientHeight;
+  const tooltipTopPosition =
+    playerContainerHeight - bottomControlsHeight - buttonHeight;
+
   // change values
   tooltipContainer.classList.add('ytp-tooltip');
   tooltipContainer.classList.add('ytp-bottom');
   tooltipContainer.classList.remove('ytp-preview');
+  tooltipContainer.classList.remove('ytp-text-detail');
+  tooltipContainer.classList.remove('ytp-has-duration');
   tooltipContainer.style.display = 'block';
   tooltipContainer.style.maxWidth = '300px';
-  tooltipContainer.style.top = '600px';
+  tooltipContainer.style.top = `${tooltipTopPosition}px`;
   tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
   tooltipContainer.setAttribute('aria-hidden', false);
   textSpan.innerHTML = this.title;
