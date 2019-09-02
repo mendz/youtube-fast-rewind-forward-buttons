@@ -20,11 +20,13 @@ function simulateKey(keyCode) {
 
 // handle click events
 function rewind({ seconds = 5, video }) {
-  video.currentTime -= parseFloat(seconds);
+  // video.currentTime -= parseFloat(seconds);
+  simulateKey(37);
 }
 
 function forward({ seconds = 5, video }) {
-  video.currentTime += parseFloat(seconds);
+  // video.currentTime += parseFloat(seconds);
+  simulateKey(39);
 }
 
 // handle mouse over events
