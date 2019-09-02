@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+/* global chrome */
 
 function createButton({ svg, title }) {
   const button = document.createElement('button');
@@ -132,3 +132,10 @@ if (document.readyState !== 'loading') {
   // modern browsers
   document.addEventListener('DOMContentLoaded', run);
 }
+
+// fire the function `run` every time that the URL changes under *"https://www.youtube.com/*"*
+chrome.runtime.onMessage.addListener(data => {
+  if (data.message === 'urlChanged') {
+    run();
+  }
+});
