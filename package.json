@@ -1,0 +1,44 @@
+{
+  "name": "youtube-rewind-and-forward-buttons",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.4.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-scripts": "3.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build-react": "react-scripts build",
+    "build-fix": "node scripts/replace-inline-script.js",
+    "build": "npm run build-react && npm run build-fix",
+    "zip-build": "node scripts/zip-build.js",
+    "update-ver": "node scripts/update-version.js",
+    "prod": "npm run build && npm run zip-build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "adm-zip": "^0.4.13",
+    "eslint-config-prettier": "^6.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "fs-extra": "^8.1.0",
+    "prettier": "^1.18.2"
+  }
+}
