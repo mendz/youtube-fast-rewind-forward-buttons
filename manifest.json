@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Youtube Fast Rewind & Forward Buttons",
   "description": "Add Fast Rewind & Forward buttons to videos player in Youtube",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "browser_action": {},
   "content_scripts": [
     {
