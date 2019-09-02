@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "short_name": "YouTube Rewind&Forward Buttons",
   "name": "YouTube Fast Rewind & Forward Buttons",
-  "description": "Add Fast Rewind & Forward buttons to videos player in YouTube site, same as the Left / Right arrow keys.",
+  "description": "Add Fast Rewind & Forward buttons to videos player in YouTube site",
   "version": "1.0.1",
   "browser_action": {},
   "content_scripts": [
