@@ -83,8 +83,8 @@ function run() {
 
   // check if there is no custom button already
   if (video && video.src && !customButton) {
-    const leftButtonsContainer = document.querySelector(
-      'div.ytp-left-controls'
+    const timeDisplay = document.querySelector(
+      'div.ytp-left-controls div.ytp-time-display'
     );
 
     const fastRewindButton = createButton({
@@ -120,8 +120,8 @@ function run() {
     fastForwardButton.addEventListener('mouseenter', mouseEnter);
     fastForwardButton.addEventListener('mouseleave', mouseLeave);
 
-    leftButtonsContainer.appendChild(fastRewindButton);
-    leftButtonsContainer.appendChild(fastForwardButton);
+    timeDisplay.insertAdjacentElement('afterend', fastForwardButton);
+    timeDisplay.insertAdjacentElement('afterend', fastRewindButton);
   }
 }
 
