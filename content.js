@@ -1,5 +1,8 @@
 /* global chrome */
 
+/**
+ * @param {{svg: string, title: string}} param0 
+ */
 function createButton({ svg, title }) {
   const button = document.createElement('button');
   button.classList.add('ytp-button');
@@ -10,6 +13,10 @@ function createButton({ svg, title }) {
   return button;
 }
 
+/**
+ * 
+ * @param {string} keyCode 
+ */
 function simulateKey(keyCode) {
   const event = new KeyboardEvent('keydown', {
     keyCode,
@@ -18,12 +25,19 @@ function simulateKey(keyCode) {
   document.dispatchEvent(event);
 }
 
-// handle click events
+/**
+ * handle click events
+ * @param {{ seconds: number, video: HTMLVideoElement }} param0 
+ */
 function rewind({ seconds = 5, video }) {
   // video.currentTime -= parseFloat(seconds);
   simulateKey(37);
 }
 
+/**
+ * handle click events
+ * @param {{ seconds: number, video: HTMLVideoElement }} param0 
+ */
 function forward({ seconds = 5, video }) {
   // video.currentTime += parseFloat(seconds);
   simulateKey(39);
@@ -82,10 +96,8 @@ function run() {
   );
 
   // check if there is no custom button already
-  if (video && video.src && !customButton) {
-    const timeDisplay = document.querySelector(
-      'div.ytp-left-controls div.ytp-time-display'
-    );
+  if (video?.src && !customButton) {
+    const nextButton = document.querySelector('div.ytp-left-controls a.ytp-next-button');
 
     const fastRewindButton = createButton({
       svg: `<svg
@@ -120,8 +132,8 @@ function run() {
     fastForwardButton.addEventListener('mouseenter', mouseEnter);
     fastForwardButton.addEventListener('mouseleave', mouseLeave);
 
-    timeDisplay.insertAdjacentElement('afterend', fastForwardButton);
-    timeDisplay.insertAdjacentElement('afterend', fastRewindButton);
+    nextButton.insertAdjacentElement('afterend', fastForwardButton);
+    nextButton.insertAdjacentElement('afterend', fastRewindButton);
   }
 }
 
