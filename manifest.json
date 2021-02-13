@@ -21,5 +21,6 @@
     "60": "icons/fast-forward-60.png",
     "128": "icons/fast-forward-128.png"
   },
-  "permissions": ["webNavigation"]
+  "permissions": ["webNavigation", "storage"],
+  "options_page": "options/options.html"
 }

@@ -1,0 +1,86 @@
+:root {
+  --white: #fff;
+  --black: #212529;
+  --blue: #0d6efd;
+  --dark-blue: #0a58ca;
+  --red: #dc3545;
+  --dark-red: #b02a37;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  text-align: center;
+  line-height: 1.5;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: var(--black);
+  background-color: #dfdbe5;
+  background-image: url('floating-cogs.svg');
+}
+
+button {
+  --color: var(--blue);
+  --active-color: var(--dark-blue);
+  cursor: pointer;
+  border: 1px solid;
+  background-color: var(--color);
+  border-color: var(--color);
+  color: var(--white);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+button:hover,
+button:focus,
+button:active {
+  background-color: var(--active-color);
+  border-color: var(--active-color);
+}
+
+button.danger {
+  --color: var(--red);
+  --active-color: var(--dark-red);
+}
+
+label {
+  user-select: none;
+}
+label input {
+  margin-left: 0.5rem;
+}
+
+input[type='checkbox'] {
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+  place-items: center;
+  height: 400px;
+}
+.container > * {
+  flex: 1;
+  place-content: center;
+  place-items: center;
+}
+.container label[for='override-keys'] {
+  cursor: pointer;
+}
+
+.seconds-change {
+  display: flex;
+  flex-direction: column;
+  place-content: space-evenly;
+  place-items: center;
+}
+
+.icon {
+  height: 1rem;
+}
