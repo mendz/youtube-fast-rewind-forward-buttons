@@ -56,6 +56,7 @@ function loadOptions() {
 }
 
 function resetToDefault() {
+  /* eslint-disable-next-line no-alert, no-restricted-globals */
   const result = confirm('Are you sure?');
   if (!result) {
     return;

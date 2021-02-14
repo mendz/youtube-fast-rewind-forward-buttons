@@ -1,0 +1,29 @@
+{
+  "name": "youtube-rewind-fastforward-buttons",
+  "version": "1.0.0",
+  "description": "Add Fast _Rewind_ & _Forward_ buttons to videos player in YouTube site, same as the Left / Right arrow keys.",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mendz/youtube-fast-rewind-forward-buttons.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues"
+  },
+  "homepage": "https://github.com/mendz/youtube-fast-rewind-forward-buttons#readme",
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1"
+  }
+}
