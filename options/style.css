@@ -81,6 +81,19 @@ input[type='checkbox'] {
   place-items: center;
 }
 
+.override-keys-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-container {
+  display: flex;
+}
+
+.button-container button:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
 .icon {
   height: 1rem;
 }
