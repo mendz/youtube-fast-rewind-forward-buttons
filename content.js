@@ -1,7 +1,16 @@
-/* global chrome */
+const ARROW_LEFT_KEY = 'ArrowLeft';
+const ARROW_RIGHT_KEY = 'ArrowRight';
+const UPDATE_TYPE = {
+  ARROW_LEFT_KEY,
+  ARROW_RIGHT_KEY,
+};
+const KEY_CODES = {
+  [ARROW_LEFT_KEY]: 37,
+  [ARROW_RIGHT_KEY]: 39,
+};
 
 /**
- * @param {{svg: string, title: string}} param0 
+ * @param {{svg: string, title: string}} param0
  */
 function createButton({ svg, title }) {
   const button = document.createElement('button');
@@ -14,33 +23,93 @@ function createButton({ svg, title }) {
 }
 
 /**
- * 
- * @param {string} keyCode 
+ * @param {string} key
  */
-function simulateKey(keyCode) {
+function simulateKey(key) {
   const event = new KeyboardEvent('keydown', {
-    keyCode,
-    which: keyCode,
+    key,
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    keyCode: KEY_CODES[key],
+    which: KEY_CODES[key],
   });
-  document.dispatchEvent(event);
+  const body = document.querySelector('body');
+  body.dispatchEvent(event);
 }
 
 /**
- * handle click events
- * @param {{ seconds: number, video: HTMLVideoElement }} param0 
+ * @param {string} updateType
+ * @param {{ rewindSeconds: number, forwardSeconds: number, shouldOverrideKeys: boolean, }} options
+ * @returns {number} seconds
  */
-function rewind({ seconds = 5, video }) {
-  // video.currentTime -= parseFloat(seconds);
-  simulateKey(37);
+function getSeconds(updateType, options) {
+  switch (updateType) {
+    case UPDATE_TYPE.ARROW_LEFT_KEY:
+      return options.rewindSeconds;
+    case UPDATE_TYPE.ARROW_RIGHT_KEY:
+      return options.forwardSeconds;
+    default:
+      return 5;
+  }
+}
+
+/* eslint-disable no-param-reassign */
+/**
+ * handle click events
+ * @param {{ seconds: number, video: HTMLVideoElement, updateType: string }} param0
+ */
+function updateVideoTime({ seconds, video, updateType }) {
+  if (updateType === UPDATE_TYPE.ARROW_LEFT_KEY) {
+    video.currentTime -= parseFloat(seconds);
+  } else if (updateType === UPDATE_TYPE.ARROW_RIGHT_KEY) {
+    video.currentTime += parseFloat(seconds);
+  }
+}
+/* eslint-enable no-param-reassign */
+
+function handleArrowButtons({ seconds, video, updateType }) {
+  if (seconds === 5) {
+    simulateKey(updateType);
+  } else {
+    updateVideoTime({ seconds, video, updateType });
+  }
 }
 
 /**
- * handle click events
- * @param {{ seconds: number, video: HTMLVideoElement }} param0 
+ * Checks:
+ * * The event key is part of the ArrowLeft / ArrowRight keys
+ * * For the correct event key if its 5 seconds or not
+ * @param {string} eventKey
+ * @param {{ rewindSeconds: number, forwardSeconds: number, shouldOverrideKeys: boolean, }} options
+ * @returns {boolean} boolean if should skip
  */
-function forward({ seconds = 5, video }) {
-  // video.currentTime += parseFloat(seconds);
-  simulateKey(39);
+function isShouldSkipOverrideKeys(eventKey, options) {
+  return (
+    ![UPDATE_TYPE.ARROW_LEFT_KEY, UPDATE_TYPE.ARROW_RIGHT_KEY].includes(
+      eventKey
+    ) ||
+    !options.shouldOverrideKeys ||
+    (eventKey === UPDATE_TYPE.ARROW_LEFT_KEY && options.rewindSeconds === 5) ||
+    (eventKey === UPDATE_TYPE.ARROW_RIGHT_KEY && options.forwardSeconds === 5)
+  );
+}
+/**
+ *
+ * @param {KeyboardEvent} event
+ * @param {{ rewindSeconds: number, forwardSeconds: number, shouldOverrideKeys: boolean, }} options
+ * @param {HTMLVideoElement} video
+ */
+function overrideArrowKeys(event, options, video) {
+  if (isShouldSkipOverrideKeys(event.key, options)) {
+    return;
+  }
+  event.preventDefault();
+  updateVideoTime({
+    seconds: getSeconds(event.key, options),
+    video,
+    updateType: event.key,
+  });
 }
 
 // handle mouse over events
@@ -89,18 +158,45 @@ function mouseLeave() {
   this.title = title;
 }
 
-function run() {
-  const video = document.querySelector('video');
-  const customButton = document.querySelector(
-    'button.custom-rewind-forward-buttons'
-  );
+function loadOptions() {
+  return new Promise((resolve, reject) => {
+    const options = {
+      rewindSeconds: 5,
+      forwardSeconds: 5,
+      shouldOverrideKeys: false,
+    };
+    chrome.storage.sync.get(Object.keys(options), (loadedOptions) => {
+      const error = chrome.runtime.lastError;
+      if (error) {
+        console.error(error);
+        reject(options);
+      }
+      Object.keys(loadedOptions ?? []).forEach((optionsKey) => {
+        options[optionsKey] = loadedOptions[optionsKey] ?? options[optionsKey];
+        const numberSeconds = parseInt(options[optionsKey], 10);
+        if (!Number.isNaN(numberSeconds)) {
+          options[optionsKey] = numberSeconds;
+        }
+      });
+      resolve(options);
+    });
+  });
+}
 
-  // check if there is no custom button already
-  if (video?.src && !customButton) {
-    const nextButton = document.querySelector('div.ytp-left-controls a.ytp-next-button');
+/**
+ *
+ * @param {{ rewindSeconds: number, forwardSeconds: number, shouldOverrideKeys: boolean, }} options
+ * @param {HTMLVideoElement} video
+ */
+function getButtons(options, video) {
+  const { shouldOverrideKeys, rewindSeconds, forwardSeconds } = options;
+  const leftArrowTitle =
+    shouldOverrideKeys || rewindSeconds === 5 ? ' (left arrow)' : '';
+  const rightArrowTitle =
+    shouldOverrideKeys || forwardSeconds === 5 ? ' (right arrow)' : '';
 
-    const fastRewindButton = createButton({
-      svg: `<svg
+  const fastRewindButton = createButton({
+    svg: `<svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 20 20"
   height="100%"
@@ -109,10 +205,10 @@ function run() {
   <path class="ytp-svg-fill" d="M19 5v10l-9-5 9-5zm-9 0v10l-9-5 9-5z" />
 </svg>
 `,
-      title: 'Go back 5 seconds (left arrow)',
-    });
-    const fastForwardButton = createButton({
-      svg: `<svg
+    title: `Go back ${rewindSeconds} seconds${leftArrowTitle}`,
+  });
+  const fastForwardButton = createButton({
+    svg: `<svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 20 20"
   fill="white"
@@ -122,18 +218,54 @@ function run() {
   <path class="ytp-svg-fill" d="M1 5l9 5-9 5V5zm9 0l9 5-9 5V5z" />
 </svg>
 `,
-      title: 'Go forward 5 seconds (right arrow)',
-    });
+    title: `Go forward ${forwardSeconds} seconds${rightArrowTitle}`,
+  });
 
-    fastRewindButton.addEventListener('click', () => rewind({ video }));
-    fastForwardButton.addEventListener('click', () => forward({ video }));
-    fastRewindButton.addEventListener('mouseenter', mouseEnter);
-    fastRewindButton.addEventListener('mouseleave', mouseLeave);
-    fastForwardButton.addEventListener('mouseenter', mouseEnter);
-    fastForwardButton.addEventListener('mouseleave', mouseLeave);
+  // add events listener
+  fastRewindButton.addEventListener('click', () =>
+    handleArrowButtons({
+      video,
+      seconds: options.rewindSeconds,
+      updateType: UPDATE_TYPE.ARROW_LEFT_KEY,
+    })
+  );
+  fastForwardButton.addEventListener('click', () =>
+    handleArrowButtons({
+      video,
+      seconds: options.forwardSeconds,
+      updateType: UPDATE_TYPE.ARROW_RIGHT_KEY,
+    })
+  );
+  fastRewindButton.addEventListener('mouseenter', mouseEnter);
+  fastRewindButton.addEventListener('mouseleave', mouseLeave);
+  fastForwardButton.addEventListener('mouseenter', mouseEnter);
+  fastForwardButton.addEventListener('mouseleave', mouseLeave);
+
+  return { fastRewindButton, fastForwardButton };
+}
+
+async function run() {
+  const options = await loadOptions();
+  const video = document.querySelector('video');
+  const customButton = document.querySelector(
+    'button.custom-rewind-forward-buttons'
+  );
+
+  // check if there is no custom button already
+  if (video?.src && !customButton) {
+    const nextButton = document.querySelector(
+      'div.ytp-left-controls a.ytp-next-button'
+    );
+
+    const { fastRewindButton, fastForwardButton } = getButtons(options, video);
 
     nextButton.insertAdjacentElement('afterend', fastForwardButton);
     nextButton.insertAdjacentElement('afterend', fastRewindButton);
+    document.addEventListener(
+      'keydown',
+      (event) => overrideArrowKeys(event, options, video),
+      { capture: true }
+    );
   }
 }
 
@@ -146,7 +278,7 @@ if (document.readyState !== 'loading') {
 }
 
 // fire the function `run` every time that the URL changes under *"https://www.youtube.com/*"*
-chrome.runtime.onMessage.addListener(data => {
+chrome.runtime.onMessage.addListener((data) => {
   if (data.message === 'urlChanged') {
     run();
   }
