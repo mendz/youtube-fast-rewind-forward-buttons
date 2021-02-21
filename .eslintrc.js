@@ -14,6 +14,7 @@ module.exports = {
   rules: {
     semi: 2,
     'no-console': 0,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'prettier/prettier': [
       'error',
       {
