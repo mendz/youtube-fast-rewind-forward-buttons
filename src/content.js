@@ -187,8 +187,9 @@ function loadOptions() {
  *
  * @param {{ rewindSeconds: number, forwardSeconds: number, shouldOverrideKeys: boolean, }} options
  * @param {HTMLVideoElement} video
+ * @param {{svgClasses: string[], pathClasses: string[], useHtml: string}} extraStyles
  */
-function getButtons(options, video) {
+function getButtons(options, video, extraStyles) {
   const { shouldOverrideKeys, rewindSeconds, forwardSeconds } = options;
   const leftArrowTitle =
     shouldOverrideKeys || rewindSeconds === 5 ? ' (left arrow)' : '';
@@ -196,27 +197,34 @@ function getButtons(options, video) {
     shouldOverrideKeys || forwardSeconds === 5 ? ' (right arrow)' : '';
 
   const fastRewindButton = createButton({
-    svg: `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 20 20"
-  height="100%"
-  width="80%"
->
-  <path class="ytp-svg-fill" d="M19 5v10l-9-5 9-5zm-9 0v10l-9-5 9-5z" />
-</svg>
+    svg: `
+    <svg class="${
+      extraStyles.svgClasses
+    }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      ${extraStyles.useHtml.replace(
+        /xlink:href="#.*"/,
+        'xlink:href="#custom-path-rewind"'
+      )}
+      <path class="${
+        extraStyles.pathClasses
+      }" id="custom-path-rewind" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
+    </svg>
 `,
     title: `Go back ${rewindSeconds} seconds${leftArrowTitle}`,
   });
   const fastForwardButton = createButton({
-    svg: `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 20 20"
-  fill="white"
-  height="100%"
-  width="80%"
->
-  <path class="ytp-svg-fill" d="M1 5l9 5-9 5V5zm9 0l9 5-9 5V5z" />
-</svg>
+    svg: `
+    <svg class="${
+      extraStyles.svgClasses
+    }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    ${extraStyles.useHtml.replace(
+      /xlink:href="#.*"/,
+      'xlink:href="#custom-path-fast-forward"'
+    )}
+      <path class="${
+        extraStyles.pathClasses
+      }" id="custom-path-fast-forward" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+    </svg>
 `,
     title: `Go forward ${forwardSeconds} seconds${rightArrowTitle}`,
   });
@@ -256,8 +264,18 @@ async function run() {
     const nextButton = document.querySelector(
       'div.ytp-left-controls a.ytp-next-button'
     );
-
-    const { fastRewindButton, fastForwardButton } = getButtons(options, video);
+    const svgClasses = [...(nextButton.querySelector('svg').classList ?? [])];
+    const pathClasses = [
+      ...(nextButton.querySelector('svg').querySelector('path').classList ??
+        []),
+    ];
+    const useHtml =
+      nextButton.querySelector('svg').querySelector('use').outerHTML ?? '';
+    const { fastRewindButton, fastForwardButton } = getButtons(options, video, {
+      svgClasses,
+      pathClasses,
+      useHtml,
+    });
 
     nextButton.insertAdjacentElement('afterend', fastForwardButton);
     nextButton.insertAdjacentElement('afterend', fastRewindButton);
