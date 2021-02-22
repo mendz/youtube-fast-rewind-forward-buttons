@@ -11,5 +11,5 @@ On the options page you can: 
 
 SVG icons are from: [Heroicons](https://heroicons.dev/).
 
-![Screenshot](./screenshots/screenshot-1400x560.png "screenshot of options & arrows")
+![Options Page & Rewind Fast Forward buttons](./screenshots/screenshot-1400x560.png "Options Page & Rewind Fast Forward buttons")
 
