@@ -96,4 +96,5 @@ input[type='checkbox'] {
 
 .icon {
   height: 1rem;
+  vertical-align: text-top;
 }
