@@ -8,6 +8,7 @@ const KEY_CODES = {
   [ARROW_LEFT_KEY]: 37,
   [ARROW_RIGHT_KEY]: 39,
 };
+const BUTTON_CLASS = `ml-custom-rewind-forward-buttons`;
 
 /**
  * @param {{svg: string, title: string}} param0
@@ -15,7 +16,7 @@ const KEY_CODES = {
 function createButton({ svg, title }) {
   const button = document.createElement('button');
   button.classList.add('ytp-button');
-  button.classList.add('custom-rewind-forward-buttons');
+  button.classList.add(BUTTON_CLASS);
   button.innerHTML = svg;
   button.title = title;
   button.setAttribute('aria-label', title);
@@ -200,7 +201,7 @@ function getButtons(options, video, extraStyles) {
     svg: `
     <svg class="${
       extraStyles.svgClasses
-    }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    }" height="100%" width="100%" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       ${extraStyles.useHtml.replace(
         /xlink:href="#.*"/,
         'xlink:href="#custom-path-rewind"'
@@ -216,7 +217,7 @@ function getButtons(options, video, extraStyles) {
     svg: `
     <svg class="${
       extraStyles.svgClasses
-    }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    }" height="100%" width="100%" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     ${extraStyles.useHtml.replace(
       /xlink:href="#.*"/,
       'xlink:href="#custom-path-fast-forward"'
@@ -255,9 +256,7 @@ function getButtons(options, video, extraStyles) {
 async function run() {
   const options = await loadOptions();
   const video = document.querySelector('video');
-  const customButton = document.querySelector(
-    'button.custom-rewind-forward-buttons'
-  );
+  const customButton = document.querySelector(`button.${BUTTON_CLASS}`);
 
   // check if there is no custom button already
   if (video?.src && !customButton) {
