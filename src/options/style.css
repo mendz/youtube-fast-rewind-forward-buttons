@@ -88,10 +88,7 @@ input[type='checkbox'] {
 
 .button-container {
   display: flex;
-}
-
-.button-container button:not(:last-child) {
-  margin-right: 0.5rem;
+  flex-direction: column;
 }
 
 .icon {

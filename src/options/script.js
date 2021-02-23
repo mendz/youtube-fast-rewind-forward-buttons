@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .querySelector('form.container button[type="submit"]')
     .addEventListener('click', submit);
   document
-    .querySelector('form.container button#reset-values')
+    .querySelector('button#reset-values')
     .addEventListener('click', resetToDefault);
   loadOptions();
 });
