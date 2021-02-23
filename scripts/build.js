@@ -3,53 +3,48 @@ const AdmZip = require('adm-zip');
 
 const zip = new AdmZip();
 
-const files = [
-  'src/manifest.json',
-  'src/background.js',
-  'src/content.js',
-  'src/content-styles.css',
-];
-const folders = ['src/icons', 'src/options'];
+const path = 'src';
 const destZipPath = './build/youtube-rewind-fastforward-buttons.zip';
 
-if (fs.existsSync(destZipPath)) {
-  console.log(`
+function run() {
+  if (fs.existsSync(destZipPath)) {
+    console.info(`
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
               BUILD CLEANING
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `);
-  fs.unlinkSync(destZipPath);
-  console.log(`'${destZipPath}' was deleted`);
-}
+    fs.unlinkSync(destZipPath);
+    console.info(`'${destZipPath}' was deleted`);
+  }
 
-console.log(`
+  console.info(`
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              ZIP FILES
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`);
-
-files.forEach((file) => {
-  console.log(`'${file}'`);
-  zip.addLocalFile(file);
-});
-
-console.log(`
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              ZIP FOLDERS
+                ZIPPING...
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `);
 
-folders.forEach((folder) => {
-  console.log(`'${folder}'`);
-  zip.addLocalFolder(folder, 'icons');
-});
+  zip.addLocalFolder(path);
 
-zip.writeZip(destZipPath, () =>
-  console.log(`
+  zip.writeZip(destZipPath, () =>
+    console.info(`
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                   DONE!
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   OUTPUT: '${destZipPath}'
 `)
-);
+  );
+}
+try {
+  run();
+} catch (error) {
+  console.error(
+    '\x1b[33m%s\x1b[0m',
+    `
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                 ERROR!
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ${error.stack}
+`
+  );
+}
