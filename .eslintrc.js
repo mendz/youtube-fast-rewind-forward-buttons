@@ -16,7 +16,7 @@ module.exports = {
     'no-console': 0,
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'prettier/prettier': [
-      'error',
+      0,
       {
         trailingComma: 'es5',
         singleQuote: true,

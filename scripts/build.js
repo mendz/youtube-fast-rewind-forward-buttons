@@ -3,7 +3,12 @@ const AdmZip = require('adm-zip');
 
 const zip = new AdmZip();
 
-const files = ['src/manifest.json', 'src/background.js', 'src/content.js'];
+const files = [
+  'src/manifest.json',
+  'src/background.js',
+  'src/content.js',
+  'src/content-styles.css',
+];
 const folders = ['src/icons', 'src/options'];
 const destZipPath = './build/youtube-rewind-fastforward-buttons.zip';
 
