@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <title>YouTube Rewind & Fast Forward Buttons - Options Page</title>
+  </head>
+  <body>
+    <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    <button type="button" class="danger" id="reset-values">
+      Reset input values to default
+    </button>
+    <form class="container">
+      <div class="seconds-change">
+        <label for="rewind"
+          >Rewind seconds (between 1 and 60):
+          <input
+            type="number"
+            id="rewind"
+            name="rewind"
+            min="1"
+            max="60"
+            value="5"
+          />
+        </label>
+        <label for="forward"
+          >Forward seconds (between 1 and 60):
+          <input
+            type="number"
+            id="forward"
+            name="forward"
+            min="1"
+            max="60"
+            value="5"
+          />
+        </label>
+      </div>
+      <div class="override-keys-container">
+        <p>
+          <svg
+            id="information"
+            class="icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            aria-labelledby="informationTitle"
+            role="img"
+          >
+            <title id="informationTitle">Information</title>
+            <path
+              d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zM9 11v4h2V9H9v2zm0-6v2h2V5H9z"
+            />
+          </svg>
+          As a default, the arrow keys rewind (left arrow) & forward (right
+          arrow) are set to <strong>5 seconds</strong>.
+        </p>
+        <label for="override-keys">
+          Should the options above override the native arrow keys seconds?
+          <input type="checkbox" name="override-keys" id="override-keys"
+        /></label>
+      </div>
+      <div class="button-container">
+        <button type="submit">Save and close</button>
+        <p>
+          <svg
+            id="information"
+            class="icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            aria-labelledby="informationTitle"
+            role="img"
+          >
+            <title id="informationTitle">Information</title>
+            <path
+              d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zM9 11v4h2V9H9v2zm0-6v2h2V5H9z"
+            />
+          </svg>
+          After saving please reload the YouTube page in order for
+          the changes to take effect.
+        </p>
+      </div>
+    </form>
+    <script src="script.js"></script>
+  </body>
+</html>

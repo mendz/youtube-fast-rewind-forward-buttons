@@ -1,8 +1,15 @@
-# YouTube Fast Rewind & Forward Buttons
+# YouTube Rewind & Fast Forward Buttons
 
-Add Fast _Rewind_ & _Forward_ buttons to videos player in YouTube site, same as the Left / Right arrow keys.
+Add _Rewind_ & _Fast Forward_ buttons to videos player on YouTube site.
 
-SVG icons are from: [Zondicons](http://www.zondicons.com/icons.html).
+As a default, they are the same as the Left / Right arrow keys. 5 seconds each.
 
-![Screenshot](./screenshots/screebshots-920x680.png "Screenshot")
+On the options page you can: 
+
+1. Change the seconds for each button individually. 
+2. Set to override the arrow keys to update the video time with the same seconds as in the  _Rewind_ & _Fast Forward_ buttons. (default is not to override)
+
+SVG icons are from: [Heroicons](https://heroicons.dev/).
+
+![Options Page & Rewind Fast Forward buttons](./screenshots/screenshot-1400x560.png "Options Page & Rewind Fast Forward buttons")
 
