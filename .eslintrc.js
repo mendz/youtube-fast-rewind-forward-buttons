@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['airbnb/base', 'prettier'],
+  extends: ['airbnb/base', 'prettier', 'plugin:sonarjs/recommended'],
   parserOptions: {
     ecmaVersion: 2020,
     ecmaFeatures: {
@@ -28,5 +28,5 @@ module.exports = {
   globals: {
     chrome: true,
   },
-  plugins: ['html', 'prettier'],
+  plugins: ['html', 'prettier', 'sonarjs'],
 };
