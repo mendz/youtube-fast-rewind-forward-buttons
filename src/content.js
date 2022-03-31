@@ -120,10 +120,12 @@ function mouseEnter() {
   const textSpan = textWrapper.querySelector('span.ytp-tooltip-text');
 
   // elements height for calculate the top of the button
-  const playerContainerHeight = document.querySelector('div#player-container')
-    .clientHeight;
-  const bottomControlsHeight = document.querySelector('div.ytp-chrome-bottom')
-    .clientHeight;
+  const playerContainerHeight = document.querySelector(
+    'div#player-container'
+  ).clientHeight;
+  const bottomControlsHeight = document.querySelector(
+    'div.ytp-chrome-bottom'
+  ).clientHeight;
   const buttonHeight = this.clientHeight;
   const tooltipTopPosition =
     playerContainerHeight - bottomControlsHeight - buttonHeight;
@@ -293,10 +295,3 @@ if (document.readyState !== 'loading') {
   // modern browsers
   document.addEventListener('DOMContentLoaded', run);
 }
-
-// fire the function `run` every time that the URL changes under *"https://www.youtube.com/*"*
-chrome.runtime.onMessage.addListener((data) => {
-  if (data.message === 'urlChanged') {
-    run();
-  }
-});

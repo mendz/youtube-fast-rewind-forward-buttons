@@ -1,10 +1,9 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "short_name": "YouTube Rewind&Forward Buttons",
   "name": "YouTube Rewind & Fast Forward Buttons",
   "description": "Add Rewind & Fast Forward buttons to videos player in a YouTube site",
   "version": "1.1.0",
-  "browser_action": {},
   "content_scripts": [
     {
       "matches": [
@@ -18,11 +17,6 @@
       ]
     }
   ],
-  "background": {
-    "scripts": [
-      "background.js"
-    ]
-  },
   "icons": {
     "16": "icons/fast-forward-16.png",
     "32": "icons/fast-forward-32.png",
