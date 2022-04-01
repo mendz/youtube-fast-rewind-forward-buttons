@@ -3,3 +3,6 @@ node_modules
 build
 .vscode
 .eslintcache
+
+# *.js files under src folder
+src/**/*.js

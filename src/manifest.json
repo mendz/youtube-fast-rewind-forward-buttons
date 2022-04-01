@@ -10,11 +10,12 @@
         "https://www.youtube.com/*"
       ],
       "js": [
-        "content.js"
+        "content/content.js"
       ],
       "css": [
-        "content-styles.css"
-      ]
+        "content/content-styles.css"
+      ],
+      "run_at": "document_idle"
     }
   ],
   "icons": {
@@ -28,5 +29,15 @@
     "webNavigation",
     "storage"
   ],
-  "options_page": "options/options.html"
+  "options_page": "options/options.html",
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "resources": [
+        "content/content.ts"
+      ]
+    }
+  ]
 }
