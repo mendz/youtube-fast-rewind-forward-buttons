@@ -80,7 +80,6 @@ function getSeconds(updateType: string, options: IOptions): number {
   }
 }
 
-// TODO: need to check now without the parseFloat
 function updateVideoTime({ seconds, video, updateType }: VideoTimeArg): void {
   if (updateType === ArrowKey.ARROW_LEFT_KEY) {
     video.currentTime -= seconds;
@@ -171,28 +170,19 @@ function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
 
   // elements height for calculate the top of the button
   const mainPlayerContainer: Nullable<Element> =
-    [...document.querySelectorAll('div#player-container')].find(
-      (container: Element): boolean =>
-        container.classList.contains('ytd-watch-flexy')
-    ) ?? null;
-  const firstPlayerContainer: Nullable<Element> = document.querySelector(
-    'div#player-container'
-  );
+    document.querySelector('ytd-player');
 
-  if (!mainPlayerContainer && !firstPlayerContainer) {
+  if (!mainPlayerContainer) {
     console.error(`Couldn't find player container`);
     return;
   }
 
-  const playerContainerHeight: number =
-    mainPlayerContainer?.clientHeight ??
-    firstPlayerContainer?.clientHeight ??
-    0;
+  const playerContainerHeight: number = mainPlayerContainer.clientHeight;
   const bottomControlsHeight: number =
     document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
   const buttonHeight: number = this.clientHeight;
   const tooltipTopPosition: number =
-    playerContainerHeight - bottomControlsHeight - buttonHeight;
+    playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
 
   // change values to show  the tooltip
   tooltipContainer.classList.add('ytp-tooltip');
@@ -200,10 +190,10 @@ function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
   tooltipContainer.classList.remove('ytp-preview');
   tooltipContainer.classList.remove('ytp-text-detail');
   tooltipContainer.classList.remove('ytp-has-duration');
-  tooltipContainer.style.display = 'block';
   tooltipContainer.style.maxWidth = '300px';
   tooltipContainer.style.top = `${tooltipTopPosition}px`;
   tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
+  tooltipContainer.style.display = 'block';
   tooltipContainer.setAttribute('aria-hidden', 'false');
   textSpan.innerHTML = this.title;
 
