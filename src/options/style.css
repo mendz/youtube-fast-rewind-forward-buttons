@@ -89,6 +89,7 @@ input[type='checkbox'] {
 .button-container {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
 }
 
 .icon {

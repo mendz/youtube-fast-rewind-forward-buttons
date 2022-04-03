@@ -6,6 +6,7 @@ enum ArrowKey {
 type CreateButtonArg = {
   svg: string;
   title: string;
+  id?: string;
 };
 
 type VideoTimeArg = {
@@ -30,15 +31,24 @@ const ALL_KEY_CODES: ArrowKey[] = [
   ArrowKey.ARROW_RIGHT_KEY,
 ];
 
-const BUTTON_CLASS = `ml-custom-rewind-forward-buttons`;
+enum ButtonClassesIds {
+  CLASS = `ml-custom-rewind-forward-buttons`,
+  REWIND_ID = 'ml-custom-rewind-button',
+  FORWARD_ID = 'ml-custom-forward-button',
+}
 
-function createButton({ svg, title }: CreateButtonArg): HTMLButtonElement {
+let loadedOptions: IOptions;
+
+function createButton({ svg, title, id }: CreateButtonArg): HTMLButtonElement {
   const button: HTMLButtonElement = document.createElement('button');
   button.classList.add('ytp-button');
-  button.classList.add(BUTTON_CLASS);
+  button.classList.add(ButtonClassesIds.CLASS);
   button.innerHTML = svg;
   button.title = title;
   button.setAttribute('aria-label', title);
+  if (id) {
+    button.id = id;
+  }
   return button;
 }
 
@@ -280,6 +290,24 @@ function getFastForwardSVG(
 `;
 }
 
+function getRewindButtonTitle(
+  seconds: number,
+  shouldOverrideKeys: boolean
+): string {
+  const title: string =
+    shouldOverrideKeys || seconds === 5 ? ' (left arrow)' : '';
+  return `Go back ${seconds} seconds${title}`;
+}
+
+function getForwardButtonTitle(
+  seconds: number,
+  shouldOverrideKeys: boolean
+): string {
+  const title: string =
+    shouldOverrideKeys || seconds === 5 ? ' (right arrow)' : '';
+  return `Go forward ${seconds} seconds${title}`;
+}
+
 function getButtons(
   options: IOptions,
   video: HTMLVideoElement,
@@ -291,34 +319,30 @@ function getButtons(
   const { shouldOverrideKeys, rewindSeconds, forwardSeconds } = options;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
-  // set buttons title (tooltip)
-  const leftArrowTitle: string =
-    shouldOverrideKeys || rewindSeconds === 5 ? ' (left arrow)' : '';
-  const rightArrowTitle: string =
-    shouldOverrideKeys || forwardSeconds === 5 ? ' (right arrow)' : '';
-
   // set the buttons
   const fastRewindButton: HTMLButtonElement = createButton({
     svg: getFastRewindSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: `Go back ${rewindSeconds} seconds${leftArrowTitle}`,
+    title: getRewindButtonTitle(rewindSeconds, shouldOverrideKeys),
+    id: ButtonClassesIds.REWIND_ID,
   });
   const fastForwardButton: HTMLButtonElement = createButton({
     svg: getFastForwardSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: `Go forward ${forwardSeconds} seconds${rightArrowTitle}`,
+    title: getForwardButtonTitle(forwardSeconds, shouldOverrideKeys),
+    id: ButtonClassesIds.FORWARD_ID,
   });
 
   // add events listener
   fastRewindButton.addEventListener('click', () =>
     handleArrowButtons({
       video,
-      seconds: options.rewindSeconds,
+      seconds: loadedOptions.rewindSeconds,
       updateType: ArrowKey.ARROW_LEFT_KEY,
     })
   );
   fastForwardButton.addEventListener('click', () =>
     handleArrowButtons({
       video,
-      seconds: options.forwardSeconds,
+      seconds: loadedOptions.forwardSeconds,
       updateType: ArrowKey.ARROW_RIGHT_KEY,
     })
   );
@@ -332,9 +356,10 @@ function getButtons(
 
 async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
+  loadedOptions = { ...options };
   const video: Nullable<HTMLVideoElement> = document.querySelector('video');
   const customButton: HTMLButtonElement | null = document.querySelector(
-    `button.${BUTTON_CLASS}`
+    `button.${ButtonClassesIds.CLASS}`
   );
 
   // check if there is no custom button already
@@ -359,21 +384,65 @@ async function run(): Promise<void> {
       playerNextButton.querySelector('svg')?.querySelector('use')?.outerHTML ??
       '';
 
-    const { fastRewindButton, fastForwardButton } = getButtons(options, video, {
-      svgClasses,
-      svgPathClasses,
-      svgUseHtml,
-    });
+    const { fastRewindButton, fastForwardButton } = getButtons(
+      loadedOptions,
+      video,
+      {
+        svgClasses,
+        svgPathClasses,
+        svgUseHtml,
+      }
+    );
 
     // add the buttons to the player
     playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
     playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
     document.addEventListener(
       'keydown',
-      (event) => overrideArrowKeys(event, options, video),
+      (event) => overrideArrowKeys(event, loadedOptions, video),
       { capture: true }
     );
   }
 }
+
+function updateButtons(newOptions: IOptions): void {
+  const { forwardSeconds, rewindSeconds, shouldOverrideKeys } = newOptions;
+  // set the buttons titles
+  const rewindButton = document.querySelector(
+    `button#${ButtonClassesIds.REWIND_ID}`
+  ) as HTMLButtonElement;
+  const forwardButton = document.querySelector(
+    `button#${ButtonClassesIds.FORWARD_ID}`
+  ) as HTMLButtonElement;
+
+  rewindButton.title = getRewindButtonTitle(rewindSeconds, shouldOverrideKeys);
+  forwardButton.title = getForwardButtonTitle(
+    forwardSeconds,
+    shouldOverrideKeys
+  );
+}
+
+chrome.storage.onChanged.addListener(
+  (changes: { [key: string]: chrome.storage.StorageChange }): void => {
+    const changeForwardSeconds: Nullable<number> = changes['forwardSeconds']
+      ?.newValue
+      ? parseInt(changes['forwardSeconds'].newValue, 10)
+      : null;
+    const changeRewindSeconds: Nullable<number> = changes['rewindSeconds']
+      ?.newValue
+      ? parseInt(changes['rewindSeconds'].newValue, 10)
+      : null;
+
+    const newOptions: IOptions = {
+      forwardSeconds: changeForwardSeconds ?? loadedOptions.forwardSeconds,
+      rewindSeconds: changeRewindSeconds ?? loadedOptions.rewindSeconds,
+      shouldOverrideKeys:
+        changes['shouldOverrideKeys']?.newValue ??
+        loadedOptions.shouldOverrideKeys,
+    };
+    loadedOptions = { ...newOptions };
+    updateButtons(newOptions);
+  }
+);
 
 run();
