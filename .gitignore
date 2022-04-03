@@ -1,8 +1,11 @@
 *.zip
 node_modules
 build
-.vscode
 .eslintcache
 
 # *.js files under src folder
 src/**/*.js
+
+!.vscode
+.vscode/*
+!.vscode/tasks.json

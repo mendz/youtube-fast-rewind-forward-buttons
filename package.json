@@ -10,7 +10,8 @@
     "build": "npm run ts:build:prod && node scripts/build.js",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
-    "prettier": "prettier ."
+    "prettier": "prettier .",
+    "updateVersion": "node ./scripts/updateVersion.js"
   },
   "repository": {
     "type": "git",
