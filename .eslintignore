@@ -1,0 +1,2 @@
+# *.js files under src folder
+src/**/*.js

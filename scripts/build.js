@@ -6,6 +6,15 @@ const zip = new AdmZip();
 const path = 'src';
 const destZipPath = './build/youtube-rewind-fastforward-buttons.zip';
 
+/**
+ * @param {string} filename
+ * @returns {boolean}
+ */
+function isTsFile(filename) {
+  const regexTsFiles = /.*\.ts/g;
+  return regexTsFiles.test(filename);
+}
+
 function run() {
   if (fs.existsSync(destZipPath)) {
     console.info(`
@@ -22,8 +31,7 @@ function run() {
                 ZIPPING...
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `);
-
-  zip.addLocalFolder(path);
+  zip.addLocalFolder(path, '', (filename) => !isTsFile(filename));
 
   zip.writeZip(destZipPath, () =>
     console.info(`

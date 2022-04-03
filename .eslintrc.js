@@ -1,5 +1,12 @@
 module.exports = {
-  extends: ['airbnb/base', 'prettier', 'plugin:sonarjs/recommended'],
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:sonarjs/recommended',
+  ],
+  plugins: ['@typescript-eslint', 'html', 'prettier', 'sonarjs'],
   parserOptions: {
     ecmaVersion: 2020,
     ecmaFeatures: {
@@ -12,13 +19,14 @@ module.exports = {
     es6: true,
   },
   rules: {
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     semi: 2,
     'no-console': 0,
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'prettier/prettier': [
       0,
       {
-        trailingComma: 'es5',
+        trailingComma: 'es6',
         singleQuote: true,
         printWidth: 80,
         endOfLine: 'auto',
@@ -28,5 +36,4 @@ module.exports = {
   globals: {
     chrome: true,
   },
-  plugins: ['html', 'prettier', 'sonarjs'],
 };
