@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Update Version",
+      "detail": "Update the extension version",
+      "type": "shell",
+      "command": "npm run updateVersion '${input:udpateVersion}'",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "udpateVersion",
+      "description": "Enter the new version you wish to update to"
+    }
+  ]
+}
