@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/mendz/youtube-fast-rewind-forward-buttons#readme",
   "devDependencies": {
+    "@types/chrome": "^0.0.180",
     "adm-zip": "^0.5.9",
     "eslint": "^8.12.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -27,6 +28,7 @@
     "eslint-plugin-html": "^6.1.1",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-sonarjs": "^0.13.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
     "prettier": "^2.6.1"
