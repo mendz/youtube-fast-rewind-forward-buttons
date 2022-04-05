@@ -1,0 +1,39 @@
+{
+    "types": [
+        {
+            "type": "feat",
+            "section": "Features"
+        },
+        {
+            "type": "fix",
+            "section": "Bug Fixes"
+        },
+        {
+            "type": "chore",
+            "section": "Chore",
+            "hidden": false
+        },
+        {
+            "type": "docs",
+            "hidden": false
+        },
+        {
+            "type": "style",
+            "hidden": true
+        },
+        {
+            "type": "refactor",
+            "hidden": true
+        },
+        {
+            "type": "perf",
+            "hidden": true
+        },
+        {
+            "type": "test",
+            "hidden": true
+        }
+    ],
+    "commitUrlFormat": "https://github.com/mendz/youtube-fast-rewind-forward-buttons/commits/{{hash}}",
+    "compareUrlFormat": "https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/{{previousTag}}...{{currentTag}}"
+}
