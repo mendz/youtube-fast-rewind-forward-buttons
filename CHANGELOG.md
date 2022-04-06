@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **typeScript:** Move to TypeScript ([#8](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/8)) ([7699768](https://github.com/mendz/youtube-fast-rewind-forward-buttons/commits/76997683c122be8f6f0b9c6cd973cc077d4a5d29))
 * **update-options:** Listen to changed options and updated the rewind and forward buttons ([#9](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/9)) ([f962f53](https://github.com/mendz/youtube-fast-rewind-forward-buttons/commits/f962f531b3b58e902dddaf39c7cd990e993a72cb))
 * **update-version:** Add script to update the version ([#10](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/10)) ([e8268bb](https://github.com/mendz/youtube-fast-rewind-forward-buttons/commits/e8268bb2220072c1d28f82aaa058f35705204f93))
+* **changelog:** Add standard-version to generate changelogs ([#14](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/14)) ([f7ae045](https://github.com/mendz/youtube-fast-rewind-forward-buttons/commits/f7ae045d3cb2a43457ed9e2ba23c6e2e6de858d0))
 
 
 ### Bug Fixes
