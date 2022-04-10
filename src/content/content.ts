@@ -21,7 +21,7 @@ type ButtonExtraStylesArg = {
   svgUseHtml: string;
 };
 
-const KEY_CODES: { [key in ArrowKey]: number } = {
+export const KEY_CODES: { [key in ArrowKey]: number } = {
   [ArrowKey.ARROW_LEFT_KEY]: 37,
   [ArrowKey.ARROW_RIGHT_KEY]: 39,
 };
@@ -31,7 +31,7 @@ const ALL_KEY_CODES: ArrowKey[] = [
   ArrowKey.ARROW_RIGHT_KEY,
 ];
 
-enum ButtonClassesIds {
+export enum ButtonClassesIds {
   CLASS = `ml-custom-rewind-forward-buttons`,
   REWIND_ID = 'ml-custom-rewind-button',
   FORWARD_ID = 'ml-custom-forward-button',
@@ -39,7 +39,11 @@ enum ButtonClassesIds {
 
 let loadedOptions: IOptions;
 
-function createButton({ svg, title, id }: CreateButtonArg): HTMLButtonElement {
+export function createButton({
+  svg,
+  title,
+  id,
+}: CreateButtonArg): HTMLButtonElement {
   const button: HTMLButtonElement = document.createElement('button');
   button.classList.add('ytp-button');
   button.classList.add(ButtonClassesIds.CLASS);
@@ -52,7 +56,7 @@ function createButton({ svg, title, id }: CreateButtonArg): HTMLButtonElement {
   return button;
 }
 
-function simulateKey(key: ArrowKey): void {
+export function simulateKey(key: ArrowKey): void {
   const event: KeyboardEvent = new KeyboardEvent('keydown', {
     key,
     bubbles: true,
@@ -69,7 +73,7 @@ function simulateKey(key: ArrowKey): void {
   }
 }
 
-function getSeconds(updateType: string, options: IOptions): number {
+export function getSeconds(updateType: string, options: IOptions): number {
   switch (updateType) {
     case ArrowKey.ARROW_LEFT_KEY:
       return options.rewindSeconds;
@@ -134,7 +138,7 @@ function overrideArrowKeys(
   });
 }
 
-function getElementsForTooltipCalculation(): {
+export function getElementsForTooltipCalculation(): {
   tooltipContainer: HTMLElement;
   tooltipTextSpan: HTMLSpanElement;
 } {
@@ -436,5 +440,3 @@ chrome.storage.onChanged.addListener(
 );
 
 run();
-
-export { createButton, getElementsForTooltipCalculation, getButtons };

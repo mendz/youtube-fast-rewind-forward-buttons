@@ -7,6 +7,12 @@ import {
   getForwardButtonTitle,
   isShouldSkipOverrideKeys,
   ArrowKey,
+  createButton,
+  ButtonClassesIds,
+  getElementsForTooltipCalculation,
+  getSeconds,
+  simulateKey,
+  KEY_CODES,
 } from './content';
 
 const HTML_PLAYER_FULL = `
@@ -34,31 +40,6 @@ const HTML_PLAYER_FULL = `
             </div>
         </div>
     </div>
-</ytd-player>
-`;
-
-const HTML_PLAYER_NO_VIDEO = `
-<ytd-player>
-  <div class="ytp-chrome-bottom">
-    <div
-      class="ytp-tooltip ytp-bottom ytp-preview ytp-has-duration ytp-text-detail"
-    >
-      <div class="ytp-tooltip-text-wrapper">
-        <div class="ytp-tooltip-title"></div>
-        <span class="ytp-tooltip-text ytp-tooltip-text-no-title"></span>
-      </div>
-      <div class="ytp-chrome-controls">
-        <div class="ytp-left-controls">
-          <a class="ytp-next-button">
-            <svg>
-              <path class="ytp-svg-fill"></path>
-              <use></use>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
 </ytd-player>
 `;
 
@@ -106,11 +87,6 @@ function createSvg(
 //     };
 // };
 
-// beforeEach(() => {
-//     document.body.innerHTML = HTML_PLAYER;
-//     run();
-// });
-
 describe('full run', () => {
   it('should have 2 buttons', async () => {
     document.body.innerHTML = HTML_PLAYER_FULL;
@@ -120,8 +96,9 @@ describe('full run', () => {
         ?.length
     ).toEqual(2);
   });
-  it('should have no button when there is no videos', async () => {
-    document.body.innerHTML = HTML_PLAYER_NO_VIDEO;
+  it('should have no button when there is no video', async () => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    document.querySelector('video')?.remove();
     await run();
     expect(
       document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
@@ -137,18 +114,18 @@ describe('getFastRewindSVG', () => {
     </svg>`;
   const xLinkAttrCustomId = '#custom-path-rewind';
 
-  it('getFastRewindSVG return the correct svg', () => {
+  it('should return the correct svg', () => {
     const newSvg: string = getFastRewindSVG([], '', []);
     expect(removeSpaces(newSvg)).toBe(removeSpaces(rewindSvg));
   });
-  it('getFastRewindSVG populate with svgClasses', () => {
+  it('should populate with svgClasses', () => {
     const svgElement = createSvg(svgClasses, '', [], 'getFastRewindSVG');
 
     expect(svgElement?.classList.contains(svgClasses[0])).toBeTruthy();
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
-  it('getFastRewindSVG populate with svgPathClasses', () => {
+  it('should populate with svgPathClasses', () => {
     const svgElement = createSvg([], '', svgPathClasses, 'getFastRewindSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
@@ -157,7 +134,7 @@ describe('getFastRewindSVG', () => {
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
-  it('getFastRewindSVG populate with svgUseHtml', () => {
+  it('should populate with svgUseHtml', () => {
     const svgElement = createSvg([], svgUseHtml, [], 'getFastRewindSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
@@ -167,7 +144,7 @@ describe('getFastRewindSVG', () => {
       xLinkAttrCustomId
     );
   });
-  it('getFastRewindSVG populate with all values', () => {
+  it('should populate with all values', () => {
     const svgElement = createSvg(
       svgClasses,
       svgUseHtml,
@@ -193,18 +170,18 @@ describe('getFastForwardSVG', () => {
     </svg>`;
   const xLinkAttrCustomId = '#custom-path-fast-forward';
 
-  it('getFastForwardSVG return the correct svg', () => {
+  it('should return the correct svg', () => {
     const newSvg: string = getFastForwardSVG([], '', []);
     expect(removeSpaces(newSvg)).toBe(removeSpaces(forwardSvg));
   });
-  it('getFastForwardSVG populate with svgClasses', () => {
+  it('should populate with svgClasses', () => {
     const svgElement = createSvg(svgClasses, '', [], 'getFastForwardSVG');
 
     expect(svgElement?.classList.contains(svgClasses[0])).toBeTruthy();
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
-  it('getFastForwardSVG populate with svgPathClasses', () => {
+  it('should populate with svgPathClasses', () => {
     const svgElement = createSvg([], '', svgPathClasses, 'getFastForwardSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
@@ -213,7 +190,7 @@ describe('getFastForwardSVG', () => {
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
-  it('getFastForwardSVG populate with svgUseHtml', () => {
+  it('should populate with svgUseHtml', () => {
     const svgElement = createSvg([], svgUseHtml, [], 'getFastForwardSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
@@ -223,7 +200,7 @@ describe('getFastForwardSVG', () => {
       xLinkAttrCustomId
     );
   });
-  it('getFastForwardSVG populate with all values', () => {
+  it('should populate with all values', () => {
     const svgElement = createSvg(
       svgClasses,
       svgUseHtml,
@@ -247,19 +224,19 @@ describe('getRewindButtonTitle return the correct text', () => {
   const fullTextTenSeconds = 'Go back 10 seconds (left arrow)';
   const shortTextTenSeconds = 'Go back 10 seconds';
 
-  it('with 5 seconds without overrideArrowKeys', () => {
+  it('should return with 5 seconds without overrideArrowKeys', () => {
     const result: string = getRewindButtonTitle(5, false);
     expect(result).toBe(fullTextFiveSeconds);
   });
-  it('with 5 seconds & with overrideArrowKeys', () => {
+  it('should return with 5 seconds & with overrideArrowKeys', () => {
     const result: string = getRewindButtonTitle(5, true);
     expect(result).toBe(fullTextFiveSeconds);
   });
-  it('with 10 seconds & with overrideArrowKeys', () => {
+  it('should return with 10 seconds & with overrideArrowKeys', () => {
     const result: string = getRewindButtonTitle(10, true);
     expect(result).toBe(fullTextTenSeconds);
   });
-  it('with 10 seconds & without overrideArrowKeys', () => {
+  it('should return with 10 seconds & without overrideArrowKeys', () => {
     const result: string = getRewindButtonTitle(10, false);
     expect(result).toBe(shortTextTenSeconds);
   });
@@ -270,19 +247,19 @@ describe('getForwardButtonTitle return the correct text', () => {
   const fullTextTenSeconds = 'Go forward 10 seconds (right arrow)';
   const shortTextTenSeconds = 'Go forward 10 seconds';
 
-  it('with 5 seconds without overrideArrowKeys', () => {
+  it('should return with 5 seconds without overrideArrowKeys', () => {
     const result: string = getForwardButtonTitle(5, false);
     expect(result).toBe(fullTextFiveSeconds);
   });
-  it('with 5 seconds & with overrideArrowKeys', () => {
+  it('should return with 5 seconds & with overrideArrowKeys', () => {
     const result: string = getForwardButtonTitle(5, true);
     expect(result).toBe(fullTextFiveSeconds);
   });
-  it('with 10 seconds & with overrideArrowKeys', () => {
+  it('should return with 10 seconds & with overrideArrowKeys', () => {
     const result: string = getForwardButtonTitle(10, true);
     expect(result).toBe(fullTextTenSeconds);
   });
-  it('with 10 seconds & without overrideArrowKeys', () => {
+  it('should return with 10 seconds & without overrideArrowKeys', () => {
     const result: string = getForwardButtonTitle(10, false);
     expect(result).toBe(shortTextTenSeconds);
   });
@@ -330,5 +307,144 @@ describe('isShouldSkipOverrideKeys', () => {
     newOptions.forwardSeconds = 10;
     result = isShouldSkipOverrideKeys(ArrowKey.ARROW_RIGHT_KEY, newOptions);
     expect(result).toBe(false);
+  });
+});
+
+describe('createButton', () => {
+  const testTitle = 'test-title';
+  const testSvg = '<svg></svg>';
+  const testId = '123';
+
+  it('should create button with the correct classes', () => {
+    const newButton: HTMLButtonElement = createButton({
+      title: testTitle,
+      svg: testSvg,
+    });
+    expect(newButton.classList.contains('ytp-button')).toBeTruthy();
+    expect(newButton.classList.contains(ButtonClassesIds.CLASS)).toBeTruthy();
+  });
+  it('should create button with the provided title', () => {
+    const newButton: HTMLButtonElement = createButton({
+      title: testTitle,
+      svg: testSvg,
+    });
+    expect(newButton.title).toBe(testTitle);
+    expect(newButton.getAttribute('aria-label')).toBe(testTitle);
+  });
+  it('should create button with the provided svg', () => {
+    const newButton: HTMLButtonElement = createButton({
+      title: testTitle,
+      svg: testSvg,
+    });
+    expect(newButton.querySelector('svg')?.outerHTML).toBe(testSvg);
+  });
+  it('should create button with the provided id', () => {
+    const newButton: HTMLButtonElement = createButton({
+      title: testTitle,
+      svg: testSvg,
+      id: testId,
+    });
+    expect(newButton.id).toBe(testId);
+  });
+});
+
+describe('getElementsForTooltipCalculation', () => {
+  const wrapperQuery = 'div.ytp-tooltip-text-wrapper';
+  const wrapperParentQuery = 'div.ytp-tooltip';
+  const tooltipContainerQuery = 'div.ytp-chrome-bottom';
+  const spanTextQuery = 'span.ytp-tooltip-text';
+  const error = `Couldn't find tooltip elements!`;
+
+  it('should fail when no wrapper', () => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    document.querySelector(wrapperQuery)?.remove();
+    expect(getElementsForTooltipCalculation).toThrowError(error);
+  });
+  it('should fail when no wrapper parent', () => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    const wrapper = document.querySelector(wrapperQuery)?.cloneNode() as Node;
+    document.querySelector(wrapperParentQuery)?.remove();
+    document.querySelector(tooltipContainerQuery)?.appendChild(wrapper);
+    expect(getElementsForTooltipCalculation).toThrowError(error);
+  });
+  it('should return the tooltip elements', () => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    const textWrapper = document.querySelector(wrapperQuery);
+    const tooltipContainer = textWrapper?.parentElement;
+    const tooltipTextSpan = textWrapper?.querySelector(spanTextQuery);
+    const tooltipElements = {
+      tooltipContainer,
+      tooltipTextSpan,
+    };
+    const result = getElementsForTooltipCalculation();
+    expect(result).toMatchObject(tooltipElements);
+  });
+});
+
+describe('getSeconds', () => {
+  it('should return 5 when wrong key', () => {
+    const resultWrongUpdateType: number = getSeconds('test', defaultOptions);
+    expect(resultWrongUpdateType).toBe(5);
+  });
+  it('should return 10 for left key', () => {
+    const newOptions = {
+      ...defaultOptions,
+      rewindSeconds: 10,
+    };
+    const resultLeftKey: number = getSeconds(
+      ArrowKey.ARROW_LEFT_KEY,
+      newOptions
+    );
+    expect(resultLeftKey).toBe(10);
+  });
+  it('should return 20 for right key', () => {
+    const newOptions = {
+      ...defaultOptions,
+      forwardSeconds: 20,
+    };
+    const resultRightKey: number = getSeconds(
+      ArrowKey.ARROW_RIGHT_KEY,
+      newOptions
+    );
+    expect(resultRightKey).toBe(20);
+  });
+});
+
+describe('simulateKey', () => {
+  const leftKeyEvent = new KeyboardEvent('keydown', {
+    key: ArrowKey.ARROW_LEFT_KEY,
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    keyCode: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
+    which: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
+  });
+  const rightKeyEvent = new KeyboardEvent('keydown', {
+    key: ArrowKey.ARROW_LEFT_KEY,
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    keyCode: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
+    which: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
+  });
+  it('should dispatch the keyboard event ', () => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    const body = document.querySelector('body') ?? { dispatchEvent: null };
+    console.log(body);
+
+    body.dispatchEvent = jest.fn();
+    simulateKey(ArrowKey.ARROW_LEFT_KEY);
+    expect(body.dispatchEvent).toHaveBeenCalledWith(leftKeyEvent);
+    simulateKey(ArrowKey.ARROW_RIGHT_KEY);
+    expect(body.dispatchEvent).toHaveBeenCalledWith(rightKeyEvent);
+  });
+  it('should console error when there is no body', () => {
+    document.querySelector('body')?.remove();
+    console.error = jest.fn();
+    simulateKey('test' as ArrowKey);
+    expect(console.error).toBeCalledTimes(1);
+    expect(console.error).toHaveBeenLastCalledWith(
+      `simulateKey failed, couldn't find body`
+    );
   });
 });
