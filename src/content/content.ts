@@ -1,4 +1,4 @@
-enum ArrowKey {
+export enum ArrowKey {
   ARROW_LEFT_KEY = 'ArrowLeft',
   ARROW_RIGHT_KEY = 'ArrowRight',
 }
@@ -106,7 +106,7 @@ function handleArrowButtons({
  * * For the correct event key if its 5 seconds or not
  * @returns boolean if should skip
  */
-function isShouldSkipOverrideKeys(
+export function isShouldSkipOverrideKeys(
   eventKey: ArrowKey,
   options: IOptions
 ): boolean {
@@ -248,7 +248,7 @@ async function loadOptions(): Promise<IOptions> {
   }
 }
 
-function getFastRewindSVG(
+export function getFastRewindSVG(
   svgClasses: string[],
   svgUseHtml: string,
   svgPathClasses: string[]
@@ -264,7 +264,7 @@ function getFastRewindSVG(
 `;
 }
 
-function getFastForwardSVG(
+export function getFastForwardSVG(
   svgClasses: string[],
   svgUseHtml: string,
   svgPathClasses: string[]
@@ -280,7 +280,7 @@ function getFastForwardSVG(
 `;
 }
 
-function getRewindButtonTitle(
+export function getRewindButtonTitle(
   seconds: number,
   shouldOverrideKeys: boolean
 ): string {
@@ -289,7 +289,7 @@ function getRewindButtonTitle(
   return `Go back ${seconds} seconds${title}`;
 }
 
-function getForwardButtonTitle(
+export function getForwardButtonTitle(
   seconds: number,
   shouldOverrideKeys: boolean
 ): string {
@@ -344,7 +344,7 @@ function getButtons(
   return { fastRewindButton, fastForwardButton };
 }
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
   loadedOptions = { ...options };
   const video: Nullable<HTMLVideoElement> = document.querySelector('video');
@@ -436,3 +436,5 @@ chrome.storage.onChanged.addListener(
 );
 
 run();
+
+export { createButton, getElementsForTooltipCalculation, getButtons };
