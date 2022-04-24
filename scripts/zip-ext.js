@@ -3,8 +3,8 @@ const AdmZip = require('adm-zip');
 
 const zip = new AdmZip();
 
-const path = 'src';
-const destZipPath = './build/youtube-rewind-fastforward-buttons.zip';
+const path = 'dist\\webext-dev';
+const destZipPath = './dist/youtube-rewind-fastforward-buttons.zip';
 
 /**
  * @param {string} filename

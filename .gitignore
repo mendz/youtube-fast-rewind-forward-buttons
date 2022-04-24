@@ -1,7 +1,9 @@
 *.zip
 node_modules
 build
+dist
 .eslintcache
+.parcel-cache
 
 # *.js files under src folder
 src/**/*.js
