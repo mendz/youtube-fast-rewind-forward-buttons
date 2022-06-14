@@ -13,6 +13,7 @@ import {
   getSeconds,
   simulateKey,
   KEY_CODES,
+  updateVideoTime,
 } from './content';
 
 const HTML_PLAYER_FULL = `
@@ -427,10 +428,9 @@ describe('simulateKey', () => {
     keyCode: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
     which: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
   });
-  it('should dispatch the keyboard event ', () => {
+  it('should dispatch the correct keyboard event ', () => {
     document.body.innerHTML = HTML_PLAYER_FULL;
     const body = document.querySelector('body') ?? { dispatchEvent: null };
-    console.log(body);
 
     body.dispatchEvent = jest.fn();
     simulateKey(ArrowKey.ARROW_LEFT_KEY);
@@ -446,5 +446,36 @@ describe('simulateKey', () => {
     expect(console.error).toHaveBeenLastCalledWith(
       `simulateKey failed, couldn't find body`
     );
+  });
+});
+
+describe('updateVideoTime', () => {
+  const videoElement = document.createElement('video');
+  it('should reduce to the currentTime video when ARROW_LEFT_KEY', () => {
+    videoElement.currentTime = 100;
+    updateVideoTime({
+      seconds: 30,
+      video: videoElement,
+      updateType: ArrowKey.ARROW_LEFT_KEY,
+    });
+    expect(videoElement.currentTime).toBe(70);
+  });
+  it('should add to the currentTime video when ARROW_RIGHT_KEY', () => {
+    videoElement.currentTime = 100;
+    updateVideoTime({
+      seconds: 30,
+      video: videoElement,
+      updateType: ArrowKey.ARROW_RIGHT_KEY,
+    });
+    expect(videoElement.currentTime).toBe(130);
+  });
+  it('should do nothing to the currentTime video when no arrow', () => {
+    videoElement.currentTime = 100;
+    updateVideoTime({
+      seconds: 30,
+      video: videoElement,
+      updateType: 'test_key' as any,
+    });
+    expect(videoElement.currentTime).toBe(100);
   });
 });
