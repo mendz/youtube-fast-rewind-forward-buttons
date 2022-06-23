@@ -6,15 +6,14 @@ import {
   getRewindButtonTitle,
   getForwardButtonTitle,
   isShouldSkipOverrideKeys,
-  ArrowKey,
   createButton,
-  ButtonClassesIds,
   getElementsForTooltipCalculation,
   getSeconds,
-  simulateKey,
-  KEY_CODES,
-  updateVideoTime,
+  handleArrowButtons,
 } from './content';
+import { simulateKey, updateVideoTime } from './other';
+import * as other from './other';
+import { ArrowKey, ButtonClassesIds, KEY_CODES } from './types';
 
 const HTML_PLAYER_FULL = `
 <ytd-player>
@@ -477,5 +476,44 @@ describe('updateVideoTime', () => {
       updateType: 'test_key' as any,
     });
     expect(videoElement.currentTime).toBe(100);
+  });
+});
+
+describe('handleArrowButtons', () => {
+  const videoElement = document.createElement('video');
+  let simulateKeySpy: jest.SpyInstance<void, [key: ArrowKey]> = jest.spyOn(
+    other,
+    'simulateKey'
+  );
+  let updateVideoTimeSpy = jest.spyOn(other, 'updateVideoTime');
+
+  beforeAll(async () => {
+    simulateKeySpy.mockClear();
+    updateVideoTimeSpy.mockClear();
+    simulateKeySpy = jest.spyOn(other, 'simulateKey');
+    updateVideoTimeSpy = jest.spyOn(other, 'updateVideoTime');
+  });
+
+  afterEach(() => {
+    simulateKeySpy.mockReset();
+  });
+
+  it('should call simulateKey when the seconds === 5', () => {
+    handleArrowButtons({
+      seconds: 5,
+      updateType: ArrowKey.ARROW_LEFT_KEY,
+      video: videoElement,
+    });
+    expect(simulateKeySpy).toHaveBeenCalledTimes(1);
+    expect(updateVideoTimeSpy).not.toHaveBeenCalled();
+  });
+  it('should call updateVideoTime when the seconds !==  5', () => {
+    handleArrowButtons({
+      seconds: 10,
+      updateType: ArrowKey.ARROW_LEFT_KEY,
+      video: videoElement,
+    });
+    expect(updateVideoTimeSpy).toHaveBeenCalledTimes(1);
+    expect(simulateKeySpy).not.toHaveBeenCalled();
   });
 });

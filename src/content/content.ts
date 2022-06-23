@@ -1,41 +1,12 @@
-export enum ArrowKey {
-  ARROW_LEFT_KEY = 'ArrowLeft',
-  ARROW_RIGHT_KEY = 'ArrowRight',
-}
-
-type CreateButtonArg = {
-  svg: string;
-  title: string;
-  id?: string;
-};
-
-type VideoTimeArg = {
-  seconds: number;
-  video: HTMLVideoElement;
-  updateType: ArrowKey;
-};
-
-type ButtonExtraStylesArg = {
-  svgClasses: string[];
-  svgPathClasses: string[];
-  svgUseHtml: string;
-};
-
-export const KEY_CODES: { [key in ArrowKey]: number } = {
-  [ArrowKey.ARROW_LEFT_KEY]: 37,
-  [ArrowKey.ARROW_RIGHT_KEY]: 39,
-};
-
-const ALL_KEY_CODES: ArrowKey[] = [
-  ArrowKey.ARROW_LEFT_KEY,
-  ArrowKey.ARROW_RIGHT_KEY,
-];
-
-export enum ButtonClassesIds {
-  CLASS = `ml-custom-rewind-forward-buttons`,
-  REWIND_ID = 'ml-custom-rewind-button',
-  FORWARD_ID = 'ml-custom-forward-button',
-}
+import { simulateKey, updateVideoTime } from './other';
+import {
+  CreateButtonArg,
+  ButtonClassesIds,
+  ArrowKey,
+  VideoTimeArg,
+  ALL_KEY_CODES,
+  ButtonExtraStylesArg,
+} from './types';
 
 let loadedOptions: IOptions;
 
@@ -56,23 +27,6 @@ export function createButton({
   return button;
 }
 
-export function simulateKey(key: ArrowKey): void {
-  const event: KeyboardEvent = new KeyboardEvent('keydown', {
-    key,
-    bubbles: true,
-    cancelable: true,
-    composed: true,
-    keyCode: KEY_CODES[key],
-    which: KEY_CODES[key],
-  } as KeyboardEventInit);
-  const body: HTMLBodyElement | null = document.querySelector('body');
-  if (body) {
-    body.dispatchEvent(event);
-  } else {
-    console.error(`simulateKey failed, couldn't find body`);
-  }
-}
-
 export function getSeconds(updateType: string, options: IOptions): number {
   switch (updateType) {
     case ArrowKey.ARROW_LEFT_KEY:
@@ -84,19 +38,7 @@ export function getSeconds(updateType: string, options: IOptions): number {
   }
 }
 
-export function updateVideoTime({
-  seconds,
-  video,
-  updateType,
-}: VideoTimeArg): void {
-  if (updateType === ArrowKey.ARROW_LEFT_KEY) {
-    video.currentTime -= seconds;
-  } else if (updateType === ArrowKey.ARROW_RIGHT_KEY) {
-    video.currentTime += seconds;
-  }
-}
-
-function handleArrowButtons({
+export function handleArrowButtons({
   seconds,
   video,
   updateType,
