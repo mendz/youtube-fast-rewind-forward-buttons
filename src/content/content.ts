@@ -60,15 +60,16 @@ export function isShouldSkipOverrideKeys(
   eventKey: ArrowKey,
   options: IOptions
 ): boolean {
+  const isNotKey = !ALL_KEY_CODES.includes(eventKey);
   return (
-    !ALL_KEY_CODES.includes(eventKey) ||
+    isNotKey ||
     !options.shouldOverrideKeys ||
     (eventKey === ArrowKey.ARROW_LEFT_KEY && options.rewindSeconds === 5) ||
     (eventKey === ArrowKey.ARROW_RIGHT_KEY && options.forwardSeconds === 5)
   );
 }
 
-function overrideArrowKeys(
+export function overrideArrowKeys(
   event: KeyboardEvent,
   options: IOptions,
   video: HTMLVideoElement

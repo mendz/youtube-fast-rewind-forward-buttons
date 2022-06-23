@@ -10,6 +10,7 @@ import {
   getElementsForTooltipCalculation,
   getSeconds,
   handleArrowButtons,
+  overrideArrowKeys,
 } from './content';
 import { simulateKey, updateVideoTime } from './other';
 import * as other from './other';
@@ -515,5 +516,60 @@ describe('handleArrowButtons', () => {
     });
     expect(updateVideoTimeSpy).toHaveBeenCalledTimes(1);
     expect(simulateKeySpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('overrideArrowKeys', () => {
+  const videoElement = document.createElement('video');
+  const key = ArrowKey.ARROW_LEFT_KEY;
+  const event: KeyboardEvent = new KeyboardEvent('keydown', {
+    key,
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    keyCode: KEY_CODES[key],
+    which: KEY_CODES[key],
+  });
+  let updateVideoTimeSpy = jest.spyOn(other, 'updateVideoTime');
+
+  beforeEach(async () => {
+    updateVideoTimeSpy.mockClear();
+    event.preventDefault = jest.fn();
+    updateVideoTimeSpy = jest.spyOn(other, 'updateVideoTime');
+  });
+
+  afterEach(() => {
+    updateVideoTimeSpy.mockReset();
+  });
+  it('Should not skip override and run updateVideoTime', () => {
+    overrideArrowKeys(
+      event,
+      { ...defaultOptions, shouldOverrideKeys: true, rewindSeconds: 10 },
+      videoElement
+    );
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(updateVideoTimeSpy).toHaveBeenCalledWith({
+      seconds: 10,
+      video: videoElement,
+      updateType: key,
+    });
+  });
+  it('Should skip override and not run updateVideoTime when options.shouldOverrideKeys is false', () => {
+    overrideArrowKeys(
+      event,
+      { ...defaultOptions, shouldOverrideKeys: false, rewindSeconds: 10 },
+      videoElement
+    );
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(updateVideoTimeSpy).not.toHaveBeenCalled();
+  });
+  it('Should skip override and not run updateVideoTime when options.shouldOverrideKeys is true but the seconds are 5', () => {
+    overrideArrowKeys(
+      event,
+      { ...defaultOptions, shouldOverrideKeys: true, rewindSeconds: 5 },
+      videoElement
+    );
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(updateVideoTimeSpy).not.toHaveBeenCalled();
   });
 });
