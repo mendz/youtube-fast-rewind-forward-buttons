@@ -52,14 +52,14 @@ export function getButtons(
 
   // add events listener
   fastRewindButton.addEventListener('click', () =>
-    handleArrowButtons({
+    exportFunctions.handleArrowButtons({
       video,
       seconds: rewindSeconds,
       updateType: ArrowKey.ARROW_LEFT_KEY,
     })
   );
   fastForwardButton.addEventListener('click', () =>
-    handleArrowButtons({
+    exportFunctions.handleArrowButtons({
       video,
       seconds: forwardSeconds,
       updateType: ArrowKey.ARROW_RIGHT_KEY,
@@ -92,3 +92,12 @@ export function updateButtons(newOptions: IOptions): void {
     shouldOverrideKeys
   );
 }
+
+// https://medium.com/@DavideRama/mock-spy-exported-functions-within-a-single-module-in-jest-cdf2b61af642
+const exportFunctions = {
+  handleArrowButtons,
+  getButtons,
+  updateButtons,
+};
+
+export default exportFunctions;
