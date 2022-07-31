@@ -176,7 +176,19 @@ export function handleTooltipOnMouseLeave(this: HTMLButtonElement): void {
   }
 }
 
-async function loadOptions(): Promise<IOptions> {
+/**
+ * Load the extension options from the storage
+ * If the option doesn't exists it will return its default values
+ * ```
+  const defaultOptions: Readonly<IOptions> = {
+    rewindSeconds: 5,
+    forwardSeconds: 5,
+    shouldOverrideKeys: false,
+  };
+ * ```
+ * @returns 
+ */
+export async function loadOptions(): Promise<IOptions> {
   const defaultOptions: Readonly<IOptions> = {
     rewindSeconds: 5,
     forwardSeconds: 5,

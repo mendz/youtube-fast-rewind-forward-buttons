@@ -13,6 +13,7 @@ import {
   overrideArrowKeys,
   handleTooltipOnMouseOver,
   handleTooltipOnMouseLeave,
+  loadOptions,
 } from './content';
 import { simulateKey, updateVideoTime } from './other';
 import * as other from './other';
@@ -52,7 +53,7 @@ const SVG_PATH_CLASSES = ['path-test-class'];
 const X_LINK_ATTR = 'xlink:href';
 const TOOLTIP_CONTAINER_WRAPPER_QUERY = 'div.ytp-tooltip-text-wrapper';
 
-const defaultOptions = {
+const DEFAULT_OPTIONS = {
   forwardSeconds: 5,
   rewindSeconds: 5,
   shouldOverrideKeys: false,
@@ -263,20 +264,20 @@ describe('isShouldSkipOverrideKeys', () => {
   it('should return true when not the correct key', () => {
     const result: boolean = isShouldSkipOverrideKeys(
       'mendy' as any,
-      defaultOptions
+      DEFAULT_OPTIONS
     );
     expect(result).toBe(true);
   });
   it('should return true when not shouldOverrideKeys', () => {
     const result: boolean = isShouldSkipOverrideKeys(
       ArrowKey.ARROW_LEFT_KEY,
-      defaultOptions
+      DEFAULT_OPTIONS
     );
     expect(result).toBe(true);
   });
   it('should return true when the correct key but 5 seconds even should overrideArrowKeys', () => {
     const newOptions = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       shouldOverrideKeys: true,
     };
     let result: boolean = isShouldSkipOverrideKeys(
@@ -289,7 +290,7 @@ describe('isShouldSkipOverrideKeys', () => {
   });
   it('should return false when the correct key but NOT 5 seconds and overrideArrowKeys', () => {
     const newOptions = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       shouldOverrideKeys: true,
       rewindSeconds: 10,
     };
@@ -377,12 +378,12 @@ describe('getElementsForTooltipCalculation', () => {
 
 describe('getSeconds', () => {
   it('should return 5 when wrong key', () => {
-    const resultWrongUpdateType: number = getSeconds('test', defaultOptions);
+    const resultWrongUpdateType: number = getSeconds('test', DEFAULT_OPTIONS);
     expect(resultWrongUpdateType).toBe(5);
   });
   it('should return 10 for left key', () => {
     const newOptions = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       rewindSeconds: 10,
     };
     const resultLeftKey: number = getSeconds(
@@ -393,7 +394,7 @@ describe('getSeconds', () => {
   });
   it('should return 20 for right key', () => {
     const newOptions = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       forwardSeconds: 20,
     };
     const resultRightKey: number = getSeconds(
@@ -547,7 +548,7 @@ describe('overrideArrowKeys', () => {
   it('Should not skip override and run updateVideoTime', () => {
     overrideArrowKeys(
       event,
-      { ...defaultOptions, shouldOverrideKeys: true, rewindSeconds: 10 },
+      { ...DEFAULT_OPTIONS, shouldOverrideKeys: true, rewindSeconds: 10 },
       videoElement
     );
     expect(event.preventDefault).toHaveBeenCalled();
@@ -560,7 +561,7 @@ describe('overrideArrowKeys', () => {
   it('Should skip override and not run updateVideoTime when options.shouldOverrideKeys is false', () => {
     overrideArrowKeys(
       event,
-      { ...defaultOptions, shouldOverrideKeys: false, rewindSeconds: 10 },
+      { ...DEFAULT_OPTIONS, shouldOverrideKeys: false, rewindSeconds: 10 },
       videoElement
     );
     expect(event.preventDefault).not.toHaveBeenCalled();
@@ -569,7 +570,7 @@ describe('overrideArrowKeys', () => {
   it('Should skip override and not run updateVideoTime when options.shouldOverrideKeys is true but the seconds are 5', () => {
     overrideArrowKeys(
       event,
-      { ...defaultOptions, shouldOverrideKeys: true, rewindSeconds: 5 },
+      { ...DEFAULT_OPTIONS, shouldOverrideKeys: true, rewindSeconds: 5 },
       videoElement
     );
     expect(event.preventDefault).not.toHaveBeenCalled();
@@ -665,5 +666,74 @@ describe('handleTooltipOnMouseLeave', () => {
     expect(tooltipContainer.getAttribute('aria-hidden')).toBe('true');
     expect(tooltipContainer.classList.contains('ytp-bottom')).toBe(false);
     expect(button.title).toBe(textTest);
+  });
+});
+
+describe('loadOptions', () => {
+  const originalConsoleError = console.error;
+
+  afterAll(() => {
+    console.error = originalConsoleError;
+  });
+
+  it('Should return the values from the storage if exists', async () => {
+    const options = {
+      rewindSeconds: 10,
+      forwardSeconds: 2,
+      shouldOverrideKeys: true,
+    };
+    chrome.storage.sync.get.mockReturnValue(options as any);
+    const loadedOptions = await loadOptions();
+
+    expect(loadedOptions).toMatchObject(options);
+  });
+
+  it(`Should return the default value from if the on storage doesn't exists`, async () => {
+    const options = {
+      rewindSeconds: 10,
+      shouldOverrideKeys: true,
+    };
+    chrome.storage.sync.get.mockReturnValue({ ...options } as any);
+    let loadedOptions = await loadOptions();
+
+    expect(loadedOptions).toMatchObject({
+      ...options,
+      forwardSeconds: DEFAULT_OPTIONS.forwardSeconds,
+    });
+
+    chrome.storage.sync.get.mockReturnValue({
+      ...options,
+      rewindSeconds: '|',
+    } as any);
+    loadedOptions = await loadOptions();
+
+    expect(loadedOptions).toMatchObject({
+      ...options,
+      forwardSeconds: DEFAULT_OPTIONS.forwardSeconds,
+      rewindSeconds: DEFAULT_OPTIONS.rewindSeconds,
+    });
+
+    const options2 = {
+      rewindSeconds: 10,
+    };
+    chrome.storage.sync.get.mockReturnValue(options2 as any);
+    loadedOptions = await loadOptions();
+
+    expect(loadedOptions).toMatchObject({
+      ...options2,
+      forwardSeconds: DEFAULT_OPTIONS.forwardSeconds,
+      shouldOverrideKeys: DEFAULT_OPTIONS.shouldOverrideKeys,
+    });
+  });
+
+  it('Should catch the error and return the default values', async () => {
+    const errorMessage = 'something happened!';
+    console.error = jest.fn();
+    chrome.storage.sync.get.mockImplementation(() => {
+      throw new Error(errorMessage);
+    });
+    const loadedOptions = await loadOptions();
+    expect(console.error).toHaveBeenCalledWith(new Error(errorMessage));
+    expect(loadedOptions).toMatchObject(DEFAULT_OPTIONS);
   });
 });
