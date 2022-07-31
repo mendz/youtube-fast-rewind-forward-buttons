@@ -7,6 +7,17 @@
       "type": "shell",
       "command": "npm run updateVersion '${input:udpateVersion}'",
       "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "test:coverage",
+      "problemMatcher": [],
+      "label": "npm: test:coverage",
+      "detail": "jest --coverage",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
     }
   ],
   "inputs": [

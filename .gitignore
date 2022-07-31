@@ -4,6 +4,7 @@ build
 dist
 .eslintcache
 .parcel-cache
+coverage
 
 # *.js files under src folder
 src/**/*.js
