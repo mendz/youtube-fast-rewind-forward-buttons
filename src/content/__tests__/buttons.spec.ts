@@ -21,7 +21,7 @@ describe('handleArrowButtons', () => {
   );
   let updateVideoTimeSpy = jest.spyOn(handleVideoPlayer, 'updateVideoTime');
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     simulateKeySpy.mockClear();
     updateVideoTimeSpy.mockClear();
     simulateKeySpy = jest.spyOn(eventKeys, 'simulateKey');
@@ -54,14 +54,14 @@ describe('handleArrowButtons', () => {
 
 describe('getButtons', () => {
   const videoElement = document.createElement('video');
-  const simulateHandleArrowButtons = jest.spyOn(buttons, 'handleArrowButtons');
+  let simulateHandleArrowButtons = jest.spyOn(buttons, 'handleArrowButtons');
 
-  afterEach(() => {
-    simulateHandleArrowButtons.mockReset();
+  beforeEach(() => {
+    simulateHandleArrowButtons = jest.spyOn(buttons, 'handleArrowButtons');
   });
 
   it('Should call handleArrowButtons when using the buttons', () => {
-    const { fastForwardButton, fastRewindButton } = getButtons(
+    const { fastForwardButton, fastRewindButton } = buttons.getButtons(
       DEFAULT_OPTIONS_MOCK,
       videoElement,
       {

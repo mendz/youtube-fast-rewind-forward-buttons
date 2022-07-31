@@ -18,4 +18,7 @@ module.exports = {
     },
   },
   testPathIgnorePatterns: ['/__utils__/'],
+  restoreMocks: true,
+  clearMocks: true,
+  resetMocks: true,
 };

@@ -1,27 +1,77 @@
 import { chrome } from 'jest-chrome';
+import * as buttons from '../buttons';
+import * as eventKeys from '../event-keys';
 import { run, loadOptions } from '../content';
+import { ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
 
 describe('full run', () => {
-  it('should have 2 buttons', async () => {
+  const originalConsoleError = console.error;
+  beforeEach(() => {
     document.body.innerHTML = HTML_PLAYER_FULL;
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    console.error = originalConsoleError;
+  });
+
+  it('should have 2 buttons', async () => {
     await run();
     expect(
       document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
         ?.length
     ).toEqual(2);
   });
+
   it('should have no button when there is no video', async () => {
-    document.body.innerHTML = HTML_PLAYER_FULL;
     document.querySelector('video')?.remove();
     await run();
     expect(
       document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
         ?.length
     ).toEqual(0);
+  });
+
+  it('Should console error when there is no player button', async () => {
+    const errorMessage = 'No playerNextButton';
+    document.querySelector('div.ytp-left-controls a.ytp-next-button')?.remove();
+    await run();
+    expect(console.error).toBeCalledWith(errorMessage);
+  });
+
+  it('Should pass to getButtons the correct svg parts depends what in the page', async () => {
+    // set all the mockups
+    const video = document.querySelector('video');
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+    const getButtonsSpy = jest.spyOn(buttons, 'getButtons');
+    // clear the dom from the svg parts
+    document.querySelector('svg path')?.classList.remove('ytp-svg-fill');
+    document.querySelector('svg use')?.remove();
+
+    await run();
+    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
+      svgClasses: [],
+      svgPathClasses: [],
+      svgUseHtml: '',
+    });
+    const rewindButton = document.querySelector(
+      `button#${ButtonClassesIds.REWIND_ID}`
+    );
+    expect(rewindButton?.querySelector('svg')?.classList.length).toBe(0);
+    getButtonsSpy.mockClear();
+
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    document.querySelector('svg')?.classList.add('test-class');
+    await run();
+    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
+      svgClasses: ['test-class'],
+      svgPathClasses: ['ytp-svg-fill'],
+      svgUseHtml: '<use></use>',
+    });
   });
 });
 
@@ -91,5 +141,15 @@ describe('loadOptions', () => {
     const loadedOptions = await loadOptions();
     expect(console.error).toHaveBeenCalledWith(new Error(errorMessage));
     expect(loadedOptions).toMatchObject(DEFAULT_OPTIONS_MOCK);
+  });
+
+  it('Should run overrideArrowKeys when user press keydown', async () => {
+    const overrideArrowKeysSpy = jest.spyOn(eventKeys, 'overrideArrowKeys');
+    await run();
+    const event = new KeyboardEvent('keydown', { keyCode: 37 });
+    document.dispatchEvent(event);
+    expect(overrideArrowKeysSpy).toBeCalled(); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run()
+    overrideArrowKeysSpy.mockClear();
+    overrideArrowKeysSpy.mockReset();
   });
 });

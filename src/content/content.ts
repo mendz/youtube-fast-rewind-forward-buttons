@@ -2,8 +2,7 @@ import { getButtons, updateButtons } from './buttons';
 import { overrideArrowKeys } from './event-keys';
 import { ButtonClassesIds } from './types';
 
-let loadedOptions: IOptions; // TODO: check who use it, if we need it to be global
-
+let loadedOptions: IOptions;
 /**
  * Load the extension options from the storage
  * If the option doesn't exists it will return its default values
@@ -93,12 +92,10 @@ export async function run(): Promise<void> {
       ...(playerNextButton.querySelector('svg')?.classList ?? []),
     ];
     const svgPathClasses: string[] = [
-      ...(playerNextButton.querySelector('svg')?.querySelector('path')
-        ?.classList ?? []),
+      ...(playerNextButton.querySelector('svg path')?.classList ?? []),
     ];
     const svgUseHtml: string =
-      playerNextButton.querySelector('svg')?.querySelector('use')?.outerHTML ??
-      '';
+      playerNextButton.querySelector('svg use')?.outerHTML ?? '';
 
     const { fastRewindButton, fastForwardButton } = getButtons(
       loadedOptions,
