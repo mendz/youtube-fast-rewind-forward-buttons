@@ -4,6 +4,11 @@ module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['./jest.setup.js'],
   coverageReporters: ['html'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/__utils__/**',
+    '!src/**/options/**',
+  ],
   coverageThreshold: {
     global: {
       branches: 80,
