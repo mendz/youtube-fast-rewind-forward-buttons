@@ -159,17 +159,21 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
 /**
  * Handle mouse leave button events for showing the tooltip
  */
-function handleTooltipOnMouseLeave(this: HTMLButtonElement): void {
-  const { tooltipContainer, tooltipTextSpan: textSpan } =
-    getElementsForTooltipCalculation();
+export function handleTooltipOnMouseLeave(this: HTMLButtonElement): void {
+  try {
+    const { tooltipContainer, tooltipTextSpan: textSpan } =
+      getElementsForTooltipCalculation();
 
-  const title: string = textSpan.innerText;
+    const title: string = textSpan.innerText;
 
-  // change values to hide the tooltip
-  tooltipContainer.style.display = 'none';
-  tooltipContainer.setAttribute('aria-hidden', 'true');
-  tooltipContainer.classList.remove('ytp-bottom');
-  this.title = title;
+    // change values to hide the tooltip
+    tooltipContainer.style.display = 'none';
+    tooltipContainer.setAttribute('aria-hidden', 'true');
+    tooltipContainer.classList.remove('ytp-bottom');
+    this.title = title;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 async function loadOptions(): Promise<IOptions> {

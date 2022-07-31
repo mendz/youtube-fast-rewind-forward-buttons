@@ -12,6 +12,7 @@ import {
   handleArrowButtons,
   overrideArrowKeys,
   handleTooltipOnMouseOver,
+  handleTooltipOnMouseLeave,
 } from './content';
 import { simulateKey, updateVideoTime } from './other';
 import * as other from './other';
@@ -580,7 +581,6 @@ describe('handleTooltipOnMouseOver', () => {
   const errorMessage = `Couldn't find player container`;
   const originalConsoleError = console.error;
   const button = document.createElement('button') as HTMLButtonElement;
-  console.log(document.body);
 
   beforeEach(async () => {
     console.error = jest.fn();
@@ -592,6 +592,11 @@ describe('handleTooltipOnMouseOver', () => {
   });
 
   it('Should console error when there is not player', () => {
+    document.body.innerHTML = /* html */ `
+      <p>TEST</P>
+    `;
+    handleTooltipOnMouseOver.bind(button)();
+    expect(console.error).toHaveBeenCalled();
     document.body.innerHTML = /* html */ `
       <p>TEST</P>
       <div class="ytp-tooltip-text-wrapper">
@@ -623,5 +628,42 @@ describe('handleTooltipOnMouseOver', () => {
     const style = tooltipContainer.style;
     expect(style.maxWidth).toBe('300px');
     expect(style.display).toBe('block');
+  });
+});
+
+describe('handleTooltipOnMouseLeave', () => {
+  const originalConsoleError = console.error;
+  const textTest = 'text test';
+  const button = document.createElement('button') as HTMLButtonElement;
+
+  beforeEach(async () => {
+    console.error = jest.fn();
+    document.body.innerHTML = HTML_PLAYER_FULL;
+  });
+
+  afterEach(() => {
+    console.error = originalConsoleError;
+  });
+
+  it('Should throw an error when there is no tooltip', () => {
+    document.body.innerHTML = /* html */ `
+    <p>TEST</P>
+  `;
+    handleTooltipOnMouseLeave.bind(button)();
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  it('Should update the style and the classes', () => {
+    const tooltipContainer = document.querySelector(
+      TOOLTIP_CONTAINER_WRAPPER_QUERY
+    )?.parentElement as HTMLDivElement;
+    (
+      tooltipContainer.querySelector('span.ytp-tooltip-text') as HTMLSpanElement
+    ).innerText = textTest;
+    handleTooltipOnMouseLeave.bind(button)();
+    expect(tooltipContainer.style.display).toBe('none');
+    expect(tooltipContainer.getAttribute('aria-hidden')).toBe('true');
+    expect(tooltipContainer.classList.contains('ytp-bottom')).toBe(false);
+    expect(button.title).toBe(textTest);
   });
 });
