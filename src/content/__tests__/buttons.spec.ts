@@ -1,4 +1,4 @@
-import { ArrowKey } from '../types';
+import { ArrowKey, ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
   SVG_CLASSES_MOCK,
@@ -7,7 +7,11 @@ import {
 } from '../__utils__/tests-helper';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
-import buttons, { getButtons, handleArrowButtons } from '../buttons';
+import buttons, {
+  getButtons,
+  handleArrowButtons,
+  updateButtons,
+} from '../buttons';
 
 describe('handleArrowButtons', () => {
   const videoElement = document.createElement('video');
@@ -70,5 +74,27 @@ describe('getButtons', () => {
     fastForwardButton.click();
     fastRewindButton.click();
     expect(simulateHandleArrowButtons).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('updateButtons', () => {
+  document.body.innerHTML = /* html */ `
+    <button id="${ButtonClassesIds.REWIND_ID}" title="test-rewind"></button>
+    <button id="${ButtonClassesIds.FORWARD_ID}" title="test-forward"></button>
+  `;
+  it('Should have the correct button titles', () => {
+    updateButtons(DEFAULT_OPTIONS_MOCK);
+    const rewindButton = document.querySelector(
+      `button#${ButtonClassesIds.REWIND_ID}`
+    ) as HTMLButtonElement;
+    const forwardButton = document.querySelector(
+      `button#${ButtonClassesIds.FORWARD_ID}`
+    ) as HTMLButtonElement;
+    expect(rewindButton.title).toBe(
+      `Go back ${DEFAULT_OPTIONS_MOCK.rewindSeconds} seconds (left arrow)`
+    );
+    expect(forwardButton.title).toBe(
+      `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
+    );
   });
 });
