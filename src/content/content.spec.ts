@@ -11,6 +11,7 @@ import {
   getSeconds,
   handleArrowButtons,
   overrideArrowKeys,
+  handleTooltipOnMouseOver,
 } from './content';
 import { simulateKey, updateVideoTime } from './other';
 import * as other from './other';
@@ -43,11 +44,12 @@ const HTML_PLAYER_FULL = `
     </div>
 </ytd-player>
 `;
-
-const svgClasses = ['test-class'];
-const svgUseHtml = '<use class="ytp-svg-shadow" xlink:href="#ytp-id-45"></use>';
-const svgPathClasses = ['path-test-class'];
-const xLinkAttr = 'xlink:href';
+const SVG_CLASSES = ['test-class'];
+const SVG_USE_HTML =
+  '<use class="ytp-svg-shadow" xlink:href="#ytp-id-45"></use>';
+const SVG_PATH_CLASSES = ['path-test-class'];
+const X_LINK_ATTR = 'xlink:href';
+const TOOLTIP_CONTAINER_WRAPPER_QUERY = 'div.ytp-tooltip-text-wrapper';
 
 const defaultOptions = {
   forwardSeconds: 5,
@@ -77,16 +79,6 @@ function createSvg(
   document.body.innerHTML = newSvg;
   return document.querySelector('svg') as SVGSVGElement;
 }
-
-// const chrome: any = {};
-
-// chrome.storage.sync.get = () => {
-//     return {
-//         rewindSeconds: 5,
-//         forwardSeconds: 5,
-//         shouldOverrideKeys: false,
-//     };
-// };
 
 describe('full run', () => {
   it('should have 2 buttons', async () => {
@@ -120,45 +112,45 @@ describe('getFastRewindSVG', () => {
     expect(removeSpaces(newSvg)).toBe(removeSpaces(rewindSvg));
   });
   it('should populate with svgClasses', () => {
-    const svgElement = createSvg(svgClasses, '', [], 'getFastRewindSVG');
+    const svgElement = createSvg(SVG_CLASSES, '', [], 'getFastRewindSVG');
 
-    expect(svgElement?.classList.contains(svgClasses[0])).toBeTruthy();
+    expect(svgElement?.classList.contains(SVG_CLASSES[0])).toBeTruthy();
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
   it('should populate with svgPathClasses', () => {
-    const svgElement = createSvg([], '', svgPathClasses, 'getFastRewindSVG');
+    const svgElement = createSvg([], '', SVG_PATH_CLASSES, 'getFastRewindSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
     expect(
-      svgElement?.querySelector('path')?.classList.contains(svgPathClasses[0])
+      svgElement?.querySelector('path')?.classList.contains(SVG_PATH_CLASSES[0])
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
   it('should populate with svgUseHtml', () => {
-    const svgElement = createSvg([], svgUseHtml, [], 'getFastRewindSVG');
+    const svgElement = createSvg([], SVG_USE_HTML, [], 'getFastRewindSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeTruthy();
-    expect(svgElement?.querySelector('use')?.getAttribute(xLinkAttr)).toBe(
+    expect(svgElement?.querySelector('use')?.getAttribute(X_LINK_ATTR)).toBe(
       xLinkAttrCustomId
     );
   });
   it('should populate with all values', () => {
     const svgElement = createSvg(
-      svgClasses,
-      svgUseHtml,
-      svgPathClasses,
+      SVG_CLASSES,
+      SVG_USE_HTML,
+      SVG_PATH_CLASSES,
       'getFastRewindSVG'
     );
 
-    expect(svgElement?.classList.contains(svgClasses[0])).toBeTruthy();
+    expect(svgElement?.classList.contains(SVG_CLASSES[0])).toBeTruthy();
     expect(
-      svgElement?.querySelector('path')?.classList.contains(svgPathClasses[0])
+      svgElement?.querySelector('path')?.classList.contains(SVG_PATH_CLASSES[0])
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeTruthy();
-    expect(svgElement?.querySelector('use')?.getAttribute(xLinkAttr)).toBe(
+    expect(svgElement?.querySelector('use')?.getAttribute(X_LINK_ATTR)).toBe(
       xLinkAttrCustomId
     );
   });
@@ -176,45 +168,45 @@ describe('getFastForwardSVG', () => {
     expect(removeSpaces(newSvg)).toBe(removeSpaces(forwardSvg));
   });
   it('should populate with svgClasses', () => {
-    const svgElement = createSvg(svgClasses, '', [], 'getFastForwardSVG');
+    const svgElement = createSvg(SVG_CLASSES, '', [], 'getFastForwardSVG');
 
-    expect(svgElement?.classList.contains(svgClasses[0])).toBeTruthy();
+    expect(svgElement?.classList.contains(SVG_CLASSES[0])).toBeTruthy();
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
   it('should populate with svgPathClasses', () => {
-    const svgElement = createSvg([], '', svgPathClasses, 'getFastForwardSVG');
+    const svgElement = createSvg([], '', SVG_PATH_CLASSES, 'getFastForwardSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
     expect(
-      svgElement?.querySelector('path')?.classList.contains(svgPathClasses[0])
+      svgElement?.querySelector('path')?.classList.contains(SVG_PATH_CLASSES[0])
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
   it('should populate with svgUseHtml', () => {
-    const svgElement = createSvg([], svgUseHtml, [], 'getFastForwardSVG');
+    const svgElement = createSvg([], SVG_USE_HTML, [], 'getFastForwardSVG');
 
     expect(svgElement?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeTruthy();
-    expect(svgElement?.querySelector('use')?.getAttribute(xLinkAttr)).toBe(
+    expect(svgElement?.querySelector('use')?.getAttribute(X_LINK_ATTR)).toBe(
       xLinkAttrCustomId
     );
   });
   it('should populate with all values', () => {
     const svgElement = createSvg(
-      svgClasses,
-      svgUseHtml,
-      svgPathClasses,
+      SVG_CLASSES,
+      SVG_USE_HTML,
+      SVG_PATH_CLASSES,
       'getFastForwardSVG'
     );
 
-    expect(svgElement?.classList.contains(svgClasses[0])).toBeTruthy();
+    expect(svgElement?.classList.contains(SVG_CLASSES[0])).toBeTruthy();
     expect(
-      svgElement?.querySelector('path')?.classList.contains(svgPathClasses[0])
+      svgElement?.querySelector('path')?.classList.contains(SVG_PATH_CLASSES[0])
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeTruthy();
-    expect(svgElement?.querySelector('use')?.getAttribute(xLinkAttr)).toBe(
+    expect(svgElement?.querySelector('use')?.getAttribute(X_LINK_ATTR)).toBe(
       xLinkAttrCustomId
     );
   });
@@ -350,7 +342,7 @@ describe('createButton', () => {
 });
 
 describe('getElementsForTooltipCalculation', () => {
-  const wrapperQuery = 'div.ytp-tooltip-text-wrapper';
+  const wrapperQuery = TOOLTIP_CONTAINER_WRAPPER_QUERY;
   const wrapperParentQuery = 'div.ytp-tooltip';
   const tooltipContainerQuery = 'div.ytp-chrome-bottom';
   const spanTextQuery = 'span.ytp-tooltip-text';
@@ -428,24 +420,33 @@ describe('simulateKey', () => {
     keyCode: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
     which: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
   });
+  const originalBody = document.body;
+  afterAll(() => {
+    document.body = originalBody;
+  });
+
   it('should dispatch the correct keyboard event ', () => {
     document.body.innerHTML = HTML_PLAYER_FULL;
     const body = document.querySelector('body') ?? { dispatchEvent: null };
+    const originalBodyDispatchEvent = body.dispatchEvent;
 
     body.dispatchEvent = jest.fn();
     simulateKey(ArrowKey.ARROW_LEFT_KEY);
     expect(body.dispatchEvent).toHaveBeenCalledWith(leftKeyEvent);
     simulateKey(ArrowKey.ARROW_RIGHT_KEY);
     expect(body.dispatchEvent).toHaveBeenCalledWith(rightKeyEvent);
+    body.dispatchEvent = originalBodyDispatchEvent;
   });
   it('should console error when there is no body', () => {
     document.querySelector('body')?.remove();
+    const originalConsoleError = console.error;
     console.error = jest.fn();
     simulateKey('test' as ArrowKey);
     expect(console.error).toBeCalledTimes(1);
     expect(console.error).toHaveBeenLastCalledWith(
       `simulateKey failed, couldn't find body`
     );
+    console.error = originalConsoleError;
   });
 });
 
@@ -541,6 +542,7 @@ describe('overrideArrowKeys', () => {
   afterEach(() => {
     updateVideoTimeSpy.mockReset();
   });
+
   it('Should not skip override and run updateVideoTime', () => {
     overrideArrowKeys(
       event,
@@ -571,5 +573,55 @@ describe('overrideArrowKeys', () => {
     );
     expect(event.preventDefault).not.toHaveBeenCalled();
     expect(updateVideoTimeSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('handleTooltipOnMouseOver', () => {
+  const errorMessage = `Couldn't find player container`;
+  const originalConsoleError = console.error;
+  const button = document.createElement('button') as HTMLButtonElement;
+  console.log(document.body);
+
+  beforeEach(async () => {
+    console.error = jest.fn();
+    document.body.innerHTML = HTML_PLAYER_FULL;
+  });
+
+  afterEach(() => {
+    console.error = originalConsoleError;
+  });
+
+  it('Should console error when there is not player', () => {
+    document.body.innerHTML = /* html */ `
+      <p>TEST</P>
+      <div class="ytp-tooltip-text-wrapper">
+        <span class="ytp-tooltip-text"></span>
+      </div>
+    `;
+    handleTooltipOnMouseOver.bind(button)();
+    expect(console.error).toHaveBeenCalledWith(errorMessage);
+  });
+
+  it('Should change the tooltip continuer with the correct classes', () => {
+    handleTooltipOnMouseOver.bind(button)();
+    const tooltipContainer = document.querySelector(
+      TOOLTIP_CONTAINER_WRAPPER_QUERY
+    )?.parentElement as HTMLDivElement;
+    const classList = tooltipContainer.classList;
+    expect(classList.contains('ytp-tooltip')).toBe(true);
+    expect(classList.contains('ytp-bottom')).toBe(true);
+    expect(classList.contains('ytp-preview')).toBe(false);
+    expect(classList.contains('ytp-has-duration')).toBe(false);
+  });
+
+  it('Should change the tooltip continuer with the correct styles', () => {
+    handleTooltipOnMouseOver.bind(button)();
+    const tooltipContainer = document.querySelector(
+      TOOLTIP_CONTAINER_WRAPPER_QUERY
+    )?.parentElement as HTMLDivElement;
+
+    const style = tooltipContainer.style;
+    expect(style.maxWidth).toBe('300px');
+    expect(style.display).toBe('block');
   });
 });

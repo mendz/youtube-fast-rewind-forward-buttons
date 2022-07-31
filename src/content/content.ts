@@ -115,41 +115,45 @@ export function getElementsForTooltipCalculation(): {
 /**
  * Handle mouse over button events for showing the tooltip
  */
-function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
-  const { tooltipContainer, tooltipTextSpan: textSpan } =
-    getElementsForTooltipCalculation();
+export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
+  try {
+    const { tooltipContainer, tooltipTextSpan: textSpan } =
+      getElementsForTooltipCalculation();
 
-  // elements height for calculate the top of the button
-  const mainPlayerContainer: Nullable<Element> =
-    document.querySelector('ytd-player');
+    // elements height for calculate the top of the button
+    const mainPlayerContainer: Nullable<Element> =
+      document.querySelector('ytd-player');
 
-  if (!mainPlayerContainer) {
-    console.error(`Couldn't find player container`);
-    return;
+    if (!mainPlayerContainer) {
+      console.error(`Couldn't find player container`);
+      return;
+    }
+
+    const playerContainerHeight: number = mainPlayerContainer.clientHeight;
+    const bottomControlsHeight: number =
+      document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
+    const buttonHeight: number = this.clientHeight;
+    const tooltipTopPosition: number =
+      playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
+
+    // change values to show  the tooltip
+    tooltipContainer.classList.add('ytp-tooltip');
+    tooltipContainer.classList.add('ytp-bottom');
+    tooltipContainer.classList.remove('ytp-preview');
+    tooltipContainer.classList.remove('ytp-text-detail');
+    tooltipContainer.classList.remove('ytp-has-duration');
+    tooltipContainer.style.maxWidth = '300px';
+    tooltipContainer.style.top = `${tooltipTopPosition}px`;
+    tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
+    tooltipContainer.style.display = 'block';
+    tooltipContainer.setAttribute('aria-hidden', 'false');
+    textSpan.innerHTML = this.title;
+
+    // remove title from the button
+    this.title = '';
+  } catch (error) {
+    console.error(error);
   }
-
-  const playerContainerHeight: number = mainPlayerContainer.clientHeight;
-  const bottomControlsHeight: number =
-    document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
-  const buttonHeight: number = this.clientHeight;
-  const tooltipTopPosition: number =
-    playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
-
-  // change values to show  the tooltip
-  tooltipContainer.classList.add('ytp-tooltip');
-  tooltipContainer.classList.add('ytp-bottom');
-  tooltipContainer.classList.remove('ytp-preview');
-  tooltipContainer.classList.remove('ytp-text-detail');
-  tooltipContainer.classList.remove('ytp-has-duration');
-  tooltipContainer.style.maxWidth = '300px';
-  tooltipContainer.style.top = `${tooltipTopPosition}px`;
-  tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
-  tooltipContainer.style.display = 'block';
-  tooltipContainer.setAttribute('aria-hidden', 'false');
-  textSpan.innerHTML = this.title;
-
-  // remove title from the button
-  this.title = '';
 }
 
 /**
