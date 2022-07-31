@@ -28,8 +28,10 @@ export const HTML_PLAYER_FULL = `
 </ytd-player>
 `;
 export const SVG_CLASSES_MOCK = ['test-class'];
-export const SVG_USE_HTML_MOCK =
-  '<use class="ytp-svg-shadow" xlink:href="#ytp-id-45"></use>';
+export const SVG_FORWARD_USE_HTML_MOCK =
+  '<use class="ytp-svg-shadow" xlink:href="#custom-path-fast-forward"></use>';
+export const SVG_REWIND_USE_HTML_MOCK =
+  '<use class="ytp-svg-shadow" xlink:href="#custom-path-rewind"></use>';
 export const SVG_PATH_CLASSES_MOCK = ['path-test-class'];
 export const X_LINK_ATTR = 'xlink:href';
 export const TOOLTIP_CONTAINER_WRAPPER_QUERY = 'div.ytp-tooltip-text-wrapper';

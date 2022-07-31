@@ -3,15 +3,12 @@ import {
   DEFAULT_OPTIONS_MOCK,
   SVG_CLASSES_MOCK,
   SVG_PATH_CLASSES_MOCK,
-  SVG_USE_HTML_MOCK,
+  SVG_FORWARD_USE_HTML_MOCK,
+  SVG_REWIND_USE_HTML_MOCK,
 } from '../__utils__/tests-helper';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
-import buttons, {
-  getButtons,
-  handleArrowButtons,
-  updateButtons,
-} from '../buttons';
+import buttons, { handleArrowButtons, updateButtons } from '../buttons';
 
 describe('handleArrowButtons', () => {
   const videoElement = document.createElement('video');
@@ -54,26 +51,61 @@ describe('handleArrowButtons', () => {
 
 describe('getButtons', () => {
   const videoElement = document.createElement('video');
-  let simulateHandleArrowButtons = jest.spyOn(buttons, 'handleArrowButtons');
 
-  beforeEach(() => {
-    simulateHandleArrowButtons = jest.spyOn(buttons, 'handleArrowButtons');
-  });
+  const { fastForwardButton, fastRewindButton } = buttons.getButtons(
+    DEFAULT_OPTIONS_MOCK,
+    videoElement,
+    {
+      svgClasses: SVG_CLASSES_MOCK,
+      svgPathClasses: SVG_PATH_CLASSES_MOCK,
+      svgUseHtml: SVG_FORWARD_USE_HTML_MOCK,
+    }
+  );
 
   it('Should call handleArrowButtons when using the buttons', () => {
-    const { fastForwardButton, fastRewindButton } = buttons.getButtons(
-      DEFAULT_OPTIONS_MOCK,
-      videoElement,
-      {
-        svgClasses: SVG_CLASSES_MOCK,
-        svgPathClasses: SVG_PATH_CLASSES_MOCK,
-        svgUseHtml: SVG_USE_HTML_MOCK,
-      }
+    const simulateHandleArrowButtons = jest.spyOn(
+      buttons,
+      'handleArrowButtons'
     );
-
     fastForwardButton.click();
     fastRewindButton.click();
     expect(simulateHandleArrowButtons).toHaveBeenCalledTimes(2);
+  });
+
+  it('Should get the fastForwardButton values and the correct svg', () => {
+    const forwardSvg = fastForwardButton.querySelector('svg');
+
+    expect(fastForwardButton.id).toBe(ButtonClassesIds.FORWARD_ID);
+    expect(fastForwardButton.title).toBe(
+      `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
+    );
+    expect(forwardSvg?.classList.contains(SVG_CLASSES_MOCK[0])).toBe(true);
+    expect(
+      forwardSvg
+        ?.querySelector('path')
+        ?.classList.contains(SVG_PATH_CLASSES_MOCK[0])
+    ).toBe(true);
+    expect(forwardSvg?.querySelector('use')?.outerHTML).toBe(
+      SVG_FORWARD_USE_HTML_MOCK
+    );
+  });
+
+  it('Should get the fastRewindButton values and the correct svg', () => {
+    const rewindSvg = fastRewindButton.querySelector('svg');
+
+    expect(fastRewindButton.id).toBe(ButtonClassesIds.REWIND_ID);
+    expect(fastRewindButton.title).toBe(
+      `Go back ${DEFAULT_OPTIONS_MOCK.rewindSeconds} seconds (left arrow)`
+    );
+    expect(rewindSvg?.classList.contains(SVG_CLASSES_MOCK[0])).toBe(true);
+    expect(
+      rewindSvg
+        ?.querySelector('path')
+        ?.classList.contains(SVG_PATH_CLASSES_MOCK[0])
+    ).toBe(true);
+    expect(rewindSvg?.querySelector('use')?.outerHTML).toBe(
+      SVG_REWIND_USE_HTML_MOCK
+    );
   });
 });
 

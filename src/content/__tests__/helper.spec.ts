@@ -13,7 +13,7 @@ import {
   removeSpaces,
   SVG_CLASSES_MOCK,
   SVG_PATH_CLASSES_MOCK,
-  SVG_USE_HTML_MOCK,
+  SVG_FORWARD_USE_HTML_MOCK,
   X_LINK_ATTR,
 } from '../__utils__/tests-helper';
 
@@ -129,7 +129,7 @@ describe('createFastRewindSVG', () => {
   it('should populate with svgUseHtml', () => {
     const svgElement = createSvgMock(
       [],
-      SVG_USE_HTML_MOCK,
+      SVG_FORWARD_USE_HTML_MOCK,
       [],
       'getFastRewindSVG'
     );
@@ -144,7 +144,7 @@ describe('createFastRewindSVG', () => {
   it('should populate with all values', () => {
     const svgElement = createSvgMock(
       SVG_CLASSES_MOCK,
-      SVG_USE_HTML_MOCK,
+      SVG_FORWARD_USE_HTML_MOCK,
       SVG_PATH_CLASSES_MOCK,
       'getFastRewindSVG'
     );
@@ -204,7 +204,7 @@ describe('createFastForwardSVG', () => {
   it('should populate with svgUseHtml', () => {
     const svgElement = createSvgMock(
       [],
-      SVG_USE_HTML_MOCK,
+      SVG_FORWARD_USE_HTML_MOCK,
       [],
       'getFastForwardSVG'
     );
@@ -219,7 +219,7 @@ describe('createFastForwardSVG', () => {
   it('should populate with all values', () => {
     const svgElement = createSvgMock(
       SVG_CLASSES_MOCK,
-      SVG_USE_HTML_MOCK,
+      SVG_FORWARD_USE_HTML_MOCK,
       SVG_PATH_CLASSES_MOCK,
       'getFastForwardSVG'
     );
