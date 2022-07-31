@@ -1,7 +1,7 @@
 import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
-import { run, loadOptions } from '../content';
+import { run, loadOptions, updateButtonAfterNewStorage } from '../content';
 import { ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
@@ -151,5 +151,71 @@ describe('loadOptions', () => {
     const loadedOptions = await loadOptions();
     expect(console.error).toHaveBeenCalledWith(new Error(errorMessage));
     expect(loadedOptions).toMatchObject(DEFAULT_OPTIONS_MOCK);
+  });
+});
+
+describe('updateButtonAfterNewStorage', () => {
+  it('Should call updateButtons and return the merge options', () => {
+    const optionsMock = {
+      forwardSeconds: 2,
+      rewindSeconds: 7,
+      shouldOverrideKeys: true,
+    };
+    const changeOptionsMock: { [key: string]: chrome.storage.StorageChange } = {
+      rewindSeconds: {
+        oldValue: optionsMock.rewindSeconds,
+        newValue: DEFAULT_OPTIONS_MOCK.rewindSeconds,
+      },
+      shouldOverrideKeys: {
+        oldValue: optionsMock.shouldOverrideKeys,
+        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      },
+    };
+    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+    const returnedOptions = updateButtonAfterNewStorage(
+      changeOptionsMock,
+      optionsMock
+    );
+
+    const returnValueToTest = {
+      ...DEFAULT_OPTIONS_MOCK,
+      forwardSeconds: optionsMock.forwardSeconds,
+    };
+    expect(updateButtonsSpy).toBeCalledWith(returnValueToTest);
+    expect(returnedOptions).toMatchObject(returnValueToTest);
+  });
+
+  it('Should handle unsparing number', () => {
+    const optionsMock = {
+      forwardSeconds: 2,
+      rewindSeconds: 7,
+      shouldOverrideKeys: true,
+    };
+    const changeOptionsMock: { [key: string]: chrome.storage.StorageChange } = {
+      rewindSeconds: {
+        oldValue: optionsMock.rewindSeconds,
+        newValue: DEFAULT_OPTIONS_MOCK.rewindSeconds,
+      },
+      forwardSeconds: {
+        oldValue: optionsMock.forwardSeconds,
+        newValue: '|',
+      },
+      shouldOverrideKeys: {
+        oldValue: optionsMock.shouldOverrideKeys,
+        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      },
+    };
+    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+    const returnedOptions = updateButtonAfterNewStorage(
+      changeOptionsMock,
+      optionsMock
+    );
+
+    const returnValueToTest = {
+      ...DEFAULT_OPTIONS_MOCK,
+      forwardSeconds: optionsMock.forwardSeconds,
+    };
+    expect(updateButtonsSpy).toBeCalledWith(returnValueToTest);
+    expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 });

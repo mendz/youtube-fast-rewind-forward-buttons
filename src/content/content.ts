@@ -46,26 +46,40 @@ export async function loadOptions(): Promise<IOptions> {
   }
 }
 
+export function updateButtonAfterNewStorage(
+  newChangesOptions: { [key: string]: chrome.storage.StorageChange },
+  currentOptions: IOptions
+): IOptions {
+  let changeForwardSeconds: Nullable<number> = parseInt(
+    newChangesOptions['forwardSeconds']?.newValue,
+    10
+  );
+  let changeRewindSeconds: Nullable<number> = parseInt(
+    newChangesOptions['rewindSeconds']?.newValue,
+    10
+  );
+
+  if (isNaN(changeForwardSeconds)) {
+    changeForwardSeconds = null;
+  }
+  if (isNaN(changeRewindSeconds)) {
+    changeRewindSeconds = null;
+  }
+
+  const newOptions: IOptions = {
+    forwardSeconds: changeForwardSeconds ?? currentOptions.forwardSeconds,
+    rewindSeconds: changeRewindSeconds ?? currentOptions.rewindSeconds,
+    shouldOverrideKeys:
+      newChangesOptions['shouldOverrideKeys']?.newValue ??
+      currentOptions.shouldOverrideKeys,
+  };
+  updateButtons(newOptions);
+  return { ...newOptions };
+}
+
 chrome.storage.onChanged.addListener(
   (changes: { [key: string]: chrome.storage.StorageChange }): void => {
-    const changeForwardSeconds: Nullable<number> = changes['forwardSeconds']
-      ?.newValue
-      ? parseInt(changes['forwardSeconds'].newValue, 10)
-      : null;
-    const changeRewindSeconds: Nullable<number> = changes['rewindSeconds']
-      ?.newValue
-      ? parseInt(changes['rewindSeconds'].newValue, 10)
-      : null;
-
-    const newOptions: IOptions = {
-      forwardSeconds: changeForwardSeconds ?? loadedOptions.forwardSeconds,
-      rewindSeconds: changeRewindSeconds ?? loadedOptions.rewindSeconds,
-      shouldOverrideKeys:
-        changes['shouldOverrideKeys']?.newValue ??
-        loadedOptions.shouldOverrideKeys,
-    };
-    loadedOptions = { ...newOptions };
-    updateButtons(newOptions);
+    loadedOptions = updateButtonAfterNewStorage(changes, loadedOptions);
   }
 );
 
