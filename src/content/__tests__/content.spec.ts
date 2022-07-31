@@ -19,6 +19,16 @@ describe('full run', () => {
     console.error = originalConsoleError;
   });
 
+  it('Should run overrideArrowKeys when user press keydown', async () => {
+    const overrideArrowKeysSpy = jest.spyOn(eventKeys, 'overrideArrowKeys');
+    await run();
+    const event = new KeyboardEvent('keydown', { keyCode: 37 });
+    document.dispatchEvent(event);
+    expect(overrideArrowKeysSpy).toBeCalledTimes(1); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run() if this test placed in the end
+    overrideArrowKeysSpy.mockClear();
+    overrideArrowKeysSpy.mockReset();
+  });
+
   it('should have 2 buttons', async () => {
     await run();
     expect(
@@ -141,15 +151,5 @@ describe('loadOptions', () => {
     const loadedOptions = await loadOptions();
     expect(console.error).toHaveBeenCalledWith(new Error(errorMessage));
     expect(loadedOptions).toMatchObject(DEFAULT_OPTIONS_MOCK);
-  });
-
-  it('Should run overrideArrowKeys when user press keydown', async () => {
-    const overrideArrowKeysSpy = jest.spyOn(eventKeys, 'overrideArrowKeys');
-    await run();
-    const event = new KeyboardEvent('keydown', { keyCode: 37 });
-    document.dispatchEvent(event);
-    expect(overrideArrowKeysSpy).toBeCalled(); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run()
-    overrideArrowKeysSpy.mockClear();
-    overrideArrowKeysSpy.mockReset();
   });
 });
