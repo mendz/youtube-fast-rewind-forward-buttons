@@ -5,11 +5,11 @@ on:
             - master
             - main
         paths:
-        - 'src/**/*'
+        - 'src/**'
         - 'package.json'
         - 'jest**'
 jobs:
-    coverage:
+    jest-coverage:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v1
