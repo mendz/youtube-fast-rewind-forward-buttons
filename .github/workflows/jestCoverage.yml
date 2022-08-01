@@ -4,10 +4,8 @@ on:
         branches:
             - master
             - main
-        paths:
-        - 'src/**'
-        - 'package.json'
-        - 'jest**'
+        paths-ignore:
+        - 'cypress/**'
 jobs:
     jest-coverage:
         runs-on: ubuntu-latest
