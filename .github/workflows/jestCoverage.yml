@@ -1,9 +1,13 @@
-name: 'coverage'
+name: 'jest coverage'
 on:
     pull_request:
         branches:
             - master
             - main
+        paths:
+        - 'src/**/*'
+        - 'package.json'
+        - 'jest**'
 jobs:
     coverage:
         runs-on: ubuntu-latest
