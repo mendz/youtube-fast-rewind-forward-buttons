@@ -15,8 +15,17 @@
       "label": "npm: test:coverage",
       "detail": "jest --coverage",
       "group": {
-        "kind": "test",
-        "isDefault": true
+        "kind": "test"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "cypress:open",
+      "problemMatcher": [],
+      "label": "npm: cypress:open",
+      "detail": "cypress open",
+      "group": {
+        "kind": "test"
       }
     }
   ],

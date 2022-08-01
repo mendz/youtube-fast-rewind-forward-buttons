@@ -1,6 +1,6 @@
 {
   "exclude": ["node_modules", "**/*.spec.ts", "build"],
-  "include": ["src/*.ts"],
+  "include": ["./src"],
   "compilerOptions": {
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */
