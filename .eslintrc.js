@@ -5,8 +5,9 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'plugin:sonarjs/recommended',
+    'plugin:cypress/recommended',
   ],
-  plugins: ['@typescript-eslint', 'html', 'prettier', 'sonarjs'],
+  plugins: ['@typescript-eslint', 'html', 'prettier', 'sonarjs', 'cypress'],
   parserOptions: {
     ecmaVersion: 2020,
     ecmaFeatures: {
@@ -17,6 +18,7 @@ module.exports = {
     browser: true,
     node: true,
     es6: true,
+    'cypress/globals': true,
   },
   rules: {
     '@typescript-eslint/no-var-requires': 'off',
@@ -32,6 +34,12 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
+    'cypress/no-assigning-return-values': 'error',
+    'cypress/no-unnecessary-waiting': 'error',
+    'cypress/assertion-before-screenshot': 'warn',
+    'cypress/no-force': 'warn',
+    'cypress/no-async-tests': 'error',
+    'cypress/no-pause': 'error',
   },
   globals: {
     chrome: true,
