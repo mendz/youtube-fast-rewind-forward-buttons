@@ -35,3 +35,16 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add('getVideo', () => {
+  return cy.get('ytd-player video');
+});
+Cypress.Commands.add('videoPause', () => {
+  cy.getVideo().then(($video) => $video.get(0).pause());
+});
+Cypress.Commands.add('videoPlay', () => {
+  cy.getVideo().then(($video) => $video.get(0).play());
+});
+Cypress.Commands.add('videoMute', () => {
+  cy.getVideo().then(($video) => ($video.get(0).muted = true));
+});

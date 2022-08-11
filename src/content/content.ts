@@ -133,3 +133,11 @@ export async function run(): Promise<void> {
 }
 
 run();
+
+// in case the document is already rendered
+if (document.readyState !== 'loading') {
+  run();
+} else if (document.addEventListener) {
+  // modern browsers
+  document.addEventListener('DOMContentLoaded', run);
+}
