@@ -48,12 +48,29 @@ test('should change the video time by clicking the arrows', async ({
   page,
 }) => {
   const { forwardButton, video, rewindButton } = getLocatorElements(page);
-  await forwardButton.click();
-  let currentTime: number = await getVideoTime(video);
-  expect(currentTime).toBe(5);
+  await test.step('Click the forward button', async () => {
+    await forwardButton.click();
+    const currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(5);
+  });
 
-  await setVideoTime(video, 20);
-  await rewindButton.click();
-  currentTime = await getVideoTime(video);
-  expect(currentTime).toBe(15);
+  await test.step('Click the rewind button', async () => {
+    await setVideoTime(video, 20);
+    await rewindButton.click();
+    const currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(15);
+  });
+});
+
+test('should have the arrows and work when navigate to another video', async ({
+  page,
+}) => {
+  const { forwardButton, video, rewindButton } = getLocatorElements(page);
+  const newVideoContainer = page.locator('ytd-compact-video-renderer').first();
+  const url: string = await newVideoContainer.evaluate((newVideoContainer) => {
+    return (newVideoContainer.querySelector('a#thumbnail') as HTMLLinkElement)
+      .href;
+  });
+  await page.locator('ytd-compact-video-renderer img').first().click();
+  await expect(page).toHaveURL(url);
 });
