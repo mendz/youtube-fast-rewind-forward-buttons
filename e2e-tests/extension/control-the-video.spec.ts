@@ -5,6 +5,7 @@ import {
   chromium,
 } from '@playwright/test';
 import path from 'path';
+import { getLocatorElements, getVideoTime, setVideoTime } from './helpers';
 
 const EXTENSION_PATH = `../../dist/webext-dev`;
 
@@ -34,26 +35,25 @@ export const test = base.extend<{
   },
 });
 
+test.beforeEach(async ({ page }) => {
+  await page.goto('https://www.youtube.com/watch?v=HGl75kurxok');
+  const video = page.locator('ytd-player video');
+  // pause the video
+  await video.click();
+  // reset the time
+  await video.evaluate((video: HTMLVideoElement) => (video.currentTime = 0));
+});
+
 test('should change the video time by clicking the arrows', async ({
   page,
 }) => {
-  await page.goto('https://www.youtube.com/watch?v=HGl75kurxok');
-  const video = page.locator('ytd-player video');
-  const rewindButton = page.locator('#ml-custom-rewind-button');
-  const forwardButton = page.locator('#ml-custom-forward-button');
-  // pause the video
-  await video.click();
-  await video.evaluate((video: HTMLVideoElement) => (video.currentTime = 0));
+  const { forwardButton, video, rewindButton } = getLocatorElements(page);
   await forwardButton.click();
-  let currentTime = await video.evaluate(
-    (video: HTMLVideoElement) => video.currentTime
-  );
+  let currentTime: number = await getVideoTime(video);
   expect(currentTime).toBe(5);
 
-  await video.evaluate((video: HTMLVideoElement) => (video.currentTime = 20));
+  await setVideoTime(video, 20);
   await rewindButton.click();
-  currentTime = await video.evaluate(
-    (video: HTMLVideoElement) => video.currentTime
-  );
+  currentTime = await getVideoTime(video);
   expect(currentTime).toBe(15);
 });
