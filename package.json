@@ -27,7 +27,11 @@
     "release:patch": "standard-version --release-as patch",
     "release:major": "standard-version --release-as major",
     "test": "jest --watchAll",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "playwright:test": "npx playwright test",
+    "playwright:test:debug": "npx playwright test --debug",
+    "playwright:report": "npx playwright show-report",
+    "playwright:codegen": "npx playwright codegen"
   },
   "repository": {
     "type": "git",
