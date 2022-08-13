@@ -3,6 +3,7 @@ import {
   expect,
   BrowserContext,
   chromium,
+  Locator,
 } from '@playwright/test';
 import path from 'path';
 import { getLocatorElements, getVideoTime, setVideoTime } from './helpers';
@@ -41,24 +42,29 @@ test.beforeEach(async ({ page }) => {
   // pause the video
   await video.click();
   // reset the time
-  await video.evaluate((video: HTMLVideoElement) => (video.currentTime = 0));
+  await setVideoTime(video, 0);
 });
 
 test('should change the video time by clicking the arrows', async ({
   page,
 }) => {
   const { forwardButton, video, rewindButton } = getLocatorElements(page);
-  await test.step('Click the forward button', async () => {
-    await forwardButton.click();
-    const currentTime: number = await getVideoTime(video);
-    expect(currentTime).toBe(5);
-  });
 
-  await test.step('Click the rewind button', async () => {
-    await setVideoTime(video, 20);
-    await rewindButton.click();
-    const currentTime = await getVideoTime(video);
+  await testClickingButtons(video, forwardButton, rewindButton);
+
+  await test.step('Click the forward & rewind button multiply times', async () => {
+    await setVideoTime(video, 0);
+    await forwardButton.click();
+    await forwardButton.click();
+    await forwardButton.click();
+    let currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(15);
+    await rewindButton.click();
+    await rewindButton.click();
+    await rewindButton.click();
+    await rewindButton.click();
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(0);
   });
 });
 
@@ -74,3 +80,23 @@ test('should have the arrows and work when navigate to another video', async ({
   await page.locator('ytd-compact-video-renderer img').first().click();
   await expect(page).toHaveURL(url);
 });
+
+async function testClickingButtons(
+  video: Locator,
+  forwardButton: Locator,
+  rewindButton: Locator
+) {
+  await test.step('Click the forward button', async () => {
+    await setVideoTime(video, 0);
+    await forwardButton.click();
+    const currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(5);
+  });
+
+  await test.step('Click the rewind button', async () => {
+    await setVideoTime(video, 20);
+    await rewindButton.click();
+    const currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(15);
+  });
+}
