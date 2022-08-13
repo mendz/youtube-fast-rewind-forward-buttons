@@ -17,7 +17,7 @@ module.exports = {
       statements: 80,
     },
   },
-  testPathIgnorePatterns: ['/__utils__/'],
+  testPathIgnorePatterns: ['/__utils__/', '<rootDir>/e2e-tests'],
   restoreMocks: true,
   clearMocks: true,
   resetMocks: true,
