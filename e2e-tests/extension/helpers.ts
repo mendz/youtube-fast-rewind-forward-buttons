@@ -1,12 +1,13 @@
 import {
-  test as base,
-  Page,
-  Locator,
-  ElementHandle,
   BrowserContext,
   chromium,
+  ElementHandle,
+  Locator,
+  Page,
+  test as base,
 } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 
 const EXTENSION_PATH = `../../dist/webext-dev`;
 
@@ -120,4 +121,14 @@ export async function handleAds(page: Page) {
   } else {
     await firstSkipButton?.click();
   }
+}
+
+export async function getOptionFileName(): Promise<string> {
+  const extFolderPath = path.join(__dirname, EXTENSION_PATH);
+  const files = await fs.promises.readdir(extFolderPath);
+  const optionFileName = files.find((file: string) => file.includes('options'));
+  if (optionFileName) {
+    return optionFileName;
+  }
+  throw new Error(`Couldn't find the option page!`);
 }
