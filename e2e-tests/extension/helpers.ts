@@ -1,4 +1,40 @@
-import { Page, Locator, ElementHandle } from '@playwright/test';
+import {
+  test as base,
+  Page,
+  Locator,
+  ElementHandle,
+  BrowserContext,
+  chromium,
+} from '@playwright/test';
+import path from 'path';
+
+const EXTENSION_PATH = `../../dist/webext-dev`;
+
+export const test = base.extend<{
+  context: BrowserContext;
+  extensionId: string;
+}>({
+  // eslint-disable-next-line no-empty-pattern
+  context: async ({}, use) => {
+    const pathToExtension = path.join(__dirname, EXTENSION_PATH);
+    const context = await chromium.launchPersistentContext('', {
+      headless: false,
+      args: [
+        `--disable-extensions-except=${pathToExtension}`,
+        `--load-extension=${pathToExtension}`,
+      ],
+    });
+    await use(context);
+    await context.close();
+  },
+  extensionId: async ({ context }, use) => {
+    let [background] = context.serviceWorkers();
+    if (!background) background = await context.waitForEvent('serviceworker');
+
+    const extensionId = background.url().split('/')[2];
+    await use(extensionId);
+  },
+});
 
 export function getVideoLocatorElements(page: Page) {
   const video = page.locator('ytd-player video');
