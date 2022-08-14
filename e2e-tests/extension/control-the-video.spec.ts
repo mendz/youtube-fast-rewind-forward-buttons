@@ -22,6 +22,7 @@ test('should change the video time by clicking the arrows', async ({
   page,
 }) => {
   const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
+  await handleAds(page);
 
   await testClickingButtons(video, forwardButton, rewindButton);
 
