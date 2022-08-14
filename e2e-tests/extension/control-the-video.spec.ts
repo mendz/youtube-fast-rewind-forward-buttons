@@ -7,13 +7,12 @@ import {
 } from '@playwright/test';
 import path from 'path';
 import {
-  isAdsInPage,
-  isAdsLeavePage,
-  getLocatorElements,
+  getVideoLocatorElements,
   getVideoTime,
   setVideoTime,
   resetVideo,
-  getSkipAdButton,
+  getTooltip,
+  handleAds,
 } from './helpers';
 
 const EXTENSION_PATH = `../../dist/webext-dev`;
@@ -56,7 +55,7 @@ test.beforeEach(async ({ page }) => {
 test('should change the video time by clicking the arrows', async ({
   page,
 }) => {
-  const { forwardButton, video, rewindButton } = getLocatorElements(page);
+  const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
 
   await testClickingButtons(video, forwardButton, rewindButton);
 
@@ -86,30 +85,29 @@ test('should have the arrows and work when navigate to another video', async ({
   });
   await page.locator('ytd-compact-video-renderer img').first().click();
   await expect(page).toHaveURL(url);
-  const { forwardButton, video, rewindButton } = getLocatorElements(page);
+  const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
 
-  // handle the ads in the after the navigation
-  const isFirstAdExists = await isAdsInPage(page);
-  const firstSkipButton = await getSkipAdButton(page);
-
-  if (isFirstAdExists && !firstSkipButton) {
-    await isAdsLeavePage(page);
-    // handle the ads in the after the navigation
-    const isSecondAdExists = await isAdsInPage(page);
-    const secondSkipButton = await getSkipAdButton(page);
-    if (isSecondAdExists && !secondSkipButton) {
-      await isAdsLeavePage(page);
-    } else {
-      secondSkipButton?.click();
-    }
-    // takes a few seconds until the real video start
-    await page.waitForTimeout(10000);
-  } else {
-    firstSkipButton?.click();
-  }
-
+  await handleAds(page);
   await resetVideo(video);
+
   await testClickingButtons(video, forwardButton, rewindButton);
+});
+
+test('should show the tooltip with correct text', async ({ page }) => {
+  const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
+  await test.step('Click the forward button, show tooltip', async () => {
+    await setVideoTime(video, 0);
+    await forwardButton.click();
+    const tooltip = getTooltip(page);
+    expect(tooltip).toHaveText('Go forward 5 seconds (right arrow)');
+  });
+
+  await test.step('Click the forward button, show tooltip', async () => {
+    await setVideoTime(video, 20);
+    await rewindButton.click();
+    const tooltip = getTooltip(page);
+    expect(tooltip).toHaveText('Go back 5 seconds (left arrow)');
+  });
 });
 
 async function testClickingButtons(

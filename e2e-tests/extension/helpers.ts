@@ -1,10 +1,14 @@
 import { Page, Locator, ElementHandle } from '@playwright/test';
 
-export function getLocatorElements(page: Page) {
+export function getVideoLocatorElements(page: Page) {
   const video = page.locator('ytd-player video');
   const rewindButton = page.locator('#ml-custom-rewind-button');
   const forwardButton = page.locator('#ml-custom-forward-button');
   return { forwardButton, video, rewindButton };
+}
+
+export function getTooltip(page: Page): Locator {
+  return page.locator('div.ytp-tooltip-text-wrapper span.ytp-tooltip-text');
 }
 
 export function getVideoTime(video: Locator): Promise<number> {
@@ -58,5 +62,26 @@ export async function isAdsLeavePage(page: Page): Promise<boolean> {
     ));
   } catch (error) {
     return false;
+  }
+}
+
+export async function handleAds(page: Page) {
+  const isFirstAdExists = await isAdsInPage(page);
+  const firstSkipButton = await getSkipAdButton(page);
+
+  if (isFirstAdExists && !firstSkipButton) {
+    await isAdsLeavePage(page);
+    // handle the ads in the after the navigation
+    const isSecondAdExists = await isAdsInPage(page);
+    const secondSkipButton = await getSkipAdButton(page);
+    if (isSecondAdExists && !secondSkipButton) {
+      await isAdsLeavePage(page);
+    } else {
+      await secondSkipButton?.click();
+    }
+    // takes a few seconds until the real video start
+    await page.waitForTimeout(10000);
+  } else {
+    await firstSkipButton?.click();
   }
 }
