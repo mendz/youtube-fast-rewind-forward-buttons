@@ -6,7 +6,15 @@ import {
   Locator,
 } from '@playwright/test';
 import path from 'path';
-import { getLocatorElements, getVideoTime, setVideoTime } from './helpers';
+import {
+  isAdsInPage,
+  isAdsLeavePage,
+  getLocatorElements,
+  getVideoTime,
+  setVideoTime,
+  resetVideo,
+  getSkipAdButton,
+} from './helpers';
 
 const EXTENSION_PATH = `../../dist/webext-dev`;
 
@@ -36,13 +44,13 @@ export const test = base.extend<{
   },
 });
 
+test.setTimeout(60 * 1000);
+
 test.beforeEach(async ({ page }) => {
   await page.goto('https://www.youtube.com/watch?v=HGl75kurxok');
   const video = page.locator('ytd-player video');
   // pause the video
-  await video.click();
-  // reset the time
-  await setVideoTime(video, 0);
+  await resetVideo(video);
 });
 
 test('should change the video time by clicking the arrows', async ({
@@ -71,7 +79,6 @@ test('should change the video time by clicking the arrows', async ({
 test('should have the arrows and work when navigate to another video', async ({
   page,
 }) => {
-  const { forwardButton, video, rewindButton } = getLocatorElements(page);
   const newVideoContainer = page.locator('ytd-compact-video-renderer').first();
   const url: string = await newVideoContainer.evaluate((newVideoContainer) => {
     return (newVideoContainer.querySelector('a#thumbnail') as HTMLLinkElement)
@@ -79,6 +86,30 @@ test('should have the arrows and work when navigate to another video', async ({
   });
   await page.locator('ytd-compact-video-renderer img').first().click();
   await expect(page).toHaveURL(url);
+  const { forwardButton, video, rewindButton } = getLocatorElements(page);
+
+  // handle the ads in the after the navigation
+  const isFirstAdExists = await isAdsInPage(page);
+  const firstSkipButton = await getSkipAdButton(page);
+
+  if (isFirstAdExists && !firstSkipButton) {
+    await isAdsLeavePage(page);
+    // handle the ads in the after the navigation
+    const isSecondAdExists = await isAdsInPage(page);
+    const secondSkipButton = await getSkipAdButton(page);
+    if (isSecondAdExists && !secondSkipButton) {
+      await isAdsLeavePage(page);
+    } else {
+      secondSkipButton?.click();
+    }
+    // takes a few seconds until the real video start
+    await page.waitForTimeout(10000);
+  } else {
+    firstSkipButton?.click();
+  }
+
+  await resetVideo(video);
+  await testClickingButtons(video, forwardButton, rewindButton);
 });
 
 async function testClickingButtons(
