@@ -7,12 +7,13 @@ import {
   resetVideo,
   getTooltip,
   handleAds,
+  YOUTUBE_URL,
 } from './helpers';
 
 test.setTimeout(60 * 1000);
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('https://www.youtube.com/watch?v=HGl75kurxok');
+  await page.goto(YOUTUBE_URL);
   const video = page.locator('ytd-player video');
   // pause the video
   await resetVideo(video);
@@ -66,14 +67,14 @@ test('should show the tooltip with correct text', async ({ page }) => {
     await setVideoTime(video, 0);
     await forwardButton.click();
     const tooltip = getTooltip(page);
-    expect(tooltip).toHaveText('Go forward 5 seconds (right arrow)');
+    await expect(tooltip).toHaveText('Go forward 5 seconds (right arrow)');
   });
 
   await test.step('Click the forward button, show tooltip', async () => {
     await setVideoTime(video, 20);
     await rewindButton.click();
     const tooltip = getTooltip(page);
-    expect(tooltip).toHaveText('Go back 5 seconds (left arrow)');
+    await expect(tooltip).toHaveText('Go back 5 seconds (left arrow)');
   });
 });
 

@@ -6,10 +6,23 @@ import {
   Page,
   test as base,
 } from '@playwright/test';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 const EXTENSION_PATH = `../../dist/webext-dev`;
+export const YOUTUBE_URL = 'https://www.youtube.com/watch?v=HGl75kurxok';
+
+export const OPTIONS_DEFAULT_VALUES = {
+  rewindSecondsInput: '5',
+  forwardSecondsInput: '5',
+  shouldOverrideKeysCheckbox: false,
+};
+
+export const OPTIONS_CHANGED_VALUES = {
+  rewindSecondsInput: '40',
+  forwardSecondsInput: '50',
+  shouldOverrideKeysCheckbox: true,
+};
 
 export const test = base.extend<{
   context: BrowserContext;
@@ -123,12 +136,33 @@ export async function handleAds(page: Page) {
   }
 }
 
-export async function getOptionFileName(): Promise<string> {
+export async function getOptionFilePath(extensionId: string): Promise<string> {
   const extFolderPath = path.join(__dirname, EXTENSION_PATH);
   const files = await fs.promises.readdir(extFolderPath);
   const optionFileName = files.find((file: string) => file.includes('options'));
   if (optionFileName) {
-    return optionFileName;
+    return `chrome-extension://${extensionId}/${optionFileName}`;
   }
   throw new Error(`Couldn't find the option page!`);
+}
+
+export async function fillInputsWithChangedValues(
+  rewindSecondsInput: Locator,
+  forwardSecondsInput: Locator,
+  shouldOverrideKeysCheckbox: Locator
+) {
+  await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+  await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+  await shouldOverrideKeysCheckbox.check();
+}
+
+export function getOptionsInputs(page: Page) {
+  const rewindSecondsInput = page.locator('input#rewind');
+  const forwardSecondsInput = page.locator('input#forward');
+  const shouldOverrideKeysCheckbox = page.locator('input#override-keys');
+  return {
+    rewindSecondsInput,
+    forwardSecondsInput,
+    shouldOverrideKeysCheckbox,
+  };
 }
