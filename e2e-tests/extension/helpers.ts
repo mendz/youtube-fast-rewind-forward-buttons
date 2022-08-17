@@ -24,6 +24,8 @@ export const OPTIONS_CHANGED_VALUES = {
   shouldOverrideKeysCheckbox: true,
 };
 
+export const BUTTON_SUBMIT_SELECTOR = 'button[type="submit"]';
+
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;

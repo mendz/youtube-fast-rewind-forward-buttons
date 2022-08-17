@@ -6,6 +6,7 @@ import {
   OPTIONS_CHANGED_VALUES,
   OPTIONS_DEFAULT_VALUES,
   test,
+  BUTTON_SUBMIT_SELECTOR,
 } from './helpers';
 
 test.beforeEach(async ({ page, extensionId }) => {
@@ -104,7 +105,7 @@ test('should keep the values after pressing the submit button and return to the 
     shouldOverrideKeysCheckbox
   );
   const newPage = await context.newPage();
-  await page.locator('button[type="submit"]').click();
+  await page.locator(BUTTON_SUBMIT_SELECTOR).click();
   expect(page.isClosed()).toBe(true);
 
   const optionFilePath = await getOptionFilePath(extensionId);
