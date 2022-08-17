@@ -194,12 +194,145 @@ test('should override the arrow keys when seconds set not to 5 and not override 
   });
 });
 
-async function navigateToYoutubeOptionsPagesSteps(
-  videoPage: Page,
-  optionPage: Page,
-  optionFilePath: string
-): Promise<void> {
-  const youtubeStepPromise = test.step('Navigate to YouTube page', async () => {
+test('should when not set to override, arrow keys should working as normal while arrow button should change the video time', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToYoutubeOptionsPagesSteps(
+    videoPage,
+    optionPage,
+    optionFilePath
+  );
+
+  await test.step('Change the options to NOT override and both of arrow buttons seconds is changed', async () => {
+    const { forwardSecondsInput, rewindSecondsInput } =
+      getOptionsInputs(optionPage);
+
+    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await test.step('Verify the youtube page press left/right arrow keys should NOT be override while buttons update the video by the new options', async () => {
+    const { video, forwardButton, rewindButton } =
+      getVideoLocatorElements(videoPage);
+    await setVideoTime(video, 0);
+
+    await videoPage.keyboard.press('ArrowRight');
+    let currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(5);
+    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
+    await expect(animationArrow).toBeVisible();
+
+    await forwardButton.click();
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(55);
+    await expect(animationArrow).not.toBeVisible();
+
+    await videoPage.keyboard.press('ArrowLeft');
+    currentTime = await getVideoTime(video);
+    await expect(animationArrow).toBeVisible();
+    expect(currentTime).toBe(50);
+
+    await rewindButton.click();
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(10);
+    await expect(animationArrow).not.toBeVisible();
+  });
+});
+
+test('should options change affect new youtube page', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  let optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToOptionsPageStep(optionPage, optionFilePath);
+
+  await test.step('Change the options', async () => {
+    const {
+      forwardSecondsInput,
+      rewindSecondsInput,
+      shouldOverrideKeysCheckbox,
+    } = getOptionsInputs(optionPage);
+
+    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+    await shouldOverrideKeysCheckbox.check();
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await navigateToYoutubeStep(videoPage);
+
+  await test.step('Verify new youtube page took and use the new options', async () => {
+    const { video, forwardButton, rewindButton } =
+      getVideoLocatorElements(videoPage);
+    await resetVideo(video);
+    await handleAds(videoPage);
+    await setVideoTime(video, 0);
+
+    await forwardButton.click();
+    let currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(50);
+
+    await rewindButton.click();
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(10);
+  });
+
+  await test.step('Change the options, one of the arrows', async () => {
+    optionPage = await context.newPage();
+    await optionPage.goto(optionFilePath);
+    const { rewindSecondsInput } = getOptionsInputs(optionPage);
+
+    await rewindSecondsInput.fill(OPTIONS_DEFAULT_VALUES.rewindSecondsInput);
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await test.step('Verify navigate to another video will take and use the new options', async () => {
+    const newVideoContainer = videoPage
+      .locator('ytd-compact-video-renderer')
+      .first();
+    const url: string = await newVideoContainer.evaluate(
+      (newVideoContainer) => {
+        return (
+          newVideoContainer.querySelector('a#thumbnail') as HTMLLinkElement
+        ).href;
+      }
+    );
+    await videoPage.locator('ytd-compact-video-renderer img').first().click();
+    await expect(videoPage).toHaveURL(url);
+    const { video, rewindButton, forwardButton } =
+      getVideoLocatorElements(videoPage);
+
+    await handleAds(videoPage);
+    await resetVideo(video);
+    await setVideoTime(video, 10);
+    await rewindButton.click();
+    let currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(5);
+
+    await forwardButton.click();
+    forwardButton;
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(55);
+  });
+});
+
+function navigateToYoutubeStep(videoPage: Page) {
+  return test.step('Navigate to YouTube page', async () => {
     await videoPage.goto(YOUTUBE_URL);
     const { video } = getVideoLocatorElements(videoPage);
     await handleAds(videoPage);
@@ -207,11 +340,26 @@ async function navigateToYoutubeOptionsPagesSteps(
 
     await expect(videoPage).toHaveURL(YOUTUBE_URL);
   });
+}
 
-  const optionsStepPromise = test.step('Navigate Options page', async () => {
+function navigateToOptionsPageStep(optionPage: Page, optionFilePath: string) {
+  return test.step('Navigate Options page', async () => {
     await optionPage.goto(optionFilePath);
     await expect(optionPage).toHaveURL(optionFilePath);
   });
+}
+
+async function navigateToYoutubeOptionsPagesSteps(
+  videoPage: Page,
+  optionPage: Page,
+  optionFilePath: string
+): Promise<void> {
+  const youtubeStepPromise = navigateToYoutubeStep(videoPage);
+
+  const optionsStepPromise = navigateToOptionsPageStep(
+    optionPage,
+    optionFilePath
+  );
 
   await Promise.all([youtubeStepPromise, optionsStepPromise]);
 }
