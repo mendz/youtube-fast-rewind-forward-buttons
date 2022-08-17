@@ -105,6 +105,7 @@ test('should keep the values after pressing the submit button and return to the 
   );
   const newPage = await context.newPage();
   await page.locator('button[type="submit"]').click();
+  expect(page.isClosed()).toBe(true);
 
   const optionFilePath = await getOptionFilePath(extensionId);
   await newPage.goto(optionFilePath);
