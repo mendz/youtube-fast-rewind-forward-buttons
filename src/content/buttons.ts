@@ -73,7 +73,7 @@ export function getButtons(
   return { fastRewindButton, fastForwardButton };
 }
 
-export function updateButtons(newOptions: IOptions): void {
+export function updateButtonsTitles(newOptions: IOptions): void {
   const { forwardSeconds, rewindSeconds, shouldOverrideKeys } = newOptions;
   // set the buttons titles
   const rewindButton = document.querySelector(
@@ -97,7 +97,7 @@ export function updateButtons(newOptions: IOptions): void {
 const exportFunctions = {
   handleArrowButtons,
   getButtons,
-  updateButtons,
+  updateButtonsTitles,
 };
 
 export default exportFunctions;

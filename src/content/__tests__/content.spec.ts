@@ -155,7 +155,7 @@ describe('loadOptions', () => {
 });
 
 describe('updateButtonAfterNewStorage', () => {
-  it('Should call updateButtons and return the merge options', () => {
+  it('Should call updateButtonsTitles and return the merge options', () => {
     const optionsMock = {
       forwardSeconds: 2,
       rewindSeconds: 7,
@@ -171,7 +171,7 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtonsTitles');
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
       optionsMock
@@ -205,7 +205,7 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtonsTitles');
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
       optionsMock

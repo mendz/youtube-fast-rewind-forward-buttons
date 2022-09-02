@@ -8,7 +8,7 @@ import {
 } from '../__utils__/tests-helper';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
-import buttons, { handleArrowButtons, updateButtons } from '../buttons';
+import buttons, { handleArrowButtons, updateButtonsTitles } from '../buttons';
 
 describe('handleArrowButtons', () => {
   const videoElement = document.createElement('video');
@@ -109,13 +109,13 @@ describe('getButtons', () => {
   });
 });
 
-describe('updateButtons', () => {
+describe('updateButtonsTitles', () => {
   document.body.innerHTML = /* html */ `
     <button id="${ButtonClassesIds.REWIND_ID}" title="test-rewind"></button>
     <button id="${ButtonClassesIds.FORWARD_ID}" title="test-forward"></button>
   `;
   it('Should have the correct button titles', () => {
-    updateButtons(DEFAULT_OPTIONS_MOCK);
+    updateButtonsTitles(DEFAULT_OPTIONS_MOCK);
     const rewindButton = document.querySelector(
       `button#${ButtonClassesIds.REWIND_ID}`
     ) as HTMLButtonElement;

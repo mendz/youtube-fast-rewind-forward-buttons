@@ -1,4 +1,4 @@
-import { getButtons, updateButtons } from './buttons';
+import { getButtons, updateButtonsTitles } from './buttons';
 import { overrideArrowKeys } from './event-keys';
 import { ButtonClassesIds } from './types';
 
@@ -73,7 +73,7 @@ export function updateButtonAfterNewStorage(
       newChangesOptions['shouldOverrideKeys']?.newValue ??
       currentOptions.shouldOverrideKeys,
   };
-  updateButtons(newOptions);
+  updateButtonsTitles(newOptions);
   return { ...newOptions };
 }
 
