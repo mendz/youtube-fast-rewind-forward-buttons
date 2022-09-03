@@ -1,4 +1,4 @@
-import { getButtons, updateButtonsTitles } from './buttons';
+import { addButtonsToVideo, updateButtons } from './buttons';
 import { overrideArrowKeys } from './event-keys';
 import { ButtonClassesIds } from './types';
 
@@ -48,7 +48,8 @@ export async function loadOptions(): Promise<IOptions> {
 
 export function updateButtonAfterNewStorage(
   newChangesOptions: { [key: string]: chrome.storage.StorageChange },
-  currentOptions: IOptions
+  currentOptions: IOptions,
+  video: HTMLVideoElement
 ): IOptions {
   let changeForwardSeconds: Nullable<number> = parseInt(
     newChangesOptions['forwardSeconds']?.newValue,
@@ -73,13 +74,14 @@ export function updateButtonAfterNewStorage(
       newChangesOptions['shouldOverrideKeys']?.newValue ??
       currentOptions.shouldOverrideKeys,
   };
-  updateButtonsTitles(newOptions);
+  updateButtons(newOptions, video);
   return { ...newOptions };
 }
 
 chrome.storage.onChanged.addListener(
   (changes: { [key: string]: chrome.storage.StorageChange }): void => {
-    loadedOptions = updateButtonAfterNewStorage(changes, loadedOptions);
+    const video = document.querySelector('video') as HTMLVideoElement;
+    loadedOptions = updateButtonAfterNewStorage(changes, loadedOptions, video);
   }
 );
 
@@ -93,37 +95,7 @@ export async function run(): Promise<void> {
 
   // check if there is no custom button already
   if (video?.src && !customButton) {
-    const playerNextButton: Nullable<HTMLButtonElement> =
-      document.querySelector('div.ytp-left-controls a.ytp-next-button');
-
-    if (!playerNextButton) {
-      console.error('No playerNextButton');
-      return;
-    }
-
-    // copy all svg values from the player button
-    const svgClasses: string[] = [
-      ...(playerNextButton.querySelector('svg')?.classList ?? []),
-    ];
-    const svgPathClasses: string[] = [
-      ...(playerNextButton.querySelector('svg path')?.classList ?? []),
-    ];
-    const svgUseHtml: string =
-      playerNextButton.querySelector('svg use')?.outerHTML ?? '';
-
-    const { fastRewindButton, fastForwardButton } = getButtons(
-      loadedOptions,
-      video,
-      {
-        svgClasses,
-        svgPathClasses,
-        svgUseHtml,
-      }
-    );
-
-    // add the buttons to the player
-    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
-    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+    addButtonsToVideo(loadedOptions, video);
     document.addEventListener(
       'keydown',
       (event) => overrideArrowKeys(event, loadedOptions, video),

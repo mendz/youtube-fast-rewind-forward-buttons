@@ -93,6 +93,61 @@ export function updateButtonsTitles(newOptions: IOptions): void {
   );
 }
 
+/**
+ * @throws Error when there is no player next button
+ */
+export function addButtonsToVideo(
+  newOptions: IOptions,
+  video: HTMLVideoElement
+): void {
+  const playerNextButton: Nullable<HTMLButtonElement> = document.querySelector(
+    'div.ytp-left-controls a.ytp-next-button'
+  );
+
+  if (!playerNextButton) {
+    throw new Error('No playerNextButton');
+  }
+
+  // copy all svg values from the player button
+  const svgClasses: string[] = [
+    ...(playerNextButton.querySelector('svg')?.classList ?? []),
+  ];
+  const svgPathClasses: string[] = [
+    ...(playerNextButton.querySelector('svg path')?.classList ?? []),
+  ];
+  const svgUseHtml: string =
+    playerNextButton.querySelector('svg use')?.outerHTML ?? '';
+
+  const { fastRewindButton, fastForwardButton } = getButtons(
+    newOptions,
+    video,
+    {
+      svgClasses,
+      svgPathClasses,
+      svgUseHtml,
+    }
+  );
+
+  // add the buttons to the player
+  playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
+  playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+}
+
+export function updateButtons(
+  newOptions: IOptions,
+  video: HTMLVideoElement
+): void {
+  const currentRewindButton = document.querySelector(
+    `button#${ButtonClassesIds.REWIND_ID}`
+  );
+  const currentForwardButton = document.querySelector(
+    `button#${ButtonClassesIds.FORWARD_ID}`
+  );
+  currentRewindButton?.remove();
+  currentForwardButton?.remove();
+  addButtonsToVideo(newOptions, video);
+}
+
 // https://medium.com/@DavideRama/mock-spy-exported-functions-within-a-single-module-in-jest-cdf2b61af642
 const exportFunctions = {
   handleArrowButtons,

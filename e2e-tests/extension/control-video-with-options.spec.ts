@@ -277,8 +277,6 @@ test('should options change affect new youtube page', async ({
   await test.step('Verify new youtube page took and use the new options', async () => {
     const { video, forwardButton, rewindButton } =
       getVideoLocatorElements(videoPage);
-    await resetVideo(video);
-    await handleAds(videoPage);
     await setVideoTime(video, 0);
 
     await forwardButton.click();
