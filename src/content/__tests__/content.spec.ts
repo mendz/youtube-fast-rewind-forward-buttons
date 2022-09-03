@@ -172,9 +172,11 @@ describe('updateButtonAfterNewStorage', () => {
       },
     };
     const updateButtonsSpy = jest.spyOn(buttons, 'updateButtonsTitles');
+    const video = document.querySelector('video') as HTMLVideoElement;
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
-      optionsMock
+      optionsMock,
+      video
     );
 
     const returnValueToTest = {
@@ -206,9 +208,11 @@ describe('updateButtonAfterNewStorage', () => {
       },
     };
     const updateButtonsSpy = jest.spyOn(buttons, 'updateButtonsTitles');
+    const video = document.querySelector('video') as HTMLVideoElement;
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
-      optionsMock
+      optionsMock,
+      video
     );
 
     const returnValueToTest = {
