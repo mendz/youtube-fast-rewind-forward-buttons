@@ -49,8 +49,7 @@ describe('full run', () => {
   it('Should console error when there is no player button', async () => {
     const errorMessage = 'No playerNextButton';
     document.querySelector('div.ytp-left-controls a.ytp-next-button')?.remove();
-    await run();
-    expect(console.error).toBeCalledWith(errorMessage);
+    await expect(run).rejects.toThrowError(errorMessage);
   });
 
   it('Should pass to getButtons the correct svg parts depends what in the page', async () => {
