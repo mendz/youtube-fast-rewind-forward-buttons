@@ -12,3 +12,6 @@ src/**/*.js
 !.vscode
 .vscode/*
 !.vscode/tasks.json
+/test-results/
+/playwright-report/
+/playwright/.cache/

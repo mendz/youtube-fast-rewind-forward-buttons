@@ -1,3 +1,4 @@
+import { chrome } from 'jest-chrome';
 import { ArrowKey, ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
@@ -5,10 +6,16 @@ import {
   SVG_PATH_CLASSES_MOCK,
   SVG_FORWARD_USE_HTML_MOCK,
   SVG_REWIND_USE_HTML_MOCK,
+  HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
-import buttons, { handleArrowButtons, updateButtons } from '../buttons';
+import buttons, {
+  addButtonsToVideo,
+  handleArrowButtons,
+  updateButtonsTitles,
+} from '../buttons';
+import { loadOptions } from '../content';
 
 describe('handleArrowButtons', () => {
   const videoElement = document.createElement('video');
@@ -109,13 +116,13 @@ describe('getButtons', () => {
   });
 });
 
-describe('updateButtons', () => {
+describe('updateButtonsTitles', () => {
   document.body.innerHTML = /* html */ `
     <button id="${ButtonClassesIds.REWIND_ID}" title="test-rewind"></button>
     <button id="${ButtonClassesIds.FORWARD_ID}" title="test-forward"></button>
   `;
   it('Should have the correct button titles', () => {
-    updateButtons(DEFAULT_OPTIONS_MOCK);
+    updateButtonsTitles(DEFAULT_OPTIONS_MOCK);
     const rewindButton = document.querySelector(
       `button#${ButtonClassesIds.REWIND_ID}`
     ) as HTMLButtonElement;
@@ -128,5 +135,41 @@ describe('updateButtons', () => {
     expect(forwardButton.title).toBe(
       `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
     );
+  });
+});
+
+describe('addButtonsToVideo', () => {
+  it('Should pass to getButtons the correct svg parts depends what in the page', async () => {
+    // set all the mockups
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    let video = document.querySelector('video') as HTMLVideoElement;
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+    const options = await loadOptions();
+    const getButtonsSpy = jest.spyOn(buttons, 'getButtons');
+    // clear the dom from the svg parts
+    document.querySelector('svg path')?.classList.remove('ytp-svg-fill');
+    document.querySelector('svg use')?.remove();
+
+    addButtonsToVideo(options, video);
+    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
+      svgClasses: [],
+      svgPathClasses: [],
+      svgUseHtml: '',
+    });
+    const rewindButton = document.querySelector(
+      `button#${ButtonClassesIds.REWIND_ID}`
+    );
+    expect(rewindButton?.querySelector('svg')?.classList.length).toBe(0);
+
+    getButtonsSpy.mockClear();
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    document.querySelector('svg')?.classList.add('test-class');
+    video = document.querySelector('video') as HTMLVideoElement;
+    addButtonsToVideo(options, video);
+    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
+      svgClasses: ['test-class'],
+      svgPathClasses: ['ytp-svg-fill'],
+      svgUseHtml: '<use></use>',
+    });
   });
 });

@@ -2,11 +2,11 @@ import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
 import { run, loadOptions, updateButtonAfterNewStorage } from '../content';
-import { ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
+import { ButtonClassesIds } from '../types';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -49,39 +49,52 @@ describe('full run', () => {
   it('Should console error when there is no player button', async () => {
     const errorMessage = 'No playerNextButton';
     document.querySelector('div.ytp-left-controls a.ytp-next-button')?.remove();
-    await run();
-    expect(console.error).toBeCalledWith(errorMessage);
+    await expect(run).rejects.toThrowError(errorMessage);
   });
 
-  it('Should pass to getButtons the correct svg parts depends what in the page', async () => {
+  it('Should pass to addButtonsToVideo options and video', async () => {
     // set all the mockups
     const video = document.querySelector('video');
     chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
-    const getButtonsSpy = jest.spyOn(buttons, 'getButtons');
-    // clear the dom from the svg parts
-    document.querySelector('svg path')?.classList.remove('ytp-svg-fill');
-    document.querySelector('svg use')?.remove();
+    const addButtonsToVideoSpy = jest.spyOn(buttons, 'addButtonsToVideo');
 
     await run();
-    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
-      svgClasses: [],
-      svgPathClasses: [],
-      svgUseHtml: '',
-    });
+    expect(addButtonsToVideoSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video);
+  });
+
+  it('Should show the correct titles for the buttons', async () => {
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+    await run();
+
     const rewindButton = document.querySelector(
       `button#${ButtonClassesIds.REWIND_ID}`
+    ) as HTMLButtonElement;
+    const forwardButton = document.querySelector(
+      `button#${ButtonClassesIds.FORWARD_ID}`
+    ) as HTMLButtonElement;
+    expect(rewindButton.title).toBe(
+      `Go back ${DEFAULT_OPTIONS_MOCK.rewindSeconds} seconds (left arrow)`
     );
-    expect(rewindButton?.querySelector('svg')?.classList.length).toBe(0);
-    getButtonsSpy.mockClear();
+    expect(forwardButton.title).toBe(
+      `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
+    );
+  });
 
-    document.body.innerHTML = HTML_PLAYER_FULL;
-    document.querySelector('svg')?.classList.add('test-class');
+  it('Should handle options with unsparing number', async () => {
+    const optionsMock = {
+      forwardSeconds: '|',
+      rewindSeconds: 7,
+      shouldOverrideKeys: true,
+    };
+    chrome.storage.sync.get.mockReturnValue(optionsMock as any);
     await run();
-    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
-      svgClasses: ['test-class'],
-      svgPathClasses: ['ytp-svg-fill'],
-      svgUseHtml: '<use></use>',
-    });
+
+    const forwardButton = document.querySelector(
+      `button#${ButtonClassesIds.FORWARD_ID}`
+    ) as HTMLButtonElement;
+    expect(forwardButton.title).toBe(
+      `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
+    );
   });
 });
 
@@ -155,7 +168,7 @@ describe('loadOptions', () => {
 });
 
 describe('updateButtonAfterNewStorage', () => {
-  it('Should call updateButtons and return the merge options', () => {
+  it('Should return the merge options', () => {
     const optionsMock = {
       forwardSeconds: 2,
       rewindSeconds: 7,
@@ -171,17 +184,17 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+    const video = document.querySelector('video') as HTMLVideoElement;
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
-      optionsMock
+      optionsMock,
+      video
     );
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
     };
-    expect(updateButtonsSpy).toBeCalledWith(returnValueToTest);
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 
@@ -205,17 +218,17 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+    const video = document.querySelector('video') as HTMLVideoElement;
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
-      optionsMock
+      optionsMock,
+      video
     );
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
     };
-    expect(updateButtonsSpy).toBeCalledWith(returnValueToTest);
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 });

@@ -12,11 +12,60 @@
       "type": "npm",
       "script": "test:coverage",
       "problemMatcher": [],
-      "label": "npm: test:coverage",
+      "label": "Run Jest + Coverage",
       "detail": "jest --coverage",
       "group": {
-        "kind": "test",
-        "isDefault": true
+        "kind": "test"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "test",
+      "problemMatcher": [],
+      "label": "Run Jest watch mode",
+      "detail": "jest --watchAll",
+      "group": {
+        "kind": "test"
+      }
+    },
+    {
+      "label": "Playwright test",
+      "detail": "npx playwright test",
+      "type": "shell",
+      "command": "npm run playwright:test '${input:testName}'",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "playwright:test:debug",
+      "problemMatcher": [],
+      "label": "Playwright Test Debug",
+      "detail": "npx playwright test --debug",
+      "group": {
+        "kind": "test"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "playwright:report",
+      "problemMatcher": [],
+      "label": "Playwright Report",
+      "detail": "npx playwright show-report",
+      "group": {
+        "kind": "test"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "playwright:codegen",
+      "problemMatcher": [],
+      "label": "Playwright Codegen",
+      "detail": "npx playwright codegen",
+      "group": {
+        "kind": "test"
       }
     }
   ],
@@ -25,6 +74,11 @@
       "type": "promptString",
       "id": "udpateVersion",
       "description": "Enter the new version you wish to update to"
+    },
+    {
+      "type": "promptString",
+      "id": "testName",
+      "description": "Enter the test name you wish to run"
     }
   ]
 }
