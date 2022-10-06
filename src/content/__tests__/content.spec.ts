@@ -52,35 +52,14 @@ describe('full run', () => {
     await expect(run).rejects.toThrowError(errorMessage);
   });
 
-  it('Should pass to getButtons the correct svg parts depends what in the page', async () => {
+  it('Should pass to addButtonsToVideo options and video', async () => {
     // set all the mockups
     const video = document.querySelector('video');
     chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
-    const getButtonsSpy = jest.spyOn(buttons, 'getButtons');
-    // clear the dom from the svg parts
-    document.querySelector('svg path')?.classList.remove('ytp-svg-fill');
-    document.querySelector('svg use')?.remove();
+    const addButtonsToVideoSpy = jest.spyOn(buttons, 'addButtonsToVideo');
 
     await run();
-    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
-      svgClasses: [],
-      svgPathClasses: [],
-      svgUseHtml: '',
-    });
-    const rewindButton = document.querySelector(
-      `button#${ButtonClassesIds.REWIND_ID}`
-    );
-    expect(rewindButton?.querySelector('svg')?.classList.length).toBe(0);
-    getButtonsSpy.mockClear();
-
-    document.body.innerHTML = HTML_PLAYER_FULL;
-    document.querySelector('svg')?.classList.add('test-class');
-    await run();
-    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
-      svgClasses: ['test-class'],
-      svgPathClasses: ['ytp-svg-fill'],
-      svgUseHtml: '<use></use>',
-    });
+    expect(addButtonsToVideoSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video);
   });
 });
 

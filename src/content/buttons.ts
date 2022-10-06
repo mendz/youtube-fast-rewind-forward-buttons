@@ -118,7 +118,7 @@ export function addButtonsToVideo(
   const svgUseHtml: string =
     playerNextButton.querySelector('svg use')?.outerHTML ?? '';
 
-  const { fastRewindButton, fastForwardButton } = getButtons(
+  const { fastRewindButton, fastForwardButton } = exportFunctions.getButtons(
     newOptions,
     video,
     {
@@ -153,6 +153,7 @@ const exportFunctions = {
   handleArrowButtons,
   getButtons,
   updateButtonsTitles,
+  addButtonsToVideo,
 };
 
 export default exportFunctions;
