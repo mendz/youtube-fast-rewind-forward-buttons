@@ -2,11 +2,11 @@ import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
 import { run, loadOptions, updateButtonAfterNewStorage } from '../content';
-import { ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
+import { ButtonClassesIds } from '../types';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -60,6 +60,41 @@ describe('full run', () => {
 
     await run();
     expect(addButtonsToVideoSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video);
+  });
+
+  it('Should show the correct titles for the buttons', async () => {
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+    await run();
+
+    const rewindButton = document.querySelector(
+      `button#${ButtonClassesIds.REWIND_ID}`
+    ) as HTMLButtonElement;
+    const forwardButton = document.querySelector(
+      `button#${ButtonClassesIds.FORWARD_ID}`
+    ) as HTMLButtonElement;
+    expect(rewindButton.title).toBe(
+      `Go back ${DEFAULT_OPTIONS_MOCK.rewindSeconds} seconds (left arrow)`
+    );
+    expect(forwardButton.title).toBe(
+      `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
+    );
+  });
+
+  it('Should handle options with unsparing number', async () => {
+    const optionsMock = {
+      forwardSeconds: '|',
+      rewindSeconds: 7,
+      shouldOverrideKeys: true,
+    };
+    chrome.storage.sync.get.mockReturnValue(optionsMock as any);
+    await run();
+
+    const forwardButton = document.querySelector(
+      `button#${ButtonClassesIds.FORWARD_ID}`
+    ) as HTMLButtonElement;
+    expect(forwardButton.title).toBe(
+      `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
+    );
   });
 });
 
@@ -133,7 +168,7 @@ describe('loadOptions', () => {
 });
 
 describe('updateButtonAfterNewStorage', () => {
-  it('Should call updateButtonsTitles and return the merge options', () => {
+  it('Should return the merge options', () => {
     const optionsMock = {
       forwardSeconds: 2,
       rewindSeconds: 7,
@@ -149,7 +184,6 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtonsTitles');
     const video = document.querySelector('video') as HTMLVideoElement;
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
@@ -161,7 +195,6 @@ describe('updateButtonAfterNewStorage', () => {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
     };
-    expect(updateButtonsSpy).toBeCalledWith(returnValueToTest);
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 
@@ -185,7 +218,6 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtonsTitles');
     const video = document.querySelector('video') as HTMLVideoElement;
     const returnedOptions = updateButtonAfterNewStorage(
       changeOptionsMock,
@@ -197,7 +229,6 @@ describe('updateButtonAfterNewStorage', () => {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
     };
-    expect(updateButtonsSpy).toBeCalledWith(returnValueToTest);
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 });
