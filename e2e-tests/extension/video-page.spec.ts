@@ -16,7 +16,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto(YOUTUBE_URL);
   const video = page.locator('ytd-player video');
   // pause the video
-  await resetVideo(video);
+  await resetVideo(video, page);
 });
 
 test('should change the video time by clicking the arrows', async ({
@@ -56,7 +56,7 @@ test('should have the arrows and work when navigate to another video', async ({
   const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
 
   await handleAds(page);
-  await resetVideo(video);
+  await resetVideo(video, page);
 
   await testClickingButtons(video, forwardButton, rewindButton);
 });
@@ -76,6 +76,22 @@ test('should show the tooltip with correct text', async ({ page }) => {
     const tooltip = getTooltip(page);
     await expect(tooltip).toHaveText('Go back 5 seconds (left arrow)');
   });
+});
+
+test.setTimeout(30 * 1000);
+
+test('Should add arrows when entering a video from the main page', async ({
+  page,
+}) => {
+  await page.goto('https://www.youtube.com/');
+  await page.locator('div.ytd-rich-item-renderer').first().click();
+  const video = page.locator('ytd-player video');
+  // pause the video
+  await handleAds(page);
+  await resetVideo(video, page);
+  const { forwardButton, rewindButton } = getVideoLocatorElements(page);
+
+  await testClickingButtons(video, forwardButton, rewindButton);
 });
 
 async function testClickingButtons(

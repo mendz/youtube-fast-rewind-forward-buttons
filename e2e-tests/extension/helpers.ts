@@ -76,10 +76,20 @@ export function setVideoTime(
   }, newTimeInSeconds);
 }
 
-export async function resetVideo(video: Locator) {
+export async function resetVideo(video: Locator, page: Page) {
   await video.click();
   // reset the time
   await setVideoTime(video, 0);
+  try {
+    // set the volume down
+    await page
+      .locator(
+        'button[data-title-no-tooltip="Mute"].ytp-mute-button.ytp-button'
+      )
+      .click({ timeout: 10000 });
+  } catch (error) {
+    console.info('Video is already muted');
+  }
 }
 
 export async function isAdsInPage(page: Page): Promise<boolean> {

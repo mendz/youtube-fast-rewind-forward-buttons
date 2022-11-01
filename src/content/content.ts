@@ -13,7 +13,7 @@ let loadedOptions: IOptions;
     shouldOverrideKeys: false,
   };
  * ```
- * @returns 
+ * @returns
  */
 export async function loadOptions(): Promise<IOptions> {
   const defaultOptions: Readonly<IOptions> = {
@@ -84,6 +84,15 @@ chrome.storage.onChanged.addListener(
     loadedOptions = updateButtonAfterNewStorage(changes, loadedOptions, video);
   }
 );
+
+// fire the function `run` every time that the URL changes under "https://www.youtube.com/*"
+chrome.runtime.onMessage.addListener((data) => {
+  if (data.message === 'urlChanged') {
+    setTimeout(() => {
+      run();
+    }, 1000);
+  }
+});
 
 export async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
