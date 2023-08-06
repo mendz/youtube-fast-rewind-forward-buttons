@@ -37,7 +37,7 @@ describe('getElementsForTooltipCalculation', () => {
       tooltipTextSpan,
     };
     const result = getElementsForTooltipCalculation();
-    expect(result).toMatchObject(tooltipElements);
+    expect(result).toEqual(tooltipElements);
   });
 });
 

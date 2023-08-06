@@ -316,7 +316,7 @@ test('should options change affect new youtube page', async ({
       getVideoLocatorElements(videoPage);
 
     await handleAds(videoPage);
-    await resetVideo(video);
+    await resetVideo(video, videoPage);
     await setVideoTime(video, 10);
     await rewindButton.click();
     let currentTime = await getVideoTime(video);
@@ -334,7 +334,7 @@ function navigateToYoutubeStep(videoPage: Page) {
     await videoPage.goto(YOUTUBE_URL);
     const { video } = getVideoLocatorElements(videoPage);
     await handleAds(videoPage);
-    await resetVideo(video);
+    await resetVideo(video, videoPage);
 
     await expect(videoPage).toHaveURL(YOUTUBE_URL);
   });
