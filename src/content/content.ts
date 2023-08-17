@@ -85,14 +85,32 @@ chrome.storage.onChanged.addListener(
   }
 );
 
-// fire the function `run` every time that the URL changes under "https://www.youtube.com/*"
-chrome.runtime.onMessage.addListener((data) => {
-  if (data.message === 'urlChanged') {
-    setTimeout(() => {
+function intervalQueryForVideo() {
+  const interval = setInterval(() => {
+    const video = document.querySelector('div.ytd-player video');
+    if (video) {
+      clearInterval(interval);
       run();
-    }, 1000);
+      observeVideoSrcChange();
+    }
+  }, 1000);
+}
+
+function observeVideoSrcChange() {
+  const video = document.querySelector<HTMLVideoElement>('video');
+
+  const observer = new MutationObserver((mutations: MutationRecord[]) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+        run();
+      }
+    }
+  });
+
+  if (video) {
+    observer.observe(video, { attributeFilter: ['src'] });
   }
-});
+}
 
 export async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
@@ -114,3 +132,4 @@ export async function run(): Promise<void> {
 }
 
 run();
+intervalQueryForVideo();
