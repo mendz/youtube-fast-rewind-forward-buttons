@@ -111,6 +111,7 @@ async function resetToDefaultOptions(): Promise<void> {
     inputRewindSeconds,
     inputForwardSeconds,
     inputShouldOverrideArrowKeys,
+    inputShouldOverrideMediaKeys,
   } = getInputs();
   try {
     await chrome.storage.sync.set(OPTIONS_DEFAULT_VALUES);
@@ -120,6 +121,8 @@ async function resetToDefaultOptions(): Promise<void> {
       OPTIONS_DEFAULT_VALUES.forwardSeconds.toString();
     inputShouldOverrideArrowKeys.checked =
       OPTIONS_DEFAULT_VALUES.shouldOverrideArrowKeys;
+    inputShouldOverrideMediaKeys.checked =
+      OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
   } catch (error) {
     console.error(error);
   }

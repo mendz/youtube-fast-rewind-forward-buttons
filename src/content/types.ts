@@ -3,6 +3,11 @@ export enum ArrowKey {
   ARROW_RIGHT_KEY = 'ArrowRight',
 }
 
+export enum MediaTrackKey {
+  MEDIA_TRACK_PREVIOUS = 'MediaTrackPrevious',
+  MEDIA_TRACK_NEXT = 'MediaTrackNext',
+}
+
 export type CreateButtonArg = {
   svg: string;
   title: string;

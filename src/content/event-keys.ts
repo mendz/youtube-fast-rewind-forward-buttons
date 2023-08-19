@@ -1,6 +1,11 @@
 import { getSeconds as eventKeys } from './helper';
 import { updateVideoTime } from './handle-video-player';
-import { ALL_KEY_CODES, ArrowKey, KEY_CODES } from './types';
+import { ALL_KEY_CODES, ArrowKey, KEY_CODES, MediaTrackKey } from './types';
+
+const MEDIA_KEYS_TO_ARROW_KEYS = {
+  [MediaTrackKey.MEDIA_TRACK_PREVIOUS]: ArrowKey.ARROW_LEFT_KEY,
+  [MediaTrackKey.MEDIA_TRACK_NEXT]: ArrowKey.ARROW_RIGHT_KEY,
+};
 
 export function simulateKey(key: ArrowKey): void {
   const event: KeyboardEvent = new KeyboardEvent('keydown', {
@@ -54,65 +59,29 @@ export function overrideArrowKeys(
   });
 }
 
-function overrideMediaKeys(
-  options: IOptions,
-  video: HTMLVideoElement,
-  arrowKeyType: ArrowKey
-): void {
-  updateVideoTime({
-    seconds: eventKeys(arrowKeyType, options),
-    video,
-    updateType: arrowKeyType,
-  });
-}
-
-export function setActionHandlersMediaKeys(
+export function overrideMediaKeys(
+  event: KeyboardEvent,
   options: IOptions,
   video: HTMLVideoElement
-) {
-  // skip if the option is set to false
+): void {
   if (!options.shouldOverrideMediaKeys) {
     return;
   }
-  try {
-    // User hit "Previous Track" key.
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-      if (options.rewindSeconds === 5) {
-        simulateKey(ArrowKey.ARROW_LEFT_KEY);
-      } else {
-        overrideMediaKeys(options, video, ArrowKey.ARROW_LEFT_KEY);
-      }
-    });
-    // User hit "Next Track" key.
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-      if (options.rewindSeconds === 5) {
-        simulateKey(ArrowKey.ARROW_RIGHT_KEY);
-      } else {
-        overrideMediaKeys(options, video, ArrowKey.ARROW_RIGHT_KEY);
-      }
-    });
-  } catch (error) {
-    console.error('WHY????', error);
-  }
-}
 
-function disableActionHandlersMediaKeys() {
-  navigator.mediaSession.setActionHandler('previoustrack', null);
-  navigator.mediaSession.setActionHandler('nexttrack', null);
-}
+  const mediaTrackKey = event.key as MediaTrackKey;
+  const arrowKey = MEDIA_KEYS_TO_ARROW_KEYS[mediaTrackKey];
 
-export function handleMediaKeysOptionUpdate(
-  oldOptions: IOptions,
-  newOptions: IOptions,
-  video: HTMLVideoElement
-) {
-  // reset the handler
   if (
-    oldOptions.shouldOverrideMediaKeys &&
-    !newOptions.shouldOverrideMediaKeys
+    (options.rewindSeconds === 5 && arrowKey === ArrowKey.ARROW_LEFT_KEY) ||
+    (options.forwardSeconds === 5 && arrowKey === ArrowKey.ARROW_RIGHT_KEY)
   ) {
-    disableActionHandlersMediaKeys();
-  } else if (newOptions.shouldOverrideMediaKeys) {
-    setActionHandlersMediaKeys(newOptions, video);
+    simulateKey(arrowKey);
+    return;
   }
+
+  updateVideoTime({
+    seconds: eventKeys(arrowKey, options),
+    video,
+    updateType: arrowKey,
+  });
 }

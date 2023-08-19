@@ -1,9 +1,5 @@
 import { addButtonsToVideo, updateButtons } from './buttons';
-import {
-  handleMediaKeysOptionUpdate,
-  overrideArrowKeys,
-  setActionHandlersMediaKeys,
-} from './event-keys';
+import { overrideArrowKeys, overrideMediaKeys } from './event-keys';
 import { ButtonClassesIds } from './types';
 
 function handleOverrideKeysMigration(
@@ -136,6 +132,21 @@ function observeVideoSrcChange() {
   }
 }
 
+function addEventListeners(video: HTMLVideoElement) {
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if (['MediaTrackPrevious', 'MediaTrackNext'].includes(event.key)) {
+        overrideMediaKeys(event, loadedOptions, video);
+        return;
+      }
+
+      overrideArrowKeys(event, loadedOptions, video);
+    },
+    { capture: true }
+  );
+}
+
 export async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
   loadedOptions = { ...options };
@@ -147,12 +158,7 @@ export async function run(): Promise<void> {
   // check if there is no custom button already
   if (video?.src && !customButton) {
     addButtonsToVideo(loadedOptions, video);
-    document.addEventListener(
-      'keydown',
-      (event) => overrideArrowKeys(event, loadedOptions, video),
-      { capture: true }
-    );
-    setActionHandlersMediaKeys(loadedOptions, video);
+    addEventListeners(video);
   }
 }
 
@@ -160,11 +166,9 @@ export async function run(): Promise<void> {
 chrome.storage.onChanged.addListener(
   (changes: { [key: string]: chrome.storage.StorageChange }): void => {
     const video = document.querySelector('video') as HTMLVideoElement;
-    const oldOptions = loadedOptions;
     loadedOptions = mergeOptions(changes, loadedOptions);
 
     updateButtons(loadedOptions, video);
-    handleMediaKeysOptionUpdate(oldOptions, loadedOptions, video);
   }
 );
 
