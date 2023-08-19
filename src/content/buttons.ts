@@ -35,18 +35,18 @@ export function getButtons(
   fastRewindButton: HTMLButtonElement;
   fastForwardButton: HTMLButtonElement;
 } {
-  const { shouldOverrideKeys, rewindSeconds, forwardSeconds } = options;
+  const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } = options;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
   // set the buttons
   const fastRewindButton: HTMLButtonElement = createButton({
     svg: createFastRewindSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: createRewindButtonTitle(rewindSeconds, shouldOverrideKeys),
+    title: createRewindButtonTitle(rewindSeconds, shouldOverrideArrowKeys),
     id: ButtonClassesIds.REWIND_ID,
   });
   const fastForwardButton: HTMLButtonElement = createButton({
     svg: createFastForwardSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: createForwardButtonTitle(forwardSeconds, shouldOverrideKeys),
+    title: createForwardButtonTitle(forwardSeconds, shouldOverrideArrowKeys),
     id: ButtonClassesIds.FORWARD_ID,
   });
 
@@ -74,7 +74,7 @@ export function getButtons(
 }
 
 export function updateButtonsTitles(newOptions: IOptions): void {
-  const { forwardSeconds, rewindSeconds, shouldOverrideKeys } = newOptions;
+  const { forwardSeconds, rewindSeconds, shouldOverrideArrowKeys } = newOptions;
   // set the buttons titles
   const rewindButton = document.querySelector(
     `button#${ButtonClassesIds.REWIND_ID}`
@@ -85,11 +85,11 @@ export function updateButtonsTitles(newOptions: IOptions): void {
 
   rewindButton.title = createRewindButtonTitle(
     rewindSeconds,
-    shouldOverrideKeys
+    shouldOverrideArrowKeys
   );
   forwardButton.title = createForwardButtonTitle(
     forwardSeconds,
-    shouldOverrideKeys
+    shouldOverrideArrowKeys
   );
 }
 

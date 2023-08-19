@@ -1,6 +1,27 @@
 import { addButtonsToVideo, updateButtons } from './buttons';
-import { overrideArrowKeys } from './event-keys';
+import {
+  handleMediaKeysOptionUpdate,
+  overrideArrowKeys,
+  setActionHandlersMediaKeys,
+} from './event-keys';
 import { ButtonClassesIds } from './types';
+
+function handleOverrideKeysMigration(
+  defaultOptions: Readonly<IOptions>,
+  storageOptions: IStorageOptions
+): boolean {
+  // check if there is a value on shouldOverrideKeys, if so use it
+  // could be undefined if it wasn't set before or false which it ok to use the new value
+  if (storageOptions?.shouldOverrideKeys) {
+    return (
+      storageOptions?.shouldOverrideKeys ?? defaultOptions.shouldOverrideKeys
+    );
+  }
+  return (
+    storageOptions?.shouldOverrideArrowKeys ??
+    defaultOptions.shouldOverrideArrowKeys
+  );
+}
 
 let loadedOptions: IOptions;
 /**
@@ -10,7 +31,8 @@ let loadedOptions: IOptions;
   const defaultOptions: Readonly<IOptions> = {
     rewindSeconds: 5,
     forwardSeconds: 5,
-    shouldOverrideKeys: false,
+    shouldOverrideArrowKeys: false,
+    shouldOverrideMediaKeys: false,
   };
  * ```
  * @returns
@@ -19,7 +41,9 @@ export async function loadOptions(): Promise<IOptions> {
   const defaultOptions: Readonly<IOptions> = {
     rewindSeconds: 5,
     forwardSeconds: 5,
-    shouldOverrideKeys: false,
+    shouldOverrideKeys: false, // todo: removed in the next version
+    shouldOverrideArrowKeys: false,
+    shouldOverrideMediaKeys: false,
   };
 
   try {
@@ -37,8 +61,13 @@ export async function loadOptions(): Promise<IOptions> {
       forwardSeconds: !Number.isNaN(forwardSeconds)
         ? forwardSeconds
         : defaultOptions.forwardSeconds,
-      shouldOverrideKeys:
-        storageOptions?.shouldOverrideKeys ?? defaultOptions.shouldOverrideKeys,
+      shouldOverrideArrowKeys: handleOverrideKeysMigration(
+        defaultOptions,
+        storageOptions
+      ),
+      shouldOverrideMediaKeys:
+        storageOptions?.shouldOverrideMediaKeys ??
+        defaultOptions.shouldOverrideMediaKeys,
     };
   } catch (error) {
     console.error(error);
@@ -46,10 +75,9 @@ export async function loadOptions(): Promise<IOptions> {
   }
 }
 
-export function updateButtonAfterNewStorage(
+export function mergeOptions(
   newChangesOptions: { [key: string]: chrome.storage.StorageChange },
-  currentOptions: IOptions,
-  video: HTMLVideoElement
+  currentOptions: IOptions
 ): IOptions {
   let changeForwardSeconds: Nullable<number> = parseInt(
     newChangesOptions['forwardSeconds']?.newValue,
@@ -70,20 +98,16 @@ export function updateButtonAfterNewStorage(
   const newOptions: IOptions = {
     forwardSeconds: changeForwardSeconds ?? currentOptions.forwardSeconds,
     rewindSeconds: changeRewindSeconds ?? currentOptions.rewindSeconds,
-    shouldOverrideKeys:
-      newChangesOptions['shouldOverrideKeys']?.newValue ??
-      currentOptions.shouldOverrideKeys,
+    shouldOverrideArrowKeys:
+      newChangesOptions.shouldOverrideArrowKeys?.newValue ??
+      currentOptions.shouldOverrideArrowKeys,
+    shouldOverrideMediaKeys:
+      newChangesOptions.shouldOverrideMediaKeys?.newValue ??
+      currentOptions.shouldOverrideMediaKeys,
   };
-  updateButtons(newOptions, video);
+
   return { ...newOptions };
 }
-
-chrome.storage.onChanged.addListener(
-  (changes: { [key: string]: chrome.storage.StorageChange }): void => {
-    const video = document.querySelector('video') as HTMLVideoElement;
-    loadedOptions = updateButtonAfterNewStorage(changes, loadedOptions, video);
-  }
-);
 
 function intervalQueryForVideo() {
   const interval = setInterval(() => {
@@ -128,8 +152,21 @@ export async function run(): Promise<void> {
       (event) => overrideArrowKeys(event, loadedOptions, video),
       { capture: true }
     );
+    setActionHandlersMediaKeys(loadedOptions, video);
   }
 }
+
+// handle option update
+chrome.storage.onChanged.addListener(
+  (changes: { [key: string]: chrome.storage.StorageChange }): void => {
+    const video = document.querySelector('video') as HTMLVideoElement;
+    const oldOptions = loadedOptions;
+    loadedOptions = mergeOptions(changes, loadedOptions);
+
+    updateButtons(loadedOptions, video);
+    handleMediaKeysOptionUpdate(oldOptions, loadedOptions, video);
+  }
+);
 
 run();
 intervalQueryForVideo();

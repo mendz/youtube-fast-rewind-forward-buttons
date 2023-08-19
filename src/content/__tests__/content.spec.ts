@@ -1,7 +1,7 @@
 import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
-import { run, loadOptions, updateButtonAfterNewStorage } from '../content';
+import { run, loadOptions, mergeOptions } from '../content';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
@@ -167,7 +167,7 @@ describe('loadOptions', () => {
   });
 });
 
-describe('updateButtonAfterNewStorage', () => {
+describe('mergeOptions', () => {
   it('Should return the merge options', () => {
     const optionsMock = {
       forwardSeconds: 2,
@@ -184,12 +184,7 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const video = document.querySelector('video') as HTMLVideoElement;
-    const returnedOptions = updateButtonAfterNewStorage(
-      changeOptionsMock,
-      optionsMock,
-      video
-    );
+    const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,
@@ -198,7 +193,7 @@ describe('updateButtonAfterNewStorage', () => {
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 
-  it('Should handle unsparing number', () => {
+  it('Should handle un-parsing number', () => {
     const optionsMock = {
       forwardSeconds: 2,
       rewindSeconds: 7,
@@ -218,12 +213,7 @@ describe('updateButtonAfterNewStorage', () => {
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
       },
     };
-    const video = document.querySelector('video') as HTMLVideoElement;
-    const returnedOptions = updateButtonAfterNewStorage(
-      changeOptionsMock,
-      optionsMock,
-      video
-    );
+    const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,

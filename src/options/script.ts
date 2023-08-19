@@ -1,13 +1,16 @@
 const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
   rewindSeconds: 5,
   forwardSeconds: 5,
-  shouldOverrideKeys: false,
+  shouldOverrideKeys: false, // TODO: old one, should removed in the next version
+  shouldOverrideArrowKeys: false,
+  shouldOverrideMediaKeys: false,
 };
 
 type InputsOptionsPage = {
   inputRewindSeconds: HTMLInputElement;
   inputForwardSeconds: HTMLInputElement;
-  InputShouldOverrideKeys: HTMLInputElement;
+  inputShouldOverrideArrowKeys: HTMLInputElement;
+  inputShouldOverrideMediaKeys: HTMLInputElement;
 };
 
 function getInputs(): InputsOptionsPage {
@@ -17,13 +20,18 @@ function getInputs(): InputsOptionsPage {
   const inputForwardSeconds: HTMLInputElement = document.querySelector(
     '#forward'
   ) as HTMLInputElement;
-  const InputShouldOverrideKeys: HTMLInputElement = document.querySelector(
-    '#override-keys'
+  const inputShouldOverrideArrowKeys: HTMLInputElement = document.querySelector(
+    '#override-arrow-keys'
   ) as HTMLInputElement;
+  const inputShouldOverrideMediaKeys: HTMLInputElement = document.querySelector(
+    '#override-media-kays'
+  ) as HTMLInputElement;
+
   return {
     inputRewindSeconds,
     inputForwardSeconds,
-    InputShouldOverrideKeys,
+    inputShouldOverrideArrowKeys,
+    inputShouldOverrideMediaKeys,
   };
 }
 
@@ -31,13 +39,15 @@ async function saveOptions(): Promise<void> {
   const {
     inputRewindSeconds: rewindSeconds,
     inputForwardSeconds: forwardSeconds,
-    InputShouldOverrideKeys: shouldOverrideKeys,
+    inputShouldOverrideArrowKeys: shouldOverrideArrowKeys,
+    inputShouldOverrideMediaKeys: shouldOverrideMediaKeys,
   } = getInputs();
   try {
     await chrome.storage.sync.set({
       rewindSeconds: rewindSeconds.value,
       forwardSeconds: forwardSeconds.value,
-      shouldOverrideKeys: shouldOverrideKeys.checked,
+      shouldOverrideArrowKeys: shouldOverrideArrowKeys.checked,
+      shouldOverrideMediaKeys: shouldOverrideMediaKeys.checked,
     });
     console.info('options saved!');
     window.close();
@@ -46,15 +56,34 @@ async function saveOptions(): Promise<void> {
   }
 }
 
-async function loadStorageOptions(): Promise<void> {
-  const { inputRewindSeconds, inputForwardSeconds, InputShouldOverrideKeys } =
-    getInputs();
+function handleOverrideKeysMigration(
+  inputShouldOverrideArrowKeys: HTMLInputElement,
+  storageOptions: IStorageOptions
+) {
+  // check if there is a value on shouldOverrideKeys, if so use it
+  // could be undefined if it wasn't set before or false which it ok to use the new value
+  if (storageOptions?.shouldOverrideKeys) {
+    inputShouldOverrideArrowKeys.checked =
+      storageOptions.shouldOverrideKeys ??
+      OPTIONS_DEFAULT_VALUES.shouldOverrideArrowKeys;
+  } else {
+    inputShouldOverrideArrowKeys.checked =
+      storageOptions?.shouldOverrideArrowKeys ??
+      OPTIONS_DEFAULT_VALUES.shouldOverrideArrowKeys;
+  }
+}
+
+async function loadInputStorageOptions(): Promise<void> {
+  const {
+    inputRewindSeconds,
+    inputForwardSeconds,
+    inputShouldOverrideArrowKeys,
+    inputShouldOverrideMediaKeys,
+  } = getInputs();
   try {
-    const storageOptions: IStorageOptions = (await chrome.storage.sync.get([
-      'rewindSeconds',
-      'forwardSeconds',
-      'shouldOverrideKeys',
-    ])) as IStorageOptions;
+    const storageOptions: IStorageOptions = (await chrome.storage.sync.get(
+      Object.keys(OPTIONS_DEFAULT_VALUES)
+    )) as IStorageOptions;
 
     // set the inputs with the loaded options
     inputRewindSeconds.value =
@@ -63,9 +92,10 @@ async function loadStorageOptions(): Promise<void> {
     inputForwardSeconds.value =
       storageOptions?.forwardSeconds ??
       OPTIONS_DEFAULT_VALUES.forwardSeconds.toString();
-    InputShouldOverrideKeys.checked =
-      storageOptions?.shouldOverrideKeys ??
-      OPTIONS_DEFAULT_VALUES.shouldOverrideKeys;
+    handleOverrideKeysMigration(inputShouldOverrideArrowKeys, storageOptions);
+    inputShouldOverrideMediaKeys.checked =
+      storageOptions?.shouldOverrideMediaKeys ??
+      OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
   } catch (error) {
     console.error(error);
   }
@@ -77,15 +107,19 @@ async function resetToDefaultOptions(): Promise<void> {
   if (!result) {
     return;
   }
-  const { inputRewindSeconds, inputForwardSeconds, InputShouldOverrideKeys } =
-    getInputs();
+  const {
+    inputRewindSeconds,
+    inputForwardSeconds,
+    inputShouldOverrideArrowKeys,
+  } = getInputs();
   try {
     await chrome.storage.sync.set(OPTIONS_DEFAULT_VALUES);
     console.info('options saved with default values!');
     inputRewindSeconds.value = OPTIONS_DEFAULT_VALUES.rewindSeconds.toString();
     inputForwardSeconds.value =
       OPTIONS_DEFAULT_VALUES.forwardSeconds.toString();
-    InputShouldOverrideKeys.checked = OPTIONS_DEFAULT_VALUES.shouldOverrideKeys;
+    inputShouldOverrideArrowKeys.checked =
+      OPTIONS_DEFAULT_VALUES.shouldOverrideArrowKeys;
   } catch (error) {
     console.error(error);
   }
@@ -107,5 +141,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('button#reset-values')
     ?.addEventListener('click', resetToDefaultOptions);
-  loadStorageOptions();
+  loadInputStorageOptions();
 });

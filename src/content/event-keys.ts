@@ -32,7 +32,7 @@ export function isShouldSkipOverrideKeys(
   const isNotKey = !ALL_KEY_CODES.includes(eventKey);
   return (
     isNotKey ||
-    !options.shouldOverrideKeys ||
+    !options.shouldOverrideArrowKeys ||
     (eventKey === ArrowKey.ARROW_LEFT_KEY && options.rewindSeconds === 5) ||
     (eventKey === ArrowKey.ARROW_RIGHT_KEY && options.forwardSeconds === 5)
   );
@@ -52,4 +52,67 @@ export function overrideArrowKeys(
     video,
     updateType: event.key as ArrowKey,
   });
+}
+
+function overrideMediaKeys(
+  options: IOptions,
+  video: HTMLVideoElement,
+  arrowKeyType: ArrowKey
+): void {
+  updateVideoTime({
+    seconds: eventKeys(arrowKeyType, options),
+    video,
+    updateType: arrowKeyType,
+  });
+}
+
+export function setActionHandlersMediaKeys(
+  options: IOptions,
+  video: HTMLVideoElement
+) {
+  // skip if the option is set to false
+  if (!options.shouldOverrideMediaKeys) {
+    return;
+  }
+  try {
+    // User hit "Previous Track" key.
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      if (options.rewindSeconds === 5) {
+        simulateKey(ArrowKey.ARROW_LEFT_KEY);
+      } else {
+        overrideMediaKeys(options, video, ArrowKey.ARROW_LEFT_KEY);
+      }
+    });
+    // User hit "Next Track" key.
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      if (options.rewindSeconds === 5) {
+        simulateKey(ArrowKey.ARROW_RIGHT_KEY);
+      } else {
+        overrideMediaKeys(options, video, ArrowKey.ARROW_RIGHT_KEY);
+      }
+    });
+  } catch (error) {
+    console.error('WHY????', error);
+  }
+}
+
+function disableActionHandlersMediaKeys() {
+  navigator.mediaSession.setActionHandler('previoustrack', null);
+  navigator.mediaSession.setActionHandler('nexttrack', null);
+}
+
+export function handleMediaKeysOptionUpdate(
+  oldOptions: IOptions,
+  newOptions: IOptions,
+  video: HTMLVideoElement
+) {
+  // reset the handler
+  if (
+    oldOptions.shouldOverrideMediaKeys &&
+    !newOptions.shouldOverrideMediaKeys
+  ) {
+    disableActionHandlersMediaKeys();
+  } else if (newOptions.shouldOverrideMediaKeys) {
+    setActionHandlersMediaKeys(newOptions, video);
+  }
 }
