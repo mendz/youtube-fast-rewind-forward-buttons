@@ -1,6 +1,12 @@
 import { getSeconds as eventKeys } from './helper';
 import { updateVideoTime } from './handle-video-player';
-import { ALL_KEY_CODES, ArrowKey, KEY_CODES, MediaTrackKey } from './types';
+import {
+  ALL_ARROW_KEY_CODES,
+  ArrowKey,
+  IOptions,
+  KEY_CODES,
+  MediaTrackKey,
+} from './types';
 
 const MEDIA_KEYS_TO_ARROW_KEYS = {
   [MediaTrackKey.MEDIA_TRACK_PREVIOUS]: ArrowKey.ARROW_LEFT_KEY,
@@ -30,11 +36,11 @@ export function simulateKey(key: ArrowKey): void {
  * * For the correct event key if its 5 seconds or not
  * @returns boolean if should skip
  */
-export function isShouldSkipOverrideKeys(
+export function isShouldSkipOverrideArrowKeys(
   eventKey: ArrowKey,
   options: IOptions
 ): boolean {
-  const isNotKey = !ALL_KEY_CODES.includes(eventKey);
+  const isNotKey = !ALL_ARROW_KEY_CODES.includes(eventKey);
   return (
     isNotKey ||
     !options.shouldOverrideArrowKeys ||
@@ -48,7 +54,7 @@ export function overrideArrowKeys(
   options: IOptions,
   video: HTMLVideoElement
 ): void {
-  if (isShouldSkipOverrideKeys(event.key as ArrowKey, options)) {
+  if (isShouldSkipOverrideArrowKeys(event.key as ArrowKey, options)) {
     return;
   }
   event.preventDefault();

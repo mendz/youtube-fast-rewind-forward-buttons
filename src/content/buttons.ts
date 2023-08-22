@@ -12,6 +12,7 @@ import {
   ArrowKey,
   ButtonClassesIds,
   ButtonExtraStylesArg,
+  IOptions,
   VideoTimeArg,
 } from './types';
 

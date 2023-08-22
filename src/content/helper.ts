@@ -1,4 +1,4 @@
-import { ArrowKey, ButtonClassesIds, CreateButtonArg } from './types';
+import { ArrowKey, ButtonClassesIds, CreateButtonArg, IOptions } from './types';
 
 export function createButton({
   svg,

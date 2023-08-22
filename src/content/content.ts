@@ -1,6 +1,11 @@
 import { addButtonsToVideo, updateButtons } from './buttons';
 import { overrideArrowKeys, overrideMediaKeys } from './event-keys';
-import { ButtonClassesIds } from './types';
+import {
+  ButtonClassesIds,
+  ChromeStorageChanges,
+  IOptions,
+  IStorageOptions,
+} from './types';
 
 function handleOverrideKeysMigration(
   defaultOptions: Readonly<IOptions>,
@@ -72,7 +77,7 @@ export async function loadOptions(): Promise<IOptions> {
 }
 
 export function mergeOptions(
-  newChangesOptions: { [key: string]: chrome.storage.StorageChange },
+  newChangesOptions: ChromeStorageChanges,
   currentOptions: IOptions
 ): IOptions {
   let changeForwardSeconds: Nullable<number> = parseInt(
@@ -163,14 +168,12 @@ export async function run(): Promise<void> {
 }
 
 // handle option update
-chrome.storage.onChanged.addListener(
-  (changes: { [key: string]: chrome.storage.StorageChange }): void => {
-    const video = document.querySelector('video') as HTMLVideoElement;
-    loadedOptions = mergeOptions(changes, loadedOptions);
+chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
+  const video = document.querySelector('video') as HTMLVideoElement;
+  loadedOptions = mergeOptions(changes, loadedOptions);
 
-    updateButtons(loadedOptions, video);
-  }
-);
+  updateButtons(loadedOptions, video);
+});
 
 run();
 intervalQueryForVideo();

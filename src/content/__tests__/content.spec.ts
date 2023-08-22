@@ -6,7 +6,7 @@ import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
-import { ButtonClassesIds } from '../types';
+import { ButtonClassesIds, ChromeStorageChanges, IOptions } from '../types';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -106,10 +106,11 @@ describe('loadOptions', () => {
   });
 
   it('Should return the values from the storage if exists', async () => {
-    const options = {
+    const options: IOptions = {
       rewindSeconds: 10,
       forwardSeconds: 2,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
     };
     chrome.storage.sync.get.mockReturnValue(options as any);
     const loadedOptions = await loadOptions();
@@ -118,9 +119,9 @@ describe('loadOptions', () => {
   });
 
   it(`Should return the default value from if the on storage doesn't exists`, async () => {
-    const options = {
+    const options: Partial<IOptions> = {
       rewindSeconds: 10,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
     };
     chrome.storage.sync.get.mockReturnValue({ ...options } as any);
     let loadedOptions = await loadOptions();
@@ -128,6 +129,7 @@ describe('loadOptions', () => {
     expect(loadedOptions).toMatchObject({
       ...options,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
+      shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
     });
 
     chrome.storage.sync.get.mockReturnValue({
@@ -151,7 +153,8 @@ describe('loadOptions', () => {
     expect(loadedOptions).toMatchObject({
       ...options2,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
-      shouldOverrideKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
+      shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
     });
   });
 
@@ -169,19 +172,20 @@ describe('loadOptions', () => {
 
 describe('mergeOptions', () => {
   it('Should return the merge options', () => {
-    const optionsMock = {
+    const optionsMock: IOptions = {
       forwardSeconds: 2,
       rewindSeconds: 7,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
     };
-    const changeOptionsMock: { [key: string]: chrome.storage.StorageChange } = {
+    const changeOptionsMock: ChromeStorageChanges = {
       rewindSeconds: {
         oldValue: optionsMock.rewindSeconds,
         newValue: DEFAULT_OPTIONS_MOCK.rewindSeconds,
       },
-      shouldOverrideKeys: {
-        oldValue: optionsMock.shouldOverrideKeys,
-        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      shouldOverrideArrowKeys: {
+        oldValue: optionsMock.shouldOverrideArrowKeys,
+        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       },
     };
     const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
@@ -194,12 +198,13 @@ describe('mergeOptions', () => {
   });
 
   it('Should handle un-parsing number', () => {
-    const optionsMock = {
+    const optionsMock: IOptions = {
       forwardSeconds: 2,
       rewindSeconds: 7,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
     };
-    const changeOptionsMock: { [key: string]: chrome.storage.StorageChange } = {
+    const changeOptionsMock: ChromeStorageChanges = {
       rewindSeconds: {
         oldValue: optionsMock.rewindSeconds,
         newValue: DEFAULT_OPTIONS_MOCK.rewindSeconds,
@@ -208,9 +213,9 @@ describe('mergeOptions', () => {
         oldValue: optionsMock.forwardSeconds,
         newValue: '|',
       },
-      shouldOverrideKeys: {
-        oldValue: optionsMock.shouldOverrideKeys,
-        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      shouldOverrideArrowKeys: {
+        oldValue: optionsMock.shouldOverrideArrowKeys,
+        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       },
     };
     const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);

@@ -1,4 +1,5 @@
 import { createFastRewindSVG, createFastForwardSVG } from '../helper';
+import { IOptions } from '../types';
 
 export const HTML_PLAYER_FULL = `
 <ytd-player>
@@ -6,7 +7,7 @@ export const HTML_PLAYER_FULL = `
         <video class="video-stream html5-main-video" src="test"></video>
     </div>
     <div class="ytp-chrome-bottom">
-        <div 
+        <div
             class="ytp-tooltip ytp-bottom ytp-preview ytp-has-duration ytp-text-detail"
             >
             <div class="ytp-tooltip-text-wrapper">
@@ -36,10 +37,11 @@ export const SVG_PATH_CLASSES_MOCK = ['path-test-class'];
 export const X_LINK_ATTR = 'xlink:href';
 export const TOOLTIP_CONTAINER_WRAPPER_QUERY = 'div.ytp-tooltip-text-wrapper';
 
-export const DEFAULT_OPTIONS_MOCK = {
+export const DEFAULT_OPTIONS_MOCK: IOptions = {
   forwardSeconds: 5,
   rewindSeconds: 5,
-  shouldOverrideKeys: false,
+  shouldOverrideArrowKeys: false,
+  shouldOverrideMediaKeys: false,
 };
 
 export function removeSpaces(text: string) {

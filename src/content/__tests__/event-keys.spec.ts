@@ -1,5 +1,5 @@
 import {
-  isShouldSkipOverrideKeys,
+  isShouldSkipOverrideArrowKeys,
   overrideArrowKeys,
   simulateKey,
 } from '../event-keys';
@@ -59,14 +59,14 @@ describe('simulateKey', () => {
 
 describe('isShouldSkipOverrideKeys', () => {
   it('should return true when not the correct key', () => {
-    const result: boolean = isShouldSkipOverrideKeys(
+    const result: boolean = isShouldSkipOverrideArrowKeys(
       'mendy' as any,
       DEFAULT_OPTIONS_MOCK
     );
     expect(result).toBe(true);
   });
   it('should return true when not shouldOverrideKeys', () => {
-    const result: boolean = isShouldSkipOverrideKeys(
+    const result: boolean = isShouldSkipOverrideArrowKeys(
       ArrowKey.ARROW_LEFT_KEY,
       DEFAULT_OPTIONS_MOCK
     );
@@ -77,27 +77,33 @@ describe('isShouldSkipOverrideKeys', () => {
       ...DEFAULT_OPTIONS_MOCK,
       shouldOverrideKeys: true,
     };
-    let result: boolean = isShouldSkipOverrideKeys(
+    let result: boolean = isShouldSkipOverrideArrowKeys(
       ArrowKey.ARROW_LEFT_KEY,
       newOptions
     );
     expect(result).toBe(true);
-    result = isShouldSkipOverrideKeys(ArrowKey.ARROW_RIGHT_KEY, newOptions);
+    result = isShouldSkipOverrideArrowKeys(
+      ArrowKey.ARROW_RIGHT_KEY,
+      newOptions
+    );
     expect(result).toBe(true);
   });
-  it('should return false when the correct key but NOT 5 seconds and overrideArrowKeys', () => {
+  it('should return false when the correct key but NOT 5 seconds and shouldOverrideArrowKeys', () => {
     const newOptions = {
       ...DEFAULT_OPTIONS_MOCK,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
       rewindSeconds: 10,
     };
-    let result: boolean = isShouldSkipOverrideKeys(
+    let result: boolean = isShouldSkipOverrideArrowKeys(
       ArrowKey.ARROW_LEFT_KEY,
       newOptions
     );
     expect(result).toBe(false);
     newOptions.forwardSeconds = 10;
-    result = isShouldSkipOverrideKeys(ArrowKey.ARROW_RIGHT_KEY, newOptions);
+    result = isShouldSkipOverrideArrowKeys(
+      ArrowKey.ARROW_RIGHT_KEY,
+      newOptions
+    );
     expect(result).toBe(false);
   });
 });
@@ -128,7 +134,11 @@ describe('overrideArrowKeys', () => {
   it('Should not skip override and run updateVideoTime', () => {
     overrideArrowKeys(
       event,
-      { ...DEFAULT_OPTIONS_MOCK, shouldOverrideKeys: true, rewindSeconds: 10 },
+      {
+        ...DEFAULT_OPTIONS_MOCK,
+        shouldOverrideArrowKeys: true,
+        rewindSeconds: 10,
+      },
       videoElement
     );
     expect(event.preventDefault).toHaveBeenCalled();
