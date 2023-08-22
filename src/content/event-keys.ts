@@ -74,6 +74,8 @@ export function overrideMediaKeys(
     return;
   }
 
+  event.preventDefault();
+
   const mediaTrackKey = event.key as MediaTrackKey;
   const arrowKey = MEDIA_KEYS_TO_ARROW_KEYS[mediaTrackKey];
 
