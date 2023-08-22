@@ -40,9 +40,11 @@ export type ButtonExtraStylesArg = {
   svgUseHtml: string;
 };
 
-export const KEY_CODES: { [key in ArrowKey]: number } = {
+export const KEY_CODES: { [key in ArrowKey | MediaTrackKey]: number } = {
   [ArrowKey.ARROW_LEFT_KEY]: 37,
   [ArrowKey.ARROW_RIGHT_KEY]: 39,
+  [MediaTrackKey.MEDIA_TRACK_PREVIOUS]: 177,
+  [MediaTrackKey.MEDIA_TRACK_NEXT]: 176,
 };
 
 export const ALL_ARROW_KEY_CODES: ArrowKey[] = [
