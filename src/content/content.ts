@@ -7,7 +7,7 @@ import {
   IStorageOptions,
 } from './types';
 
-function handleOverrideKeysMigration(
+export function handleOverrideKeysMigration(
   defaultOptions: Readonly<IOptions>,
   storageOptions: IStorageOptions
 ): boolean {
@@ -137,17 +137,24 @@ function observeVideoSrcChange() {
   }
 }
 
+function keyDownHandler(event: KeyboardEvent, video: HTMLVideoElement) {
+  if (['MediaTrackPrevious', 'MediaTrackNext'].includes(event.key)) {
+    overrideMediaKeys(event, loadedOptions, video);
+    return;
+  }
+
+  overrideArrowKeys(event, loadedOptions, video);
+}
+
 function addEventListeners(video: HTMLVideoElement) {
+  document.removeEventListener(
+    'keydown',
+    (event) => keyDownHandler(event, video),
+    { capture: true }
+  );
   document.addEventListener(
     'keydown',
-    (event) => {
-      if (['MediaTrackPrevious', 'MediaTrackNext'].includes(event.key)) {
-        overrideMediaKeys(event, loadedOptions, video);
-        return;
-      }
-
-      overrideArrowKeys(event, loadedOptions, video);
-    },
+    (event) => keyDownHandler(event, video),
     { capture: true }
   );
 }

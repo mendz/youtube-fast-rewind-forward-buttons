@@ -1,12 +1,25 @@
 import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
-import { run, loadOptions, mergeOptions } from '../content';
+import {
+  run,
+  loadOptions,
+  mergeOptions,
+  handleOverrideKeysMigration,
+} from '../content';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
-import { ButtonClassesIds, ChromeStorageChanges, IOptions } from '../types';
+import {
+  ArrowKey,
+  ButtonClassesIds,
+  ChromeStorageChanges,
+  IOptions,
+  IStorageOptions,
+  KEY_CODES,
+  MediaTrackKey,
+} from '../types';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -22,11 +35,27 @@ describe('full run', () => {
   it('Should run overrideArrowKeys when user press keydown', async () => {
     const overrideArrowKeysSpy = jest.spyOn(eventKeys, 'overrideArrowKeys');
     await run();
-    const event = new KeyboardEvent('keydown', { keyCode: 37 });
+    const event = new KeyboardEvent('keydown', {
+      keyCode: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
+      key: ArrowKey.ARROW_LEFT_KEY,
+    });
     document.dispatchEvent(event);
     expect(overrideArrowKeysSpy).toBeCalledTimes(1); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run() if this test placed in the end
     overrideArrowKeysSpy.mockClear();
     overrideArrowKeysSpy.mockReset();
+  });
+
+  it('Should run overrideMediaKeys when user press keydown', async () => {
+    const overrideMediaKeysSpy = jest.spyOn(eventKeys, 'overrideMediaKeys');
+    await run();
+    const event = new KeyboardEvent('keydown', {
+      keyCode: KEY_CODES[MediaTrackKey.MEDIA_TRACK_PREVIOUS],
+      key: MediaTrackKey.MEDIA_TRACK_PREVIOUS,
+    });
+    document.dispatchEvent(event);
+    expect(overrideMediaKeysSpy).toHaveBeenCalled();
+    overrideMediaKeysSpy.mockClear();
+    overrideMediaKeysSpy.mockReset();
   });
 
   it('should have 2 buttons', async () => {
@@ -60,6 +89,17 @@ describe('full run', () => {
 
     await run();
     expect(addButtonsToVideoSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video);
+  });
+
+  it('Should addEventListener when run', async () => {
+    // set all the mockups
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+    document.removeEventListener = jest.fn();
+    document.addEventListener = jest.fn();
+
+    await run();
+    expect(document.removeEventListener).toHaveBeenCalled();
+    expect(document.addEventListener).toHaveBeenCalled();
   });
 
   it('Should show the correct titles for the buttons', async () => {
@@ -110,7 +150,7 @@ describe('loadOptions', () => {
       rewindSeconds: 10,
       forwardSeconds: 2,
       shouldOverrideArrowKeys: true,
-      shouldOverrideMediaKeys: false,
+      shouldOverrideMediaKeys: true,
     };
     chrome.storage.sync.get.mockReturnValue(options as any);
     const loadedOptions = await loadOptions();
@@ -156,6 +196,19 @@ describe('loadOptions', () => {
       shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
     });
+
+    const options3 = {
+      shouldOverrideMediaKeys: true,
+    };
+    chrome.storage.sync.get.mockReturnValue(options3 as any);
+    loadedOptions = await loadOptions();
+
+    expect(loadedOptions).toMatchObject({
+      ...options3,
+      rewindSeconds: DEFAULT_OPTIONS_MOCK.rewindSeconds,
+      forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
+      shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
+    });
   });
 
   it('Should catch the error and return the default values', async () => {
@@ -187,12 +240,17 @@ describe('mergeOptions', () => {
         oldValue: optionsMock.shouldOverrideArrowKeys,
         newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       },
+      shouldOverrideMediaKeys: {
+        oldValue: optionsMock.shouldOverrideMediaKeys,
+        newValue: true,
+      },
     };
     const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
+      shouldOverrideMediaKeys: true,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
@@ -225,5 +283,64 @@ describe('mergeOptions', () => {
       forwardSeconds: optionsMock.forwardSeconds,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
+  });
+});
+
+describe('handleOverrideKeysMigration', () => {
+  it('Should return true, if the old value is true or if the old value if false/undefined and the new value is true', () => {
+    const defaultOptions: Readonly<IOptions> = {
+      rewindSeconds: 5,
+      forwardSeconds: 5,
+      shouldOverrideKeys: false,
+      shouldOverrideArrowKeys: false,
+      shouldOverrideMediaKeys: false,
+    };
+
+    let storageOptions: IStorageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: false,
+      shouldOverrideMediaKeys: false,
+    };
+
+    const result = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result).toBe(true);
+
+    storageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
+    };
+
+    const result2 = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result2).toBe(true);
+
+    storageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideKeys: false,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
+    };
+
+    const result3 = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result3).toBe(true);
+
+    storageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideKeys: false,
+      shouldOverrideArrowKeys: false,
+      shouldOverrideMediaKeys: true,
+    };
+
+    const result4 = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result4).toBe(false);
   });
 });
