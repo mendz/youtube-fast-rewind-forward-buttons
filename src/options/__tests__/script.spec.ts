@@ -53,6 +53,7 @@ describe('Options page', () => {
     beforeEach(() => {
       document.body.innerHTML = MOCK_HTML;
       console.info = jest.fn();
+      console.error = jest.fn();
       window.close = jest.fn();
     });
 
@@ -72,10 +73,15 @@ describe('Options page', () => {
       expect(window.close).toHaveBeenCalled();
     });
 
-    // todo: add test
-    // it('Should console.error when set function throw an error', () => {
-    // runtime.lastError
-    // })
+    it('Should console.error when set function throw an error', () => {
+      chrome.storage.sync.set.mockImplementation(() => {
+        throw 'ERROR!';
+      });
+      saveOptions();
+      expect(console.info).not.toHaveBeenCalled();
+      expect(window.close).not.toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledWith('ERROR!');
+    });
 
     it('Should save what returns from the getInputs', () => {
       document.body.innerHTML = MOCK_HTML;
