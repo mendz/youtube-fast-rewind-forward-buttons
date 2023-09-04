@@ -1,3 +1,5 @@
+import { IOptions, IStorageOptions } from '../content/types';
+
 const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
   rewindSeconds: 5,
   forwardSeconds: 5,
@@ -13,7 +15,7 @@ type InputsOptionsPage = {
   inputShouldOverrideMediaKeys: HTMLInputElement;
 };
 
-function getInputs(): InputsOptionsPage {
+export function getInputs(): InputsOptionsPage {
   const inputRewindSeconds: HTMLInputElement = document.querySelector(
     '#rewind'
   ) as HTMLInputElement;
@@ -35,7 +37,7 @@ function getInputs(): InputsOptionsPage {
   };
 }
 
-async function saveOptions(): Promise<void> {
+export async function saveOptions(): Promise<void> {
   const {
     inputRewindSeconds: rewindSeconds,
     inputForwardSeconds: forwardSeconds,
@@ -56,7 +58,7 @@ async function saveOptions(): Promise<void> {
   }
 }
 
-function handleOverrideKeysMigration(
+export function handleOverrideKeysMigration(
   inputShouldOverrideArrowKeys: HTMLInputElement,
   storageOptions: IStorageOptions
 ) {
@@ -73,7 +75,7 @@ function handleOverrideKeysMigration(
   }
 }
 
-async function loadInputStorageOptions(): Promise<void> {
+export async function loadInputStorageOptions(): Promise<void> {
   const {
     inputRewindSeconds,
     inputForwardSeconds,
@@ -101,9 +103,9 @@ async function loadInputStorageOptions(): Promise<void> {
   }
 }
 
-async function resetToDefaultOptions(): Promise<void> {
+export async function resetToDefaultOptions(): Promise<void> {
   /* eslint-disable-next-line no-alert, no-restricted-globals */
-  const result = confirm('Are you sure?');
+  const result = window.confirm('Are you sure?');
   if (!result) {
     return;
   }
@@ -128,7 +130,7 @@ async function resetToDefaultOptions(): Promise<void> {
   }
 }
 
-function submit(event: Event): void {
+export function submit(event: Event): void {
   event.preventDefault();
   const form: HTMLFormElement = document.querySelector(
     'form.container'
