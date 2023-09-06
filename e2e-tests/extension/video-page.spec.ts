@@ -82,14 +82,17 @@ test.setTimeout(30 * 1000);
 
 test('Should add arrows when entering a video from the main page', async ({
   page,
+  context,
 }) => {
-  await page.goto('https://www.youtube.com/');
-  await page.locator('div.ytd-rich-item-renderer').first().click();
-  const video = page.locator('ytd-player video');
+  page.close();
+  const newPage = await context.newPage();
+  await newPage.goto('https://www.youtube.com/');
+  await newPage.locator('div.ytd-rich-item-renderer').first().click();
+  const video = newPage.locator('ytd-player video');
   // pause the video
-  await handleAds(page);
-  await resetVideo(video, page);
-  const { forwardButton, rewindButton } = getVideoLocatorElements(page);
+  await handleAds(newPage);
+  await resetVideo(video, newPage);
+  const { forwardButton, rewindButton } = getVideoLocatorElements(newPage);
 
   await testClickingButtons(video, forwardButton, rewindButton);
 });
