@@ -151,7 +151,9 @@ export async function handleAds(page: Page) {
 export async function getOptionFilePath(extensionId: string): Promise<string> {
   const extFolderPath = path.join(__dirname, EXTENSION_PATH);
   const files = await fs.promises.readdir(extFolderPath);
-  const optionFileName = files.find((file: string) => file.includes('options'));
+  const optionFileName = files.find((file: string) =>
+    /options.*html$/.test(file)
+  );
   if (optionFileName) {
     return `chrome-extension://${extensionId}/${optionFileName}`;
   }
@@ -161,20 +163,28 @@ export async function getOptionFilePath(extensionId: string): Promise<string> {
 export async function fillInputsWithChangedValues(
   rewindSecondsInput: Locator,
   forwardSecondsInput: Locator,
-  shouldOverrideKeysCheckbox: Locator
+  shouldOverrideKeysCheckbox: Locator,
+  shouldOverrideMediaKeysCheckbox: Locator
 ) {
   await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
   await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
   await shouldOverrideKeysCheckbox.check();
+  await shouldOverrideMediaKeysCheckbox.check();
 }
 
 export function getOptionsInputs(page: Page) {
   const rewindSecondsInput = page.locator('input#rewind');
   const forwardSecondsInput = page.locator('input#forward');
-  const shouldOverrideKeysCheckbox = page.locator('input#override-keys');
+  const shouldOverrideArrowKeysCheckbox = page.locator(
+    'input#override-arrow-keys'
+  );
+  const shouldOverrideMediaKeysCheckbox = page.locator(
+    'input#override-media-kays'
+  );
   return {
     rewindSecondsInput,
     forwardSecondsInput,
-    shouldOverrideKeysCheckbox,
+    shouldOverrideArrowKeysCheckbox,
+    shouldOverrideMediaKeysCheckbox,
   };
 }
