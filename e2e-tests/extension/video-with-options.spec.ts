@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import {
   BUTTON_SUBMIT_SELECTOR,
   fillInputsWithChangedValues,
@@ -331,6 +331,49 @@ test('should options change affect new youtube page', async ({
   });
 });
 
+test('should change the video time by pressing the media arrows keys', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToYoutubeOptionsPagesSteps(
+    videoPage,
+    optionPage,
+    optionFilePath
+  );
+
+  await test.step('Change MediaKeys checkbox', async () => {
+    const { shouldOverrideMediaKeysCheckbox } = getOptionsInputs(optionPage);
+
+    await shouldOverrideMediaKeysCheckbox.check();
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  const { video } = getVideoLocatorElements(videoPage);
+
+  await testPressingMediaKeys(video, videoPage);
+
+  await test.step('Pressing the Arrow Right/Left keys multiply times', async () => {
+    await setVideoTime(video, 0);
+    await videoPage.keyboard.press('MediaTrackNext');
+    await videoPage.keyboard.press('MediaTrackNext');
+    await videoPage.keyboard.press('MediaTrackNext');
+    let currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(15);
+    await videoPage.keyboard.press('MediaTrackPrevious');
+    await videoPage.keyboard.press('MediaTrackPrevious');
+    await videoPage.keyboard.press('MediaTrackPrevious');
+    await videoPage.keyboard.press('MediaTrackPrevious');
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(0);
+  });
+});
+
 function navigateToYoutubeStep(videoPage: Page) {
   return test.step('Navigate to YouTube page', async () => {
     await videoPage.goto(YOUTUBE_URL);
@@ -362,4 +405,20 @@ async function navigateToYoutubeOptionsPagesSteps(
   );
 
   await Promise.all([youtubeStepPromise, optionsStepPromise]);
+}
+
+async function testPressingMediaKeys(video: Locator, page: Page) {
+  await test.step('Pressing the MediaTrackNext key', async () => {
+    await setVideoTime(video, 0);
+    await page.keyboard.press('MediaTrackNext');
+    const currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(5);
+  });
+
+  await test.step('Pressing the MediaTrackPrevious key', async () => {
+    await setVideoTime(video, 20);
+    await page.keyboard.press('MediaTrackPrevious');
+    const currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(15);
+  });
 }
