@@ -47,6 +47,8 @@ test('should change the video time by pressing the arrows keys', async ({
   page,
 }) => {
   const { video } = getVideoLocatorElements(page);
+  await handleAds(page);
+
   await testPressingArrowKeys(video, page);
 
   await test.step('Pressing the Arrow Right/Left keys multiply times', async () => {
