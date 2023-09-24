@@ -1,4 +1,4 @@
-import { ArrowKey, ButtonClassesIds, CreateButtonArg } from './types';
+import { ArrowKey, ButtonClassesIds, CreateButtonArg, IOptions } from './types';
 
 export function createButton({
   svg,
@@ -62,18 +62,18 @@ export function createFastForwardSVG(
 
 export function createRewindButtonTitle(
   seconds: number,
-  shouldOverrideKeys: boolean
+  shouldOverrideArrowKeys: boolean
 ): string {
   const title: string =
-    shouldOverrideKeys || seconds === 5 ? ' (left arrow)' : '';
+    shouldOverrideArrowKeys || seconds === 5 ? ' (left arrow)' : '';
   return `Go back ${seconds} seconds${title}`;
 }
 
 export function createForwardButtonTitle(
   seconds: number,
-  shouldOverrideKeys: boolean
+  shouldOverrideArrowKeys: boolean
 ): string {
   const title: string =
-    shouldOverrideKeys || seconds === 5 ? ' (right arrow)' : '';
+    shouldOverrideArrowKeys || seconds === 5 ? ' (right arrow)' : '';
   return `Go forward ${seconds} seconds${title}`;
 }
