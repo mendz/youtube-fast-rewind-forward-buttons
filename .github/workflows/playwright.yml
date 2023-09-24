@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main, master]
 jobs:
-  test:
+  playwright-test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -17,6 +17,8 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Build the extensntion
+        run: npx parcel build src/manifest.json --no-source-maps --no-scope-hoist
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v3
