@@ -70,6 +70,7 @@ test('should change the video time by pressing the arrows keys', async ({
 test('should have the arrows and work when navigate to another video', async ({
   page,
 }) => {
+  test.slow();
   const newVideoContainer = page.locator('ytd-compact-video-renderer').first();
   const url: string = await newVideoContainer.evaluate((newVideoContainer) => {
     return (newVideoContainer.querySelector('a#thumbnail') as HTMLLinkElement)
@@ -103,8 +104,6 @@ test('should show the tooltip with correct text', async ({ page }) => {
   });
 });
 
-test.setTimeout(30 * 1000);
-
 test('Should add arrows when entering a video from the main page', async ({
   page,
   context,
@@ -122,6 +121,8 @@ test('Should add arrows when entering a video from the main page', async ({
   await testClickingButtons(video, forwardButton, rewindButton);
   await testPressingArrowKeys(video, newPage);
 });
+
+test.setTimeout(30 * 1000);
 
 async function testClickingButtons(
   video: Locator,

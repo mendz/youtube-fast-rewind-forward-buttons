@@ -36,6 +36,9 @@ export const test = base.extend<{
     const context = await chromium.launchPersistentContext('', {
       headless: false,
       args: [
+        // the new headless arg for chrome v109+. Use '--headless=chrome'
+        // as arg for browsers v94-108.
+        // `--headless=new`,
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
       ],
@@ -92,12 +95,41 @@ export async function resetVideo(video: Locator, page: Page) {
   }
 }
 
-export async function isAdsInPage(page: Page): Promise<boolean> {
+async function isAdsInPage(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector(
-      '.ytp-ad-simple-ad-badge, .ytp-ad-duration-remaining',
-      { state: 'attached', timeout: 5000 }
-    ));
+    const firstSpan = page.waitForSelector('.ytp-ad-simple-ad-badge', {
+      state: 'attached',
+      timeout: 3000,
+    });
+    const secondSpan = page.waitForSelector('.ytp-ad-duration-remaining', {
+      state: 'attached',
+      timeout: 3000,
+    });
+    return !!(await Promise.any([firstSpan, secondSpan]));
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isCounterSkipButton(page: Page): Promise<boolean> {
+  try {
+    return !!(await page.waitForSelector('.ytp-ad-preview-container', {
+      state: 'attached',
+      timeout: 5000,
+      strict: false,
+    }));
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isCounterSkipButtonLeave(page: Page): Promise<boolean> {
+  try {
+    return !!(await page.waitForSelector('.ytp-ad-preview-container', {
+      state: 'detached',
+      timeout: 5000,
+      strict: false,
+    }));
   } catch (error) {
     return false;
   }
@@ -118,33 +150,61 @@ export async function getSkipAdButton(
 
 export async function isAdsLeavePage(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector(
-      '.ytp-ad-simple-ad-badge, .ytp-ad-duration-remaining',
-      { state: 'detached' }
-    ));
+    const firstSpan = page.waitForSelector('.ytp-ad-simple-ad-badge', {
+      state: 'detached',
+    });
+    const secondSpan = page.waitForSelector('.ytp-ad-duration-remaining', {
+      state: 'detached',
+    });
+    return !!(await Promise.any([firstSpan, secondSpan]));
   } catch (error) {
     return false;
   }
 }
 
 export async function handleAds(page: Page) {
-  const isFirstAdExists = await isAdsInPage(page);
-  const firstSkipButton = await getSkipAdButton(page);
+  const [isFirstAdExists, isCounterSkipButtonExists, firstSkipButton] =
+    await Promise.all([
+      isAdsInPage(page),
+      isCounterSkipButton(page),
+      getSkipAdButton(page),
+    ]);
+  let skipButtonAfterCounter: ElementHandle<HTMLElement | SVGElement> | null;
 
   if (isFirstAdExists && !firstSkipButton) {
     await isAdsLeavePage(page);
     // handle the ads in the after the navigation
-    const isSecondAdExists = await isAdsInPage(page);
-    const secondSkipButton = await getSkipAdButton(page);
+    const [
+      isSecondAdExists,
+      isSecondCounterSkipButtonExists,
+      secondSkipButton,
+    ] = await Promise.all([
+      isAdsInPage(page),
+      isCounterSkipButton(page),
+      getSkipAdButton(page),
+    ]);
+
     if (isSecondAdExists && !secondSkipButton) {
       await isAdsLeavePage(page);
     } else {
-      await secondSkipButton?.click();
+      if (isSecondCounterSkipButtonExists) {
+        await isCounterSkipButtonLeave(page);
+        skipButtonAfterCounter = await getSkipAdButton(page);
+        skipButtonAfterCounter?.click();
+      } else {
+        await secondSkipButton?.click();
+      }
     }
     // takes a few seconds until the real video start
     await page.waitForTimeout(10000);
   } else {
-    await firstSkipButton?.click();
+    if (isCounterSkipButtonExists) {
+      await isCounterSkipButtonLeave(page);
+      skipButtonAfterCounter = await getSkipAdButton(page);
+      skipButtonAfterCounter?.click();
+    } else {
+      await firstSkipButton?.click();
+    }
   }
 }
 
