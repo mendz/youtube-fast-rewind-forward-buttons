@@ -115,8 +115,8 @@ function intervalQueryForVideo() {
     const video = document.querySelector('div.ytd-player video');
     if (video) {
       clearInterval(interval);
-      run();
-      observeVideoSrcChange();
+      exportFunctions.run();
+      exportFunctions.observeVideoSrcChange();
     }
   }, 1000);
 }
@@ -127,7 +127,7 @@ function observeVideoSrcChange() {
   const observer = new MutationObserver((mutations: MutationRecord[]) => {
     for (const mutation of mutations) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-        run();
+        exportFunctions.run();
       }
     }
   });
@@ -184,3 +184,11 @@ chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
 
 run();
 intervalQueryForVideo();
+
+const exportFunctions = {
+  run,
+  observeVideoSrcChange,
+  intervalQueryForVideo,
+};
+
+export default exportFunctions;

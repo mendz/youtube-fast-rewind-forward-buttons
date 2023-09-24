@@ -1,7 +1,7 @@
 import { createFastRewindSVG, createFastForwardSVG } from '../helper';
 import { IOptions } from '../types';
 
-export const HTML_PLAYER_FULL = `
+export const HTML_PLAYER_FULL = /* html */ `
 <ytd-player>
     <div class="html5-video-container">
         <video class="video-stream html5-main-video" src="test"></video>
@@ -28,6 +28,35 @@ export const HTML_PLAYER_FULL = `
     </div>
 </ytd-player>
 `;
+
+export const INITIAL_HTML_PLAYER_FULL = /* html */ `
+<div class="ytd-player">
+    <div class="html5-video-container">
+        <!-- <video class="video-stream html5-main-video" src="test"></video> -->
+    </div>
+    <div class="ytp-chrome-bottom">
+        <div
+            class="ytp-tooltip ytp-bottom ytp-preview ytp-has-duration ytp-text-detail"
+            >
+            <div class="ytp-tooltip-text-wrapper">
+                <div class="ytp-tooltip-title"></div>
+                <span class="ytp-tooltip-text ytp-tooltip-text-no-title"></span>
+            </div>
+            <div class="ytp-chrome-controls">
+                <div class="ytp-left-controls">
+                    <a class="ytp-next-button">
+                        <svg>
+                            <path class="ytp-svg-fill"></path>
+                            <use></use>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+`;
+
 export const SVG_CLASSES_MOCK = ['test-class'];
 export const SVG_FORWARD_USE_HTML_MOCK =
   '<use class="ytp-svg-shadow" xlink:href="#custom-path-fast-forward"></use>';

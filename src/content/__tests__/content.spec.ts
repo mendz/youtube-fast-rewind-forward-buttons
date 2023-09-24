@@ -1,7 +1,7 @@
 import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
-import {
+import content, {
   run,
   loadOptions,
   mergeOptions,
@@ -10,6 +10,7 @@ import {
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
+  INITIAL_HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
 import {
   ArrowKey,
@@ -135,6 +136,32 @@ describe('full run', () => {
     expect(forwardButton.title).toBe(
       `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
     );
+  });
+
+  it('should call run and observeVideoSrcChange after finding video element', async () => {
+    jest.useFakeTimers();
+    document.body.innerHTML = INITIAL_HTML_PLAYER_FULL;
+    const runSpy = jest.spyOn(content, 'run');
+    const observeSpy = jest.spyOn(content, 'observeVideoSrcChange');
+
+    content.intervalQueryForVideo();
+
+    // Fast-forward time to trigger interval
+    jest.advanceTimersByTime(1000);
+
+    const videoMock = document.createElement('video');
+    videoMock.src = 'test';
+    videoMock.classList.add('video-stream', 'html5-main-video');
+    document.querySelector('.html5-video-container')?.appendChild(videoMock);
+
+    jest.advanceTimersByTime(1000);
+
+    expect(runSpy).toHaveBeenCalled();
+    expect(observeSpy).toHaveBeenCalled();
+
+    document.querySelector('video')!.src = 'test2';
+
+    expect(runSpy).toHaveBeenCalled();
   });
 });
 
