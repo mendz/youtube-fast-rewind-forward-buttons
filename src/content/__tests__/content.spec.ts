@@ -1,12 +1,26 @@
 import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
-import { run, loadOptions, updateButtonAfterNewStorage } from '../content';
+import content, {
+  run,
+  loadOptions,
+  mergeOptions,
+  handleOverrideKeysMigration,
+} from '../content';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
+  INITIAL_HTML_PLAYER_FULL,
 } from '../__utils__/tests-helper';
-import { ButtonClassesIds } from '../types';
+import {
+  ArrowKey,
+  ButtonClassesIds,
+  ChromeStorageChanges,
+  IOptions,
+  IStorageOptions,
+  KEY_CODES,
+  MediaTrackKey,
+} from '../types';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -22,11 +36,27 @@ describe('full run', () => {
   it('Should run overrideArrowKeys when user press keydown', async () => {
     const overrideArrowKeysSpy = jest.spyOn(eventKeys, 'overrideArrowKeys');
     await run();
-    const event = new KeyboardEvent('keydown', { keyCode: 37 });
+    const event = new KeyboardEvent('keydown', {
+      keyCode: KEY_CODES[ArrowKey.ARROW_LEFT_KEY],
+      key: ArrowKey.ARROW_LEFT_KEY,
+    });
     document.dispatchEvent(event);
     expect(overrideArrowKeysSpy).toBeCalledTimes(1); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run() if this test placed in the end
     overrideArrowKeysSpy.mockClear();
     overrideArrowKeysSpy.mockReset();
+  });
+
+  it('Should run overrideMediaKeys when user press keydown', async () => {
+    const overrideMediaKeysSpy = jest.spyOn(eventKeys, 'overrideMediaKeys');
+    await run();
+    const event = new KeyboardEvent('keydown', {
+      keyCode: KEY_CODES[MediaTrackKey.MEDIA_TRACK_PREVIOUS],
+      key: MediaTrackKey.MEDIA_TRACK_PREVIOUS,
+    });
+    document.dispatchEvent(event);
+    expect(overrideMediaKeysSpy).toHaveBeenCalled();
+    overrideMediaKeysSpy.mockClear();
+    overrideMediaKeysSpy.mockReset();
   });
 
   it('should have 2 buttons', async () => {
@@ -60,6 +90,17 @@ describe('full run', () => {
 
     await run();
     expect(addButtonsToVideoSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video);
+  });
+
+  it('Should addEventListener when run', async () => {
+    // set all the mockups
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+    document.removeEventListener = jest.fn();
+    document.addEventListener = jest.fn();
+
+    await run();
+    expect(document.removeEventListener).toHaveBeenCalled();
+    expect(document.addEventListener).toHaveBeenCalled();
   });
 
   it('Should show the correct titles for the buttons', async () => {
@@ -96,6 +137,32 @@ describe('full run', () => {
       `Go forward ${DEFAULT_OPTIONS_MOCK.forwardSeconds} seconds (right arrow)`
     );
   });
+
+  it('should call run and observeVideoSrcChange after finding video element', async () => {
+    jest.useFakeTimers();
+    document.body.innerHTML = INITIAL_HTML_PLAYER_FULL;
+    const runSpy = jest.spyOn(content, 'run');
+    const observeSpy = jest.spyOn(content, 'observeVideoSrcChange');
+
+    content.intervalQueryForVideo();
+
+    // Fast-forward time to trigger interval
+    jest.advanceTimersByTime(1000);
+
+    const videoMock = document.createElement('video');
+    videoMock.src = 'test';
+    videoMock.classList.add('video-stream', 'html5-main-video');
+    document.querySelector('.html5-video-container')?.appendChild(videoMock);
+
+    jest.advanceTimersByTime(1000);
+
+    expect(runSpy).toHaveBeenCalled();
+    expect(observeSpy).toHaveBeenCalled();
+
+    document.querySelector('video')!.src = 'test2';
+
+    expect(runSpy).toHaveBeenCalled();
+  });
 });
 
 describe('loadOptions', () => {
@@ -106,10 +173,11 @@ describe('loadOptions', () => {
   });
 
   it('Should return the values from the storage if exists', async () => {
-    const options = {
+    const options: IOptions = {
       rewindSeconds: 10,
       forwardSeconds: 2,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: true,
     };
     chrome.storage.sync.get.mockReturnValue(options as any);
     const loadedOptions = await loadOptions();
@@ -118,9 +186,9 @@ describe('loadOptions', () => {
   });
 
   it(`Should return the default value from if the on storage doesn't exists`, async () => {
-    const options = {
+    const options: Partial<IOptions> = {
       rewindSeconds: 10,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
     };
     chrome.storage.sync.get.mockReturnValue({ ...options } as any);
     let loadedOptions = await loadOptions();
@@ -128,6 +196,7 @@ describe('loadOptions', () => {
     expect(loadedOptions).toMatchObject({
       ...options,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
+      shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
     });
 
     chrome.storage.sync.get.mockReturnValue({
@@ -151,7 +220,21 @@ describe('loadOptions', () => {
     expect(loadedOptions).toMatchObject({
       ...options2,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
-      shouldOverrideKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
+      shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
+    });
+
+    const options3 = {
+      shouldOverrideMediaKeys: true,
+    };
+    chrome.storage.sync.get.mockReturnValue(options3 as any);
+    loadedOptions = await loadOptions();
+
+    expect(loadedOptions).toMatchObject({
+      ...options3,
+      rewindSeconds: DEFAULT_OPTIONS_MOCK.rewindSeconds,
+      forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
+      shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
     });
   });
 
@@ -167,44 +250,46 @@ describe('loadOptions', () => {
   });
 });
 
-describe('updateButtonAfterNewStorage', () => {
+describe('mergeOptions', () => {
   it('Should return the merge options', () => {
-    const optionsMock = {
+    const optionsMock: IOptions = {
       forwardSeconds: 2,
       rewindSeconds: 7,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
     };
-    const changeOptionsMock: { [key: string]: chrome.storage.StorageChange } = {
+    const changeOptionsMock: ChromeStorageChanges = {
       rewindSeconds: {
         oldValue: optionsMock.rewindSeconds,
         newValue: DEFAULT_OPTIONS_MOCK.rewindSeconds,
       },
-      shouldOverrideKeys: {
-        oldValue: optionsMock.shouldOverrideKeys,
-        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      shouldOverrideArrowKeys: {
+        oldValue: optionsMock.shouldOverrideArrowKeys,
+        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
+      },
+      shouldOverrideMediaKeys: {
+        oldValue: optionsMock.shouldOverrideMediaKeys,
+        newValue: true,
       },
     };
-    const video = document.querySelector('video') as HTMLVideoElement;
-    const returnedOptions = updateButtonAfterNewStorage(
-      changeOptionsMock,
-      optionsMock,
-      video
-    );
+    const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
+      shouldOverrideMediaKeys: true,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
 
-  it('Should handle unsparing number', () => {
-    const optionsMock = {
+  it('Should handle un-parsing number', () => {
+    const optionsMock: IOptions = {
       forwardSeconds: 2,
       rewindSeconds: 7,
-      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
     };
-    const changeOptionsMock: { [key: string]: chrome.storage.StorageChange } = {
+    const changeOptionsMock: ChromeStorageChanges = {
       rewindSeconds: {
         oldValue: optionsMock.rewindSeconds,
         newValue: DEFAULT_OPTIONS_MOCK.rewindSeconds,
@@ -213,22 +298,76 @@ describe('updateButtonAfterNewStorage', () => {
         oldValue: optionsMock.forwardSeconds,
         newValue: '|',
       },
-      shouldOverrideKeys: {
-        oldValue: optionsMock.shouldOverrideKeys,
-        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideKeys,
+      shouldOverrideArrowKeys: {
+        oldValue: optionsMock.shouldOverrideArrowKeys,
+        newValue: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       },
     };
-    const video = document.querySelector('video') as HTMLVideoElement;
-    const returnedOptions = updateButtonAfterNewStorage(
-      changeOptionsMock,
-      optionsMock,
-      video
-    );
+    const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
+  });
+});
+
+describe('handleOverrideKeysMigration', () => {
+  it('Should return true, if the old value is true or if the old value if false/undefined and the new value is true', () => {
+    const defaultOptions: Readonly<IOptions> = {
+      rewindSeconds: 5,
+      forwardSeconds: 5,
+      shouldOverrideKeys: false,
+      shouldOverrideArrowKeys: false,
+      shouldOverrideMediaKeys: false,
+    };
+
+    let storageOptions: IStorageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideKeys: true,
+      shouldOverrideArrowKeys: false,
+      shouldOverrideMediaKeys: false,
+    };
+
+    const result = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result).toBe(true);
+
+    storageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
+    };
+
+    const result2 = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result2).toBe(true);
+
+    storageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideKeys: false,
+      shouldOverrideArrowKeys: true,
+      shouldOverrideMediaKeys: false,
+    };
+
+    const result3 = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result3).toBe(true);
+
+    storageOptions = {
+      rewindSeconds: '5',
+      forwardSeconds: '5',
+      shouldOverrideKeys: false,
+      shouldOverrideArrowKeys: false,
+      shouldOverrideMediaKeys: true,
+    };
+
+    const result4 = handleOverrideKeysMigration(defaultOptions, storageOptions);
+
+    expect(result4).toBe(false);
   });
 });

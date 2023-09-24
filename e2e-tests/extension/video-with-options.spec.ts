@@ -37,12 +37,14 @@ test('should changed options affect the video without refresh', async ({
     const {
       forwardSecondsInput,
       rewindSecondsInput,
-      shouldOverrideKeysCheckbox,
+      shouldOverrideArrowKeysCheckbox,
+      shouldOverrideMediaKeysCheckbox,
     } = getOptionsInputs(optionPage);
     await fillInputsWithChangedValues(
       forwardSecondsInput,
       rewindSecondsInput,
-      shouldOverrideKeysCheckbox
+      shouldOverrideArrowKeysCheckbox,
+      shouldOverrideMediaKeysCheckbox
     );
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
     expect(optionPage.isClosed()).toBe(true);
@@ -98,11 +100,11 @@ test('should override the arrow keys when seconds set not to 5 and not override 
   );
 
   await test.step('Change the options to override and ArrowRight seconds', async () => {
-    const { forwardSecondsInput, shouldOverrideKeysCheckbox } =
+    const { forwardSecondsInput, shouldOverrideArrowKeysCheckbox } =
       getOptionsInputs(optionPage);
 
     await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
-    await shouldOverrideKeysCheckbox.check();
+    await shouldOverrideArrowKeysCheckbox.check();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
@@ -261,12 +263,12 @@ test('should options change affect new youtube page', async ({
     const {
       forwardSecondsInput,
       rewindSecondsInput,
-      shouldOverrideKeysCheckbox,
+      shouldOverrideArrowKeysCheckbox,
     } = getOptionsInputs(optionPage);
 
     await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
     await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
-    await shouldOverrideKeysCheckbox.check();
+    await shouldOverrideArrowKeysCheckbox.check();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);

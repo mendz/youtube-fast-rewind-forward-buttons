@@ -50,6 +50,9 @@ button.danger {
 label {
   user-select: none;
 }
+label:has(input[type='checkbox']) {
+  cursor: pointer;
+}
 label input {
   margin-left: 0.5rem;
 }
