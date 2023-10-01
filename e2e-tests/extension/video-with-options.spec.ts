@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import {
   BUTTON_SUBMIT_SELECTOR,
   fillInputsWithChangedValues,
@@ -12,6 +12,7 @@ import {
   resetVideo,
   setVideoTime,
   test,
+  expect,
   YOUTUBE_URL,
 } from './helpers';
 

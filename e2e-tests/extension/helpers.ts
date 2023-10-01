@@ -48,16 +48,13 @@ export const test = base.extend<{
   },
   extensionId: async ({ context }, use) => {
     let [background] = context.serviceWorkers();
-    try {
-      if (!background) background = await context.waitForEvent('serviceworker');
-    } catch (error) {
-      console.error(error);
-    }
+    if (!background) background = await context.waitForEvent('serviceworker');
 
     const extensionId = background.url().split('/')[2];
     await use(extensionId);
   },
 });
+export const expect = test.expect;
 
 export function getVideoLocatorElements(page: Page) {
   const video = page.locator('ytd-player video');

@@ -1,4 +1,3 @@
-import { expect } from '@playwright/test';
 import {
   fillInputsWithChangedValues,
   getOptionFilePath,
@@ -6,6 +5,7 @@ import {
   OPTIONS_CHANGED_VALUES,
   OPTIONS_DEFAULT_VALUES,
   test,
+  expect,
   BUTTON_SUBMIT_SELECTOR,
 } from './helpers';
 
