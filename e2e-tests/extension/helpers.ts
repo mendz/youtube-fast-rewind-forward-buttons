@@ -48,7 +48,11 @@ export const test = base.extend<{
   },
   extensionId: async ({ context }, use) => {
     let [background] = context.serviceWorkers();
-    if (!background) background = await context.waitForEvent('serviceworker');
+    try {
+      if (!background) background = await context.waitForEvent('serviceworker');
+    } catch (error) {
+      console.error(error);
+    }
 
     const extensionId = background.url().split('/')[2];
     await use(extensionId);
