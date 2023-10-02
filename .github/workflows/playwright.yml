@@ -17,8 +17,8 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      - name: Run the extensntion
-        run: npx parcel watch src/manifest.json --host localhost
+      - name: Build the extensntion
+        run: npx parcel build src/manifest.json --no-source-maps --no-scope-hoist
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v3
