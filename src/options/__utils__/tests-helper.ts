@@ -77,6 +77,7 @@ export enum InputId {
   FORWARD = 'forward',
   OVERRIDE_ARROW_KEYS = 'override-arrow-keys',
   OVERRIDE_MEDIA_KAYS = 'override-media-kays',
+  SHOULD_SHOW_BUTTONS_TOOLTIP = 'should-show-buttons-tooltip',
 }
 
 export const INPUTS_IDS = Object.values(InputId);
