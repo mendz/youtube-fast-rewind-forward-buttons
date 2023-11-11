@@ -103,6 +103,7 @@ describe('Options page', () => {
         forwardSeconds: '5',
         shouldOverrideArrowKeys: false,
         shouldOverrideMediaKeys: true,
+        shouldShowButtonsTooltip: true,
       });
     });
   });

@@ -65,6 +65,15 @@ export const MOCK_HTML = /* HTML */ `
         Should override the keyboard media keys above to behave as the arrow
         keys?
       </label>
+      <label>
+        <input
+          type="checkbox"
+          name="should-show-buttons-tooltip"
+          id="should-show-buttons-tooltip"
+          checked
+        />
+        Should show buttons tooltip?
+      </label>
     </div>
     <div class="button-container">
       <button type="submit">Save and close</button>
