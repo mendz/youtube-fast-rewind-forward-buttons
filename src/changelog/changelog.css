@@ -1,0 +1,23 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  line-height: 1.5;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: var(--black);
+  background-color: #dfdbe5;
+  background-image: url('../assets/floating-cogs.svg');
+  padding: 0.5rem;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2.date {
+  font-weight: 700;
+}
