@@ -114,7 +114,7 @@ test('should NOT reset all input values when pressing the button and dismiss the
   );
   expect(shouldOverrideArrowKeysCheckbox).toBeChecked();
   expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
-  expect(shouldShowButtonsTooltipCheckbox).toBeChecked();
+  expect(shouldShowButtonsTooltipCheckbox).not.toBeChecked();
 });
 
 test('should keep the values after pressing the submit button and return to the page', async ({
