@@ -20,7 +20,7 @@ body {
   font-family: 'Roboto', sans-serif;
   color: var(--black);
   background-color: #dfdbe5;
-  background-image: url('floating-cogs.svg');
+  background-image: url('../assets/floating-cogs.svg');
 }
 
 button {
