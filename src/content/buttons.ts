@@ -36,7 +36,12 @@ export function getButtons(
   fastRewindButton: HTMLButtonElement;
   fastForwardButton: HTMLButtonElement;
 } {
-  const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } = options;
+  const {
+    shouldOverrideArrowKeys,
+    rewindSeconds,
+    forwardSeconds,
+    shouldShowButtonsTooltip,
+  } = options;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
   // set the buttons
@@ -66,10 +71,12 @@ export function getButtons(
       updateType: ArrowKey.ARROW_RIGHT_KEY,
     })
   );
-  fastRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
-  fastRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
-  fastForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
-  fastForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+  if (shouldShowButtonsTooltip) {
+    fastRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+    fastRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+    fastForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+    fastForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+  }
 
   return { fastRewindButton, fastForwardButton };
 }

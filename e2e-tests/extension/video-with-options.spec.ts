@@ -4,6 +4,7 @@ import {
   fillInputsWithChangedValues,
   getOptionFilePath,
   getOptionsInputs,
+  getTooltip,
   getVideoLocatorElements,
   getVideoTime,
   handleAds,
@@ -39,12 +40,14 @@ test('should changed options affect the video without refresh', async ({
       rewindSecondsInput,
       shouldOverrideArrowKeysCheckbox,
       shouldOverrideMediaKeysCheckbox,
+      shouldShowButtonsTooltipCheckbox,
     } = getOptionsInputs(optionPage);
     await fillInputsWithChangedValues(
       forwardSecondsInput,
       rewindSecondsInput,
       shouldOverrideArrowKeysCheckbox,
-      shouldOverrideMediaKeysCheckbox
+      shouldOverrideMediaKeysCheckbox,
+      shouldShowButtonsTooltipCheckbox
     );
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
     expect(optionPage.isClosed()).toBe(true);
@@ -61,6 +64,14 @@ test('should changed options affect the video without refresh', async ({
     await rewindButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(30);
+
+    await forwardButton.click();
+    const forwardTooltip = getTooltip(videoPage);
+    await expect(forwardTooltip).toHaveText(/\S/);
+
+    await rewindButton.click();
+    const rewindTooltip = getTooltip(videoPage);
+    await expect(rewindTooltip).toHaveText(/\S/);
   });
 
   await test.step('Reopen the options page to reset the values', async () => {
@@ -82,6 +93,14 @@ test('should changed options affect the video without refresh', async ({
     await rewindButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(0);
+
+    await forwardButton.click();
+    const forwardTooltip = getTooltip(videoPage);
+    await expect(forwardTooltip).not.toHaveText(/\S/);
+
+    await rewindButton.click();
+    const rewindTooltip = getTooltip(videoPage);
+    await expect(rewindTooltip).not.toHaveText(/\S/);
   });
 });
 
@@ -264,11 +283,13 @@ test('should options change affect new youtube page', async ({
       forwardSecondsInput,
       rewindSecondsInput,
       shouldOverrideArrowKeysCheckbox,
+      shouldShowButtonsTooltipCheckbox,
     } = getOptionsInputs(optionPage);
 
     await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
     await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
     await shouldOverrideArrowKeysCheckbox.check();
+    await shouldShowButtonsTooltipCheckbox.uncheck();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
@@ -288,14 +309,24 @@ test('should options change affect new youtube page', async ({
     await rewindButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(10);
+
+    await forwardButton.click();
+    const forwardTooltip = getTooltip(videoPage);
+    await expect(forwardTooltip).toHaveText(/\S/);
+
+    await rewindButton.click();
+    const rewindTooltip = getTooltip(videoPage);
+    await expect(rewindTooltip).toHaveText(/\S/);
   });
 
   await test.step('Change the options, one of the arrows', async () => {
     optionPage = await context.newPage();
     await optionPage.goto(optionFilePath);
-    const { rewindSecondsInput } = getOptionsInputs(optionPage);
+    const { rewindSecondsInput, shouldShowButtonsTooltipCheckbox } =
+      getOptionsInputs(optionPage);
 
     await rewindSecondsInput.fill(OPTIONS_DEFAULT_VALUES.rewindSecondsInput);
+    await shouldShowButtonsTooltipCheckbox.check();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
@@ -328,6 +359,14 @@ test('should options change affect new youtube page', async ({
     forwardButton;
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(55);
+
+    await forwardButton.click();
+    const forwardTooltip = getTooltip(videoPage);
+    await expect(forwardTooltip).not.toHaveText(/\S/);
+
+    await rewindButton.click();
+    const rewindTooltip = getTooltip(videoPage);
+    await expect(rewindTooltip).not.toHaveText(/\S/);
   });
 });
 

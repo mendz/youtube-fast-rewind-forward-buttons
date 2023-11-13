@@ -65,6 +65,15 @@ export const MOCK_HTML = /* HTML */ `
         Should override the keyboard media keys above to behave as the arrow
         keys?
       </label>
+      <label>
+        <input
+          type="checkbox"
+          name="should-show-buttons-tooltip"
+          id="should-show-buttons-tooltip"
+          checked
+        />
+        Should show buttons tooltip?
+      </label>
     </div>
     <div class="button-container">
       <button type="submit">Save and close</button>
@@ -77,6 +86,7 @@ export enum InputId {
   FORWARD = 'forward',
   OVERRIDE_ARROW_KEYS = 'override-arrow-keys',
   OVERRIDE_MEDIA_KAYS = 'override-media-keys',
+  SHOULD_SHOW_BUTTONS_TOOLTIP = 'should-show-buttons-tooltip',
 }
 
 export const INPUTS_IDS = Object.values(InputId);
@@ -86,6 +96,7 @@ export const DEFAULT_OPTIONS_MOCK: IOptions = {
   rewindSeconds: 5,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
+  shouldShowButtonsTooltip: true,
 };
 
 export const DEFAULT_STORAGE_OPTIONS_MOCK: IStorageOptions = {
@@ -94,4 +105,5 @@ export const DEFAULT_STORAGE_OPTIONS_MOCK: IStorageOptions = {
   shouldOverrideKeys: true,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
+  shouldShowButtonsTooltip: true,
 };
