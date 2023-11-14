@@ -241,7 +241,7 @@ export function getOptionsInputs(page: Page) {
     'input#override-arrow-keys'
   );
   const shouldOverrideMediaKeysCheckbox = page.locator(
-    'input#override-media-kays'
+    'input#override-media-keys'
   );
   const shouldShowButtonsTooltipCheckbox = page.locator(
     'input#should-show-buttons-tooltip'
