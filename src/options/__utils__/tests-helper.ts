@@ -59,8 +59,8 @@ export const MOCK_HTML = /* HTML */ `
       <label>
         <input
           type="checkbox"
-          name="override-media-kays"
-          id="override-media-kays"
+          name="override-media-keys"
+          id="override-media-keys"
         />
         Should override the keyboard media keys above to behave as the arrow
         keys?
@@ -85,7 +85,7 @@ export enum InputId {
   REWIND = 'rewind',
   FORWARD = 'forward',
   OVERRIDE_ARROW_KEYS = 'override-arrow-keys',
-  OVERRIDE_MEDIA_KAYS = 'override-media-kays',
+  OVERRIDE_MEDIA_KAYS = 'override-media-keys',
   SHOULD_SHOW_BUTTONS_TOOLTIP = 'should-show-buttons-tooltip',
 }
 

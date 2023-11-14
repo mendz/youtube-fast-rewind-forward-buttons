@@ -16,7 +16,9 @@
   </head>
 
   <body>
-    <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    <header>
+      <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    </header>
     <button type="button" class="danger" id="reset-values">
       Reset input values to default
     </button>
@@ -44,8 +46,6 @@
             value="5"
           />
         </label>
-      </div>
-      <div class="override-keys-container">
         <p>
           <svg
             id="information"
@@ -63,6 +63,8 @@
           As a default, the arrow keys rewind (left arrow) & forward (right
           arrow) are set to <strong>5 seconds</strong>.
         </p>
+      </div>
+      <div class="checkbox-container">
         <label>
           <input
             type="checkbox"
@@ -74,11 +76,11 @@
         <label>
           <input
             type="checkbox"
-            name="override-media-kays"
-            id="override-media-kays"
+            name="override-media-keys"
+            id="override-media-keys"
           />
-          Should override the keyboard media keys above to behave as the arrow
-          keys?
+          Should override the keyboard media keys with the above seconds to
+          behave as the arrow keys?
         </label>
         <label>
           <input
@@ -89,38 +91,10 @@
           />
           Should show buttons tooltip?
         </label>
-        <hr />
-        <toggle-checkbox id="123" label="Hi! 🙋‍♀️"></toggle-checkbox>
       </div>
       <div class="button-container">
         <button type="submit">Save and close</button>
       </div>
     </form>
-
-    <!-- toggle-checkbox.html -->
-    <template id="toggle-checkbox">
-      <style>
-        label {
-          display: block;
-          user-select: none;
-        }
-
-        label:has(input[type='checkbox']) {
-          cursor: pointer;
-        }
-
-        label input {
-          margin-left: 0.5rem;
-        }
-
-        input[type='checkbox'] {
-          cursor: pointer;
-        }
-      </style>
-      <label>
-        <input type="checkbox" />
-        <span class="label-text"></span>
-      </label>
-    </template>
   </body>
 </html>
