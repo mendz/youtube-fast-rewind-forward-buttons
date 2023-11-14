@@ -11,7 +11,8 @@
       rel="stylesheet"
     />
     <title>YouTube Rewind & Fast Forward Buttons - Options Page</title>
-    <script type="module" src="script.ts"></script>
+    <script type="module" src="script.ts" defer></script>
+    <script type="module" src="./web-components/checkbox.ts" defer></script>
   </head>
 
   <body>
@@ -88,10 +89,38 @@
           />
           Should show buttons tooltip?
         </label>
+        <hr />
+        <toggle-checkbox id="123" label="Hi! 🙋‍♀️"></toggle-checkbox>
       </div>
       <div class="button-container">
         <button type="submit">Save and close</button>
       </div>
     </form>
+
+    <!-- toggle-checkbox.html -->
+    <template id="toggle-checkbox">
+      <style>
+        label {
+          display: block;
+          user-select: none;
+        }
+
+        label:has(input[type='checkbox']) {
+          cursor: pointer;
+        }
+
+        label input {
+          margin-left: 0.5rem;
+        }
+
+        input[type='checkbox'] {
+          cursor: pointer;
+        }
+      </style>
+      <label>
+        <input type="checkbox" />
+        <span class="label-text"></span>
+      </label>
+    </template>
   </body>
 </html>
