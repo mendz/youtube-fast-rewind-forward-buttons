@@ -11,11 +11,14 @@
       rel="stylesheet"
     />
     <title>YouTube Rewind & Fast Forward Buttons - Options Page</title>
-    <script type="module" src="script.ts"></script>
+    <script type="module" src="script.ts" defer></script>
+    <script type="module" src="./web-components/checkbox.ts" defer></script>
   </head>
 
   <body>
-    <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    <header>
+      <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    </header>
     <button type="button" class="danger" id="reset-values">
       Reset input values to default
     </button>
@@ -43,8 +46,6 @@
             value="5"
           />
         </label>
-      </div>
-      <div class="override-keys-container">
         <p>
           <svg
             id="information"
@@ -62,6 +63,8 @@
           As a default, the arrow keys rewind (left arrow) & forward (right
           arrow) are set to <strong>5 seconds</strong>.
         </p>
+      </div>
+      <div class="checkbox-container">
         <label>
           <input
             type="checkbox"
@@ -73,11 +76,11 @@
         <label>
           <input
             type="checkbox"
-            name="override-media-kays"
-            id="override-media-kays"
+            name="override-media-keys"
+            id="override-media-keys"
           />
-          Should override the keyboard media keys above to behave as the arrow
-          keys?
+          Should override the keyboard media keys with the above seconds to
+          behave as the arrow keys?
         </label>
       </div>
       <div class="button-container">

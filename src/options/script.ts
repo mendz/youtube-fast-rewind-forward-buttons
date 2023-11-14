@@ -26,7 +26,7 @@ export function getInputs(): InputsOptionsPage {
     '#override-arrow-keys'
   ) as HTMLInputElement;
   const inputShouldOverrideMediaKeys: HTMLInputElement = document.querySelector(
-    '#override-media-kays'
+    '#override-media-keys'
   ) as HTMLInputElement;
 
   return {
