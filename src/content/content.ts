@@ -45,7 +45,7 @@ export async function loadOptions(): Promise<IOptions> {
     shouldOverrideKeys: false, // todo: removed in the next version
     shouldOverrideArrowKeys: false,
     shouldOverrideMediaKeys: false,
-    shouldShowButtonsTooltip: true,
+    shouldHideButtonsTooltip: false,
   };
 
   try {
@@ -70,9 +70,9 @@ export async function loadOptions(): Promise<IOptions> {
       shouldOverrideMediaKeys:
         storageOptions?.shouldOverrideMediaKeys ??
         defaultOptions.shouldOverrideMediaKeys,
-      shouldShowButtonsTooltip:
-        storageOptions?.shouldShowButtonsTooltip ??
-        defaultOptions.shouldShowButtonsTooltip,
+      shouldHideButtonsTooltip:
+        storageOptions?.shouldHideButtonsTooltip ??
+        defaultOptions.shouldHideButtonsTooltip,
     };
   } catch (error) {
     console.error(error);
@@ -109,9 +109,9 @@ export function mergeOptions(
     shouldOverrideMediaKeys:
       newChangesOptions.shouldOverrideMediaKeys?.newValue ??
       currentOptions.shouldOverrideMediaKeys,
-    shouldShowButtonsTooltip:
-      newChangesOptions.shouldShowButtonsTooltip?.newValue ??
-      currentOptions.shouldShowButtonsTooltip,
+    shouldHideButtonsTooltip:
+      newChangesOptions.shouldHideButtonsTooltip?.newValue ??
+      currentOptions.shouldHideButtonsTooltip,
   };
 
   return { ...newOptions };

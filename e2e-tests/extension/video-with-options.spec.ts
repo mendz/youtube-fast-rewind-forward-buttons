@@ -40,14 +40,14 @@ test('should changed options affect the video without refresh', async ({
       rewindSecondsInput,
       shouldOverrideArrowKeysCheckbox,
       shouldOverrideMediaKeysCheckbox,
-      shouldShowButtonsTooltipCheckbox,
+      shouldHideButtonsTooltipCheckbox,
     } = getOptionsInputs(optionPage);
     await fillInputsWithChangedValues(
       forwardSecondsInput,
       rewindSecondsInput,
       shouldOverrideArrowKeysCheckbox,
       shouldOverrideMediaKeysCheckbox,
-      shouldShowButtonsTooltipCheckbox
+      shouldHideButtonsTooltipCheckbox
     );
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
     expect(optionPage.isClosed()).toBe(true);
@@ -283,13 +283,13 @@ test('should options change affect new youtube page', async ({
       forwardSecondsInput,
       rewindSecondsInput,
       shouldOverrideArrowKeysCheckbox,
-      shouldShowButtonsTooltipCheckbox,
+      shouldHideButtonsTooltipCheckbox,
     } = getOptionsInputs(optionPage);
 
     await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
     await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
     await shouldOverrideArrowKeysCheckbox.check();
-    await shouldShowButtonsTooltipCheckbox.uncheck();
+    await shouldHideButtonsTooltipCheckbox.check();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
@@ -319,14 +319,14 @@ test('should options change affect new youtube page', async ({
     await expect(rewindTooltip).toHaveText(/\S/);
   });
 
-  await test.step('Change the options, one of the arrows', async () => {
+  await test.step('Change the options, one of the arrows & show the tooltip', async () => {
     optionPage = await context.newPage();
     await optionPage.goto(optionFilePath);
-    const { rewindSecondsInput, shouldShowButtonsTooltipCheckbox } =
+    const { rewindSecondsInput, shouldHideButtonsTooltipCheckbox } =
       getOptionsInputs(optionPage);
 
     await rewindSecondsInput.fill(OPTIONS_DEFAULT_VALUES.rewindSecondsInput);
-    await shouldShowButtonsTooltipCheckbox.check();
+    await shouldHideButtonsTooltipCheckbox.uncheck();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
