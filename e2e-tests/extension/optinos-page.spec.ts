@@ -26,7 +26,7 @@ test('should have the default values', async ({ page }) => {
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(page);
   expect(rewindSecondsInput).toHaveValue(
     OPTIONS_DEFAULT_VALUES.rewindSecondsInput
@@ -36,7 +36,7 @@ test('should have the default values', async ({ page }) => {
   );
   expect(shouldOverrideArrowKeysCheckbox).not.toBeChecked();
   expect(shouldOverrideMediaKeysCheckbox).not.toBeChecked();
-  expect(shouldShowButtonsTooltipCheckbox).toBeChecked();
+  expect(shouldHideButtonsTooltipCheckbox).not.toBeChecked();
 });
 
 test('should reset all input values when pressing the button and accept the alert', async ({
@@ -47,7 +47,7 @@ test('should reset all input values when pressing the button and accept the aler
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(page);
 
   await test.step('Fill the input values', async () => {
@@ -56,7 +56,7 @@ test('should reset all input values when pressing the button and accept the aler
       forwardSecondsInput,
       shouldOverrideArrowKeysCheckbox,
       shouldOverrideMediaKeysCheckbox,
-      shouldShowButtonsTooltipCheckbox
+      shouldHideButtonsTooltipCheckbox
     );
 
     expect(rewindSecondsInput).toHaveValue(
@@ -67,7 +67,7 @@ test('should reset all input values when pressing the button and accept the aler
     );
     expect(shouldOverrideArrowKeysCheckbox).toBeChecked();
     expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
-    expect(shouldShowButtonsTooltipCheckbox).not.toBeChecked();
+    expect(shouldHideButtonsTooltipCheckbox).toBeChecked();
   });
 
   await test.step('Reset the values', async () => {
@@ -82,7 +82,7 @@ test('should reset all input values when pressing the button and accept the aler
     );
     expect(shouldOverrideArrowKeysCheckbox).not.toBeChecked();
     expect(shouldOverrideMediaKeysCheckbox).not.toBeChecked();
-    expect(shouldShowButtonsTooltipCheckbox).toBeChecked();
+    expect(shouldHideButtonsTooltipCheckbox).not.toBeChecked();
   });
 });
 
@@ -94,14 +94,14 @@ test('should NOT reset all input values when pressing the button and dismiss the
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(page);
   await fillInputsWithChangedValues(
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox
+    shouldHideButtonsTooltipCheckbox
   );
   page.on('dialog', (dialog) => dialog.dismiss());
   await page.locator('button#reset-values').click();
@@ -114,7 +114,7 @@ test('should NOT reset all input values when pressing the button and dismiss the
   );
   expect(shouldOverrideArrowKeysCheckbox).toBeChecked();
   expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
-  expect(shouldShowButtonsTooltipCheckbox).not.toBeChecked();
+  expect(shouldHideButtonsTooltipCheckbox).toBeChecked();
 });
 
 test('should keep the values after pressing the submit button and return to the page', async ({
@@ -127,14 +127,14 @@ test('should keep the values after pressing the submit button and return to the 
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(page);
   await fillInputsWithChangedValues(
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox
+    shouldHideButtonsTooltipCheckbox
   );
 
   const newPage = await context.newPage();
@@ -150,7 +150,7 @@ test('should keep the values after pressing the submit button and return to the 
     forwardSecondsInput: newPageForwardSecondsInput,
     shouldOverrideArrowKeysCheckbox: newPageShouldOverrideKeysCheckbox,
     shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox: newPageShouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox: newPageShouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(newPage);
   expect(newPageRewindSecondsInput).toHaveValue(
     OPTIONS_CHANGED_VALUES.rewindSecondsInput
@@ -160,7 +160,7 @@ test('should keep the values after pressing the submit button and return to the 
   );
   expect(newPageShouldOverrideKeysCheckbox).toBeChecked();
   expect(newPageShouldOverrideMediaKeysCheckbox).toBeChecked();
-  expect(newPageShouldShowButtonsTooltipCheckbox).not.toBeChecked();
+  expect(newPageShouldHideButtonsTooltipCheckbox).toBeChecked();
 });
 
 test('should NOT keep the values if user close the page and return to the back to it', async ({
@@ -173,14 +173,14 @@ test('should NOT keep the values if user close the page and return to the back t
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(page);
   await fillInputsWithChangedValues(
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox
+    shouldHideButtonsTooltipCheckbox
   );
   const newPage = await context.newPage();
   await page.close();
@@ -193,7 +193,7 @@ test('should NOT keep the values if user close the page and return to the back t
     forwardSecondsInput: newPageForwardSecondsInput,
     shouldOverrideArrowKeysCheckbox: newPageShouldOverrideKeysCheckbox,
     shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox: newPageShouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox: newPageShouldHideButtonsTooltipCheckbox,
   } = getOptionsInputs(newPage);
   expect(newPageRewindSecondsInput).toHaveValue(
     OPTIONS_DEFAULT_VALUES.rewindSecondsInput
@@ -203,5 +203,5 @@ test('should NOT keep the values if user close the page and return to the back t
   );
   expect(newPageShouldOverrideKeysCheckbox).not.toBeChecked();
   expect(newPageShouldOverrideMediaKeysCheckbox).not.toBeChecked();
-  expect(newPageShouldShowButtonsTooltipCheckbox).toBeChecked();
+  expect(newPageShouldHideButtonsTooltipCheckbox).not.toBeChecked();
 });

@@ -225,13 +225,13 @@ export async function fillInputsWithChangedValues(
   forwardSecondsInput: Locator,
   shouldOverrideKeysCheckbox: Locator,
   shouldOverrideMediaKeysCheckbox: Locator,
-  shouldShowButtonsTooltipCheckbox: Locator
+  shouldHideButtonsTooltipCheckbox: Locator
 ) {
   await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
   await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
   await shouldOverrideKeysCheckbox.check();
   await shouldOverrideMediaKeysCheckbox.check();
-  await shouldShowButtonsTooltipCheckbox.uncheck();
+  await shouldHideButtonsTooltipCheckbox.check();
 }
 
 export function getOptionsInputs(page: Page) {
@@ -243,7 +243,7 @@ export function getOptionsInputs(page: Page) {
   const shouldOverrideMediaKeysCheckbox = page.locator(
     'input#override-media-keys'
   );
-  const shouldShowButtonsTooltipCheckbox = page.locator(
+  const shouldHideButtonsTooltipCheckbox = page.locator(
     'input#should-show-buttons-tooltip'
   );
   return {
@@ -251,6 +251,6 @@ export function getOptionsInputs(page: Page) {
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    shouldShowButtonsTooltipCheckbox,
+    shouldHideButtonsTooltipCheckbox,
   };
 }

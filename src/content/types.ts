@@ -4,7 +4,7 @@ export interface IOptions {
   shouldOverrideKeys?: boolean; // TODO: old one, should removed in the next version
   shouldOverrideArrowKeys: boolean;
   shouldOverrideMediaKeys: boolean;
-  shouldShowButtonsTooltip: boolean;
+  shouldHideButtonsTooltip: boolean;
 }
 
 export interface IStorageOptions
