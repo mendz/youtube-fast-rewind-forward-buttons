@@ -86,7 +86,7 @@ export enum InputId {
   FORWARD = 'forward',
   OVERRIDE_ARROW_KEYS = 'override-arrow-keys',
   OVERRIDE_MEDIA_KAYS = 'override-media-keys',
-  SHOULD_SHOW_BUTTONS_TOOLTIP = 'should-show-buttons-tooltip',
+  SHOULD_HIDE_BUTTONS_TOOLTIP = 'should-hide-buttons-tooltip',
 }
 
 export const INPUTS_IDS = Object.values(InputId);
@@ -96,7 +96,7 @@ export const DEFAULT_OPTIONS_MOCK: IOptions = {
   rewindSeconds: 5,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
-  shouldShowButtonsTooltip: true,
+  shouldHideButtonsTooltip: false,
 };
 
 export const DEFAULT_STORAGE_OPTIONS_MOCK: IStorageOptions = {
@@ -105,5 +105,5 @@ export const DEFAULT_STORAGE_OPTIONS_MOCK: IStorageOptions = {
   shouldOverrideKeys: true,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
-  shouldShowButtonsTooltip: true,
+  shouldHideButtonsTooltip: false,
 };

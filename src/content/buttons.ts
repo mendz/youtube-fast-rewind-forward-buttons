@@ -40,7 +40,7 @@ export function getButtons(
     shouldOverrideArrowKeys,
     rewindSeconds,
     forwardSeconds,
-    shouldShowButtonsTooltip,
+    shouldHideButtonsTooltip,
   } = options;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
@@ -71,7 +71,7 @@ export function getButtons(
       updateType: ArrowKey.ARROW_RIGHT_KEY,
     })
   );
-  if (shouldShowButtonsTooltip) {
+  if (!shouldHideButtonsTooltip) {
     fastRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
     fastRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
     fastForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);

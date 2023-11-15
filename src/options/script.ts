@@ -6,7 +6,7 @@ const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
   shouldOverrideKeys: false, // TODO: old one, should removed in the next version
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
-  shouldShowButtonsTooltip: true,
+  shouldHideButtonsTooltip: false,
 };
 
 type InputsOptionsPage = {
@@ -14,7 +14,7 @@ type InputsOptionsPage = {
   inputForwardSeconds: HTMLInputElement;
   inputShouldOverrideArrowKeys: HTMLInputElement;
   inputShouldOverrideMediaKeys: HTMLInputElement;
-  inputShouldShowButtonsTooltip: HTMLInputElement;
+  inputShouldHideButtonsTooltip: HTMLInputElement;
 };
 
 export function getInputs(): InputsOptionsPage {
@@ -30,7 +30,7 @@ export function getInputs(): InputsOptionsPage {
   const inputShouldOverrideMediaKeys: HTMLInputElement = document.querySelector(
     '#override-media-keys'
   ) as HTMLInputElement;
-  const inputShouldShowButtonsTooltip: HTMLInputElement =
+  const inputShouldHideButtonsTooltip: HTMLInputElement =
     document.querySelector('#should-show-buttons-tooltip') as HTMLInputElement;
 
   return {
@@ -38,7 +38,7 @@ export function getInputs(): InputsOptionsPage {
     inputForwardSeconds,
     inputShouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys,
-    inputShouldShowButtonsTooltip,
+    inputShouldHideButtonsTooltip,
   };
 }
 
@@ -48,7 +48,7 @@ export async function saveOptions(): Promise<void> {
     inputForwardSeconds: forwardSeconds,
     inputShouldOverrideArrowKeys: shouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys: shouldOverrideMediaKeys,
-    inputShouldShowButtonsTooltip: shouldShowButtonsTooltip,
+    inputShouldHideButtonsTooltip: shouldHideButtonsTooltip,
   } = getInputs();
   try {
     await chrome.storage.sync.set({
@@ -56,7 +56,7 @@ export async function saveOptions(): Promise<void> {
       forwardSeconds: forwardSeconds.value,
       shouldOverrideArrowKeys: shouldOverrideArrowKeys.checked,
       shouldOverrideMediaKeys: shouldOverrideMediaKeys.checked,
-      shouldShowButtonsTooltip: shouldShowButtonsTooltip.checked,
+      shouldHideButtonsTooltip: shouldHideButtonsTooltip.checked,
     });
     console.info('options saved!');
     window.close();
@@ -88,7 +88,7 @@ export async function loadInputStorageOptions(): Promise<void> {
     inputForwardSeconds,
     inputShouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys,
-    inputShouldShowButtonsTooltip,
+    inputShouldHideButtonsTooltip,
   } = getInputs();
   try {
     const storageOptions: IStorageOptions = (await chrome.storage.sync.get(
@@ -106,9 +106,9 @@ export async function loadInputStorageOptions(): Promise<void> {
     inputShouldOverrideMediaKeys.checked =
       storageOptions?.shouldOverrideMediaKeys ??
       OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
-    inputShouldShowButtonsTooltip.checked =
-      storageOptions?.shouldShowButtonsTooltip ??
-      OPTIONS_DEFAULT_VALUES.shouldShowButtonsTooltip;
+    inputShouldHideButtonsTooltip.checked =
+      storageOptions?.shouldHideButtonsTooltip ??
+      OPTIONS_DEFAULT_VALUES.shouldHideButtonsTooltip;
   } catch (error) {
     console.error(error);
   }
@@ -125,7 +125,7 @@ export async function resetToDefaultOptions(): Promise<void> {
     inputForwardSeconds,
     inputShouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys,
-    inputShouldShowButtonsTooltip,
+    inputShouldHideButtonsTooltip,
   } = getInputs();
   try {
     await chrome.storage.sync.set(OPTIONS_DEFAULT_VALUES);
@@ -137,8 +137,8 @@ export async function resetToDefaultOptions(): Promise<void> {
       OPTIONS_DEFAULT_VALUES.shouldOverrideArrowKeys;
     inputShouldOverrideMediaKeys.checked =
       OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
-    inputShouldShowButtonsTooltip.checked =
-      OPTIONS_DEFAULT_VALUES.shouldShowButtonsTooltip;
+    inputShouldHideButtonsTooltip.checked =
+      OPTIONS_DEFAULT_VALUES.shouldHideButtonsTooltip;
   } catch (error) {
     console.error(error);
   }
