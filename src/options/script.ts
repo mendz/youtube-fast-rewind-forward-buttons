@@ -31,7 +31,7 @@ export function getInputs(): InputsOptionsPage {
     '#override-media-keys'
   ) as HTMLInputElement;
   const inputShouldHideButtonsTooltip: HTMLInputElement =
-    document.querySelector('#should-show-buttons-tooltip') as HTMLInputElement;
+    document.querySelector('#should-hide-buttons-tooltip') as HTMLInputElement;
 
   return {
     inputRewindSeconds,

@@ -93,7 +93,7 @@ describe('Options page', () => {
       ) as HTMLInputElement;
       rewindInput.value = '10';
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
       overrideMediaKeysInput.checked = true;
 
@@ -169,7 +169,7 @@ describe('Options page', () => {
         (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
       ) as HTMLInputElement;
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
       const shouldHideButtonsTooltipInput = pageInputs.find(
         (input) => input.id === InputId.SHOULD_HIDE_BUTTONS_TOOLTIP
@@ -179,7 +179,7 @@ describe('Options page', () => {
       expect(rewindInput.value).toBe('5');
       expect(overrideArrowKeysInput.checked).toBe(true);
       expect(overrideMediaKeysInput.checked).toBe(false);
-      expect(shouldHideButtonsTooltipInput.checked).toBe(false);
+      expect(shouldHideButtonsTooltipInput.checked).toBe(true);
     });
   });
 
@@ -246,7 +246,7 @@ describe('Options page', () => {
       ) as HTMLInputElement;
       expect(forwardInput2.value).toBe('5');
       expect(overrideArrowKeysInput2.checked).toBe(false);
-      expect(shouldHideButtonsTooltipInput2.checked).toBe(true);
+      expect(shouldHideButtonsTooltipInput2.checked).toBe(false);
     });
   });
 

@@ -1,7 +1,9 @@
 import { IOptions, IStorageOptions } from '../../content/types';
 
 export const MOCK_HTML = /* HTML */ `
-  <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+  <header>
+    <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+  </header>
   <button type="button" class="danger" id="reset-values">
     Reset input values to default
   </button>
@@ -29,8 +31,6 @@ export const MOCK_HTML = /* HTML */ `
           value="5"
         />
       </label>
-    </div>
-    <div class="override-keys-container">
       <p>
         <svg
           id="information"
@@ -48,6 +48,8 @@ export const MOCK_HTML = /* HTML */ `
         As a default, the arrow keys rewind (left arrow) & forward (right arrow)
         are set to <strong>5 seconds</strong>.
       </p>
+    </div>
+    <div class="checkbox-container">
       <label>
         <input
           type="checkbox"
@@ -62,17 +64,16 @@ export const MOCK_HTML = /* HTML */ `
           name="override-media-keys"
           id="override-media-keys"
         />
-        Should override the keyboard media keys above to behave as the arrow
-        keys?
+        Should override the keyboard media keys with the above seconds to behave
+        as the arrow keys?
       </label>
       <label>
         <input
           type="checkbox"
-          name="should-show-buttons-tooltip"
-          id="should-show-buttons-tooltip"
-          checked
+          name="should-hide-buttons-tooltip"
+          id="should-hide-buttons-tooltip"
         />
-        Should show buttons tooltip?
+        Should hide buttons tooltip?
       </label>
     </div>
     <div class="button-container">
@@ -85,7 +86,7 @@ export enum InputId {
   REWIND = 'rewind',
   FORWARD = 'forward',
   OVERRIDE_ARROW_KEYS = 'override-arrow-keys',
-  OVERRIDE_MEDIA_KAYS = 'override-media-keys',
+  OVERRIDE_MEDIA_KEYS = 'override-media-keys',
   SHOULD_HIDE_BUTTONS_TOOLTIP = 'should-hide-buttons-tooltip',
 }
 
