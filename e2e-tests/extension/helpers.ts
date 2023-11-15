@@ -244,7 +244,7 @@ export function getOptionsInputs(page: Page) {
     'input#override-media-keys'
   );
   const shouldHideButtonsTooltipCheckbox = page.locator(
-    'input#should-show-buttons-tooltip'
+    'input#should-hide-buttons-tooltip'
   );
   return {
     rewindSecondsInput,
