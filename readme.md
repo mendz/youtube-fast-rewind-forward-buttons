@@ -25,4 +25,5 @@ Personalize your view by hiding buttons' tooltips for a cleaner interface.
 SVG icons are from: [Heroicons](https://heroicons.dev/).
 
 ![Options Page & Rewind Fast Forward buttons](./screenshots/screenshot-1400x560.png "Options Page & Rewind Fast Forward buttons")
+![Ways to open the Options page](screenshots/screenshot-1280x800-2.png)
 
