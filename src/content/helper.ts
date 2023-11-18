@@ -9,8 +9,10 @@ export function createButton({
   button.classList.add('ytp-button');
   button.classList.add(ButtonClassesIds.CLASS);
   button.innerHTML = svg;
-  button.title = title;
-  button.setAttribute('aria-label', title);
+  if (title) {
+    button.title = title;
+    button.setAttribute('aria-label', title);
+  }
   if (id) {
     button.id = id;
   }

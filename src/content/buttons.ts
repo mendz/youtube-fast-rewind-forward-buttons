@@ -47,12 +47,16 @@ export function getButtons(
   // set the buttons
   const fastRewindButton: HTMLButtonElement = createButton({
     svg: createFastRewindSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: createRewindButtonTitle(rewindSeconds, shouldOverrideArrowKeys),
+    title: shouldHideButtonsTooltip
+      ? null
+      : createRewindButtonTitle(rewindSeconds, shouldOverrideArrowKeys),
     id: ButtonClassesIds.REWIND_ID,
   });
   const fastForwardButton: HTMLButtonElement = createButton({
     svg: createFastForwardSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: createForwardButtonTitle(forwardSeconds, shouldOverrideArrowKeys),
+    title: shouldHideButtonsTooltip
+      ? null
+      : createForwardButtonTitle(forwardSeconds, shouldOverrideArrowKeys),
     id: ButtonClassesIds.FORWARD_ID,
   });
 
