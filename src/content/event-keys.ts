@@ -1,6 +1,17 @@
 import { getSeconds as eventKeys } from './helper';
 import { updateVideoTime } from './handle-video-player';
-import { ALL_KEY_CODES, ArrowKey, KEY_CODES } from './types';
+import {
+  ALL_ARROW_KEY_CODES,
+  ArrowKey,
+  IOptions,
+  KEY_CODES,
+  MediaTrackKey,
+} from './types';
+
+const MEDIA_KEYS_TO_ARROW_KEYS = {
+  [MediaTrackKey.MEDIA_TRACK_PREVIOUS]: ArrowKey.ARROW_LEFT_KEY,
+  [MediaTrackKey.MEDIA_TRACK_NEXT]: ArrowKey.ARROW_RIGHT_KEY,
+};
 
 export function simulateKey(key: ArrowKey): void {
   const event: KeyboardEvent = new KeyboardEvent('keydown', {
@@ -25,14 +36,14 @@ export function simulateKey(key: ArrowKey): void {
  * * For the correct event key if its 5 seconds or not
  * @returns boolean if should skip
  */
-export function isShouldSkipOverrideKeys(
+export function isShouldSkipOverrideArrowKeys(
   eventKey: ArrowKey,
   options: IOptions
 ): boolean {
-  const isNotKey = !ALL_KEY_CODES.includes(eventKey);
+  const isNotKey = !ALL_ARROW_KEY_CODES.includes(eventKey);
   return (
     isNotKey ||
-    !options.shouldOverrideKeys ||
+    !options.shouldOverrideArrowKeys ||
     (eventKey === ArrowKey.ARROW_LEFT_KEY && options.rewindSeconds === 5) ||
     (eventKey === ArrowKey.ARROW_RIGHT_KEY && options.forwardSeconds === 5)
   );
@@ -43,7 +54,7 @@ export function overrideArrowKeys(
   options: IOptions,
   video: HTMLVideoElement
 ): void {
-  if (isShouldSkipOverrideKeys(event.key as ArrowKey, options)) {
+  if (isShouldSkipOverrideArrowKeys(event.key as ArrowKey, options)) {
     return;
   }
   event.preventDefault();
@@ -51,5 +62,34 @@ export function overrideArrowKeys(
     seconds: eventKeys(event.key, options),
     video,
     updateType: event.key as ArrowKey,
+  });
+}
+
+export function overrideMediaKeys(
+  event: KeyboardEvent,
+  options: IOptions,
+  video: HTMLVideoElement
+): void {
+  if (!options.shouldOverrideMediaKeys) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const mediaTrackKey = event.key as MediaTrackKey;
+  const arrowKey = MEDIA_KEYS_TO_ARROW_KEYS[mediaTrackKey];
+
+  if (
+    (options.rewindSeconds === 5 && arrowKey === ArrowKey.ARROW_LEFT_KEY) ||
+    (options.forwardSeconds === 5 && arrowKey === ArrowKey.ARROW_RIGHT_KEY)
+  ) {
+    simulateKey(arrowKey);
+    return;
+  }
+
+  updateVideoTime({
+    seconds: eventKeys(arrowKey, options),
+    video,
+    updateType: arrowKey,
   });
 }

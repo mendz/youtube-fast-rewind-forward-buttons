@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,16 +11,19 @@
       rel="stylesheet"
     />
     <title>YouTube Rewind & Fast Forward Buttons - Options Page</title>
+    <script type="module" src="script.ts" defer></script>
   </head>
 
   <body>
-    <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    <header>
+      <h1>YouTube Rewind & Fast Forward Buttons - Options</h1>
+    </header>
     <button type="button" class="danger" id="reset-values">
       Reset input values to default
     </button>
     <form class="container">
       <div class="seconds-change">
-        <label for="rewind"
+        <label
           >Rewind seconds (between 1 and 60):
           <input
             type="number"
@@ -31,7 +34,7 @@
             value="5"
           />
         </label>
-        <label for="forward"
+        <label
           >Forward seconds (between 1 and 60):
           <input
             type="number"
@@ -42,8 +45,6 @@
             value="5"
           />
         </label>
-      </div>
-      <div class="override-keys-container">
         <p>
           <svg
             id="information"
@@ -61,15 +62,29 @@
           As a default, the arrow keys rewind (left arrow) & forward (right
           arrow) are set to <strong>5 seconds</strong>.
         </p>
-        <label for="override-keys">
+      </div>
+      <div class="checkbox-container">
+        <label>
+          <input
+            type="checkbox"
+            name="override-arrow-keys"
+            id="override-arrow-keys"
+          />
           Should the options above override the native arrow keys seconds?
-          <input type="checkbox" name="override-keys" id="override-keys"
-        /></label>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="override-media-keys"
+            id="override-media-keys"
+          />
+          Should override the keyboard media keys with the above seconds to
+          behave as the arrow keys?
+        </label>
       </div>
       <div class="button-container">
         <button type="submit">Save and close</button>
       </div>
     </form>
-    <script src="script.ts"></script>
   </body>
 </html>
