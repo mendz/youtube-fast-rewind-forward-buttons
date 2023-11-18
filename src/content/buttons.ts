@@ -36,18 +36,27 @@ export function getButtons(
   fastRewindButton: HTMLButtonElement;
   fastForwardButton: HTMLButtonElement;
 } {
-  const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } = options;
+  const {
+    shouldOverrideArrowKeys,
+    rewindSeconds,
+    forwardSeconds,
+    shouldHideButtonsTooltip,
+  } = options;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
   // set the buttons
   const fastRewindButton: HTMLButtonElement = createButton({
     svg: createFastRewindSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: createRewindButtonTitle(rewindSeconds, shouldOverrideArrowKeys),
+    title: shouldHideButtonsTooltip
+      ? null
+      : createRewindButtonTitle(rewindSeconds, shouldOverrideArrowKeys),
     id: ButtonClassesIds.REWIND_ID,
   });
   const fastForwardButton: HTMLButtonElement = createButton({
     svg: createFastForwardSVG(svgClasses, svgUseHtml, svgPathClasses),
-    title: createForwardButtonTitle(forwardSeconds, shouldOverrideArrowKeys),
+    title: shouldHideButtonsTooltip
+      ? null
+      : createForwardButtonTitle(forwardSeconds, shouldOverrideArrowKeys),
     id: ButtonClassesIds.FORWARD_ID,
   });
 
@@ -66,10 +75,12 @@ export function getButtons(
       updateType: ArrowKey.ARROW_RIGHT_KEY,
     })
   );
-  fastRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
-  fastRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
-  fastForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
-  fastForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+  if (!shouldHideButtonsTooltip) {
+    fastRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+    fastRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+    fastForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+    fastForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+  }
 
   return { fastRewindButton, fastForwardButton };
 }

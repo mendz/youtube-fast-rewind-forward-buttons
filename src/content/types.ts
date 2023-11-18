@@ -4,6 +4,7 @@ export interface IOptions {
   shouldOverrideKeys?: boolean; // TODO: old one, should removed in the next version
   shouldOverrideArrowKeys: boolean;
   shouldOverrideMediaKeys: boolean;
+  shouldHideButtonsTooltip: boolean;
 }
 
 export interface IStorageOptions
@@ -24,7 +25,7 @@ export enum MediaTrackKey {
 
 export type CreateButtonArg = {
   svg: string;
-  title: string;
+  title: string | null;
   id?: string;
 };
 

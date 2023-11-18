@@ -178,6 +178,7 @@ describe('loadOptions', () => {
       forwardSeconds: 2,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: true,
+      shouldHideButtonsTooltip: false,
     };
     chrome.storage.sync.get.mockReturnValue(options as any);
     const loadedOptions = await loadOptions();
@@ -257,6 +258,7 @@ describe('mergeOptions', () => {
       rewindSeconds: 7,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
+      shouldHideButtonsTooltip: false,
     };
     const changeOptionsMock: ChromeStorageChanges = {
       rewindSeconds: {
@@ -271,6 +273,10 @@ describe('mergeOptions', () => {
         oldValue: optionsMock.shouldOverrideMediaKeys,
         newValue: true,
       },
+      shouldHideButtonsTooltip: {
+        oldValue: optionsMock.shouldHideButtonsTooltip,
+        newValue: true,
+      },
     };
     const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
@@ -278,6 +284,7 @@ describe('mergeOptions', () => {
       ...DEFAULT_OPTIONS_MOCK,
       forwardSeconds: optionsMock.forwardSeconds,
       shouldOverrideMediaKeys: true,
+      shouldHideButtonsTooltip: true,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
@@ -288,6 +295,7 @@ describe('mergeOptions', () => {
       rewindSeconds: 7,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
+      shouldHideButtonsTooltip: false,
     };
     const changeOptionsMock: ChromeStorageChanges = {
       rewindSeconds: {
@@ -321,6 +329,7 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: false,
       shouldOverrideArrowKeys: false,
       shouldOverrideMediaKeys: false,
+      shouldHideButtonsTooltip: false,
     };
 
     let storageOptions: IStorageOptions = {
@@ -329,6 +338,7 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: true,
       shouldOverrideArrowKeys: false,
       shouldOverrideMediaKeys: false,
+      shouldHideButtonsTooltip: true,
     };
 
     const result = handleOverrideKeysMigration(defaultOptions, storageOptions);
@@ -340,6 +350,7 @@ describe('handleOverrideKeysMigration', () => {
       forwardSeconds: '5',
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
+      shouldHideButtonsTooltip: true,
     };
 
     const result2 = handleOverrideKeysMigration(defaultOptions, storageOptions);
@@ -352,6 +363,7 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: false,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
+      shouldHideButtonsTooltip: false,
     };
 
     const result3 = handleOverrideKeysMigration(defaultOptions, storageOptions);
@@ -364,6 +376,7 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: false,
       shouldOverrideArrowKeys: false,
       shouldOverrideMediaKeys: true,
+      shouldHideButtonsTooltip: false,
     };
 
     const result4 = handleOverrideKeysMigration(defaultOptions, storageOptions);

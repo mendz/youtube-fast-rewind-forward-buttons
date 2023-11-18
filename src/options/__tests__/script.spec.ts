@@ -23,9 +23,9 @@ describe('Options page', () => {
   });
 
   describe('getInputs', () => {
-    it('Should return all 4 inputs', () => {
+    it('Should return all 5 inputs', () => {
       const inputs = getInputs();
-      expect(Object.keys(inputs).length).toBe(4);
+      expect(Object.keys(inputs).length).toBe(5);
     });
 
     it('Should return the same amounts of inputs in the page', () => {
@@ -65,7 +65,7 @@ describe('Options page', () => {
 
     it('Should console info when saved', async () => {
       await saveOptions();
-      expect(console.info).toBeCalledWith('options saved!');
+      expect(console.info).toHaveBeenCalledWith('options saved!');
     });
 
     it('Should close the window after saving', async () => {
@@ -93,7 +93,7 @@ describe('Options page', () => {
       ) as HTMLInputElement;
       rewindInput.value = '10';
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
       overrideMediaKeysInput.checked = true;
 
@@ -103,6 +103,7 @@ describe('Options page', () => {
         forwardSeconds: '5',
         shouldOverrideArrowKeys: false,
         shouldOverrideMediaKeys: true,
+        shouldHideButtonsTooltip: false,
       });
     });
   });
@@ -150,6 +151,7 @@ describe('Options page', () => {
         ...DEFAULT_OPTIONS_MOCK,
         forwardSeconds: 20,
         shouldOverrideArrowKeys: true,
+        shouldHideButtonsTooltip: true,
       } as any);
 
       await loadInputStorageOptions();
@@ -167,13 +169,17 @@ describe('Options page', () => {
         (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
       ) as HTMLInputElement;
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
+      ) as HTMLInputElement;
+      const shouldHideButtonsTooltipInput = pageInputs.find(
+        (input) => input.id === InputId.SHOULD_HIDE_BUTTONS_TOOLTIP
       ) as HTMLInputElement;
 
       expect(forwardInput.value).toBe('20');
       expect(rewindInput.value).toBe('5');
       expect(overrideArrowKeysInput.checked).toBe(true);
       expect(overrideMediaKeysInput.checked).toBe(false);
+      expect(shouldHideButtonsTooltipInput.checked).toBe(true);
     });
   });
 
@@ -216,6 +222,10 @@ describe('Options page', () => {
         (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
       ) as HTMLInputElement;
       overrideArrowKeysInput.checked = true;
+      const shouldHideButtonsTooltipInput = pageInputs.find(
+        (input) => input.id === InputId.SHOULD_HIDE_BUTTONS_TOOLTIP
+      ) as HTMLInputElement;
+      shouldHideButtonsTooltipInput.checked = false;
       (window.confirm as jest.Mock).mockReturnValue(true);
 
       // run
@@ -231,8 +241,12 @@ describe('Options page', () => {
       const overrideArrowKeysInput2 = pageInputs2.find(
         (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
       ) as HTMLInputElement;
+      const shouldHideButtonsTooltipInput2 = pageInputs2.find(
+        (input) => input.id === InputId.SHOULD_HIDE_BUTTONS_TOOLTIP
+      ) as HTMLInputElement;
       expect(forwardInput2.value).toBe('5');
       expect(overrideArrowKeysInput2.checked).toBe(false);
+      expect(shouldHideButtonsTooltipInput2.checked).toBe(false);
     });
   });
 
