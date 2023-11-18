@@ -25,7 +25,7 @@ export enum MediaTrackKey {
 
 export type CreateButtonArg = {
   svg: string;
-  title: string;
+  title: string | null;
   id?: string;
 };
 
