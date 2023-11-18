@@ -65,13 +65,28 @@ test('should changed options affect the video without refresh', async ({
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(30);
 
-    await forwardButton.click();
-    const forwardTooltip = getTooltip(videoPage);
-    await expect(forwardTooltip).toHaveText(/\S/);
+    const { forwardTitle, forwardAriaLabel } = await forwardButton.evaluate(
+      (button) => {
+        return {
+          forwardTitle: button.getAttribute('title'),
+          // eslint-disable-next-line sonarjs/no-duplicate-string
+          forwardAriaLabel: button.getAttribute('aria-label'),
+        };
+      }
+    );
+    expect(forwardTitle).toBeFalsy();
+    expect(forwardAriaLabel).toBeFalsy();
 
-    await rewindButton.click();
-    const rewindTooltip = getTooltip(videoPage);
-    await expect(rewindTooltip).toHaveText(/\S/);
+    const { rewindTitle, rewindAriaLabel } = await rewindButton.evaluate(
+      (button) => {
+        return {
+          rewindTitle: button.getAttribute('title'),
+          rewindAriaLabel: button.getAttribute('aria-label'),
+        };
+      }
+    );
+    expect(rewindTitle).toBeFalsy();
+    expect(rewindAriaLabel).toBeFalsy();
   });
 
   await test.step('Reopen the options page to reset the values', async () => {
@@ -94,13 +109,27 @@ test('should changed options affect the video without refresh', async ({
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(0);
 
-    await forwardButton.click();
-    const forwardTooltip = getTooltip(videoPage);
-    await expect(forwardTooltip).not.toHaveText(/\S/);
+    const { forwardTitle, forwardAriaLabel } = await forwardButton.evaluate(
+      (button) => {
+        return {
+          forwardTitle: button.getAttribute('title'),
+          forwardAriaLabel: button.getAttribute('aria-label'),
+        };
+      }
+    );
+    expect(forwardTitle).not.toHaveLength(0);
+    expect(forwardAriaLabel).not.toHaveLength(0);
 
-    await rewindButton.click();
-    const rewindTooltip = getTooltip(videoPage);
-    await expect(rewindTooltip).not.toHaveText(/\S/);
+    const { rewindTitle, rewindAriaLabel } = await rewindButton.evaluate(
+      (button) => {
+        return {
+          rewindTitle: button.getAttribute('title'),
+          rewindAriaLabel: button.getAttribute('aria-label'),
+        };
+      }
+    );
+    expect(rewindTitle).not.toHaveLength(0);
+    expect(rewindAriaLabel).not.toHaveLength(0);
   });
 });
 
