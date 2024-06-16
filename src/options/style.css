@@ -14,13 +14,35 @@
 }
 
 body {
-  text-align: center;
   line-height: 1.5;
   font-size: 1rem;
   font-family: 'Roboto', sans-serif;
   color: var(--black);
   background-color: #dfdbe5;
   background-image: url('floating-cogs.svg');
+
+  display: grid;
+  grid-auto-columns: 0.5fr 3fr 1fr;
+  grid-auto-rows: minmax(100px, auto);
+  grid-template-areas:
+    'support header blank'
+    'container container container';
+  place-items: center;
+
+  & aside {
+    grid-area: support;
+    cursor: pointer;
+  }
+
+  & header {
+    grid-area: header;
+    justify-self: center;
+  }
+
+  & main {
+    grid-area: container;
+    text-align: center;
+  }
 }
 
 button {
