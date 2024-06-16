@@ -2,9 +2,9 @@
   --white: #fff;
   --black: #212529;
   --blue: #0d6efd;
-  --dark-blue: #0a58ca;
-  --red: #dc3545;
-  --dark-red: #b02a37;
+  --dark-blue: #0c5ae9;
+  --red: #ec474f;
+  --dark-red: #dc3545;
 }
 
 *,
@@ -14,6 +14,7 @@
 }
 
 body {
+  text-align: center;
   line-height: 1.5;
   font-size: 1rem;
   font-family: 'Roboto', sans-serif;
@@ -22,16 +23,22 @@ body {
   background-image: url('floating-cogs.svg');
 
   display: grid;
-  grid-auto-columns: 0.5fr 3fr 1fr;
-  grid-auto-rows: minmax(100px, auto);
+  grid-auto-columns: 1fr 3fr 1fr;
+  grid-auto-rows: auto 1fr;
   grid-template-areas:
     'support header blank'
-    'container container container';
+    'blank1 container blank';
   place-items: center;
+  height: 100vh;
+  text-wrap: balance;
 
   & aside {
     grid-area: support;
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
   }
 
   & header {
@@ -41,7 +48,63 @@ body {
 
   & main {
     grid-area: container;
+    align-self: start;
     text-align: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  body {
+    grid-auto-columns: 1fr;
+    grid-auto-rows: auto auto 1fr;
+    grid-template-areas:
+      'header'
+      'support'
+      'container';
+  }
+}
+
+@media screen and (800px <= width <= 1200px) {
+  body {
+    grid-template-areas:
+      'support header blank'
+      'container container container';
+  }
+}
+
+aside {
+  & a {
+    cursor: pointer;
+  }
+  & p {
+    margin: 0;
+
+    a#rate-us {
+      color: #18272f;
+      position: relative;
+      text-decoration: none;
+      display: inline-block;
+
+      &::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        border-radius: 4px;
+        background-color: #18272f;
+        bottom: -4px; /* Adjust as necessary */
+        left: 0;
+        transform-origin: right;
+        transform: scaleX(0);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      &:hover::before {
+        transform-origin: left;
+        transform: scaleX(1);
+      }
+    }
   }
 }
 
@@ -71,12 +134,16 @@ button.danger {
 
 label {
   user-select: none;
-}
-label:has(input[type='checkbox']) {
-  cursor: pointer;
-}
-label input {
-  margin-left: 0.5rem;
+  text-wrap: pretty;
+
+  &:has(input[type='checkbox']) {
+    align-self: flex-start;
+    cursor: pointer;
+  }
+
+  & input {
+    margin-left: 0.5rem;
+  }
 }
 
 input[type='checkbox'] {
@@ -84,39 +151,77 @@ input[type='checkbox'] {
 }
 
 .container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-rows: minmax(200px, 1fr) auto;
+  grid-template-areas:
+    'seconds'
+    'checkboxs'
+    'buttons';
   place-content: center;
   place-items: center;
-  margin-top: 1rem;
-  gap: 1rem;
-}
-.container > * {
-  flex: 1;
-  place-content: center;
-  place-items: center;
-}
-.container label[for='override-keys'] {
-  cursor: pointer;
+
+  margin-top: 2rem;
+  gap: 1.5rem;
+  height: 100%;
+
+  & > * {
+    padding: 10px;
+  }
+
+  & label[for='override-keys'] {
+    cursor: pointer;
+  }
 }
 
-.seconds-change {
+@media screen and (max-width: 800px) {
+  .container {
+    grid-auto-columns: 1fr;
+    grid-auto-rows: minmax(100px, 1fr) auto;
+    grid-template-areas:
+      'seconds'
+      'checkboxs'
+      'buttons';
+    margin-top: 0.5rem;
+    gap: 0.5rem;
+
+    & label {
+      &:has(input[type='checkbox']) {
+        align-self: center;
+      }
+    }
+  }
+
+  .button-container {
+    align-self: start;
+  }
+}
+
+.seconds-change-container {
+  grid-area: seconds;
   display: flex;
+  gap: 0.5rem;
   flex-direction: column;
   place-content: space-evenly;
   place-items: center;
+  height: max-content;
 }
 
 .checkbox-container {
+  grid-area: checkboxs;
   display: flex;
+  gap: 0.5rem;
   flex-direction: column;
   align-items: start;
 }
 
 .button-container {
+  grid-area: buttons;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
 }
 
 .icon {
