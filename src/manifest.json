@@ -27,7 +27,8 @@
     "128": "icons/fast-forward-128.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "options_ui": {
     "page": "options/options.html",
@@ -43,6 +44,17 @@
         "https://www.youtube.com/*"
       ],
       "resources": []
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "resources": [
+        "background/readme-update.html"
+      ]
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background/service-worker.ts"
+  }
 }

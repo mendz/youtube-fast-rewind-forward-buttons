@@ -1,0 +1,24 @@
+:root {
+  --white: #fff;
+  --black: #212529;
+  --blue: #0d6efd;
+  --dark-blue: #0c5ae9;
+  --red: #ec474f;
+  --dark-red: #dc3545;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  text-align: center;
+  line-height: 1.5;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: var(--black);
+  background-color: #dfdbe5;
+  background-image: url('../assets/floating-cogs.svg');
+}
