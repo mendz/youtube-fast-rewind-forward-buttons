@@ -1,0 +1,73 @@
+:root {
+  --gray: #f1f3f5;
+  --light-gray: #dee2e6;
+  --blue: #0d6efd;
+
+  --primary-color: #212529;
+  --secondary-color: #6c757d;
+
+  --primary-background-color: #dfdbe5;
+  --secondary-background-color: #f8f9fa;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  line-height: 1.5;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: var(--primary-color);
+  background-color: var(--primary-background-color);
+  background-image: url('../../assets/floating-cogs.svg');
+
+  & p {
+    font-size: 1.1em;
+  }
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  color: var(--secondary-color);
+  font-size: 1.8em;
+  margin-top: 30px;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--secondary-background-color);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+div#updates {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  & h3 {
+    margin: 0;
+  }
+
+  & .card {
+    background-color: var(--gray);
+    border-left: 4px solid var(--blue);
+    padding: 15px;
+    border-radius: 4px;
+  }
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: var(--light-gray);
+  margin: 30px 0;
+}

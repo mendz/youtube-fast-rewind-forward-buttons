@@ -134,7 +134,7 @@ input[type='checkbox'] {
   height: 100%;
 
   & p:has(.icon) {
-    line-height: 1rem;
+    text-wrap: pretty;
   }
 
   & .icon {
