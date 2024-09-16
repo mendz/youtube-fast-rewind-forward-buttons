@@ -15,7 +15,7 @@ import {
   resetToDefaultOptions,
   saveOptions,
   submit,
-} from '../script';
+} from '../popup-script';
 
 describe('Options page', () => {
   beforeEach(() => {

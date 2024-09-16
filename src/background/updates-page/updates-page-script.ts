@@ -3,13 +3,13 @@ interface IUpdates {
   description: string;
 }
 
-interface IVersionUpdates {
+export interface IVersionUpdates {
   version: string;
   date: string;
   updates: IUpdates[];
 }
 
-const versionUpdates: IVersionUpdates[] = [
+export const versionUpdates: IVersionUpdates[] = [
   {
     version: '1.3.1',
     date: getDate('2024-08-13'),
@@ -28,9 +28,11 @@ const versionUpdates: IVersionUpdates[] = [
   },
 ];
 
-setUpdates();
+document.addEventListener('DOMContentLoaded', () => {
+  setUpdates();
+});
 
-function getDate(dateStr: string) {
+export function getDate(dateStr: string) {
   const date = new Date(dateStr);
   return new Intl.DateTimeFormat('en-IL', {
     month: 'long',
@@ -39,9 +41,9 @@ function getDate(dateStr: string) {
   }).format(date);
 }
 
-function setUpdates() {
+export function setUpdates(updates: IVersionUpdates[] = versionUpdates) {
   const updatesElement = document.getElementById('updates') as HTMLDivElement;
-  const html = versionUpdates
+  const html = updates
     .reverse()
     .map(
       (versionUpdate) => /* html */ `
@@ -57,7 +59,7 @@ function setUpdates() {
   updatesElement.innerHTML = html;
 }
 
-function renderUpdate(update: IUpdates): string {
+export function renderUpdate(update: IUpdates): string {
   return /* html */ `
     <div class="card">
       <h3>${update.title}</h3>
