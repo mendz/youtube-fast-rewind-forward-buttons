@@ -104,17 +104,18 @@ test('should show the tooltip with correct text', async ({ page }) => {
   });
 });
 
-test('Should add arrows when entering a video from the main page', async ({
+test('should add arrows when entering a video from the main page', async ({
   page,
   context,
 }) => {
   page.close();
   const newPage = await context.newPage();
   await newPage.goto('https://www.youtube.com/');
-  await newPage.locator('div.ytd-rich-item-renderer').first().click();
+  await newPage.locator('div.ytd-rich-item-renderer').nth(1).click();
+  await handleAds(newPage);
+
   const video = newPage.locator('ytd-player video');
   // pause the video
-  await handleAds(newPage);
   await resetVideo(video, newPage);
   const { forwardButton, rewindButton } = getVideoLocatorElements(newPage);
 

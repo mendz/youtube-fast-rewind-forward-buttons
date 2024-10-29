@@ -113,7 +113,8 @@ async function isAdsInPage(page: Page): Promise<boolean> {
 
 async function isCounterSkipButton(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector('.ytp-ad-preview-container', {
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    return !!(await page.waitForSelector('.ytp-skip-ad-button', {
       state: 'attached',
       timeout: 5000,
       strict: false,
@@ -125,7 +126,7 @@ async function isCounterSkipButton(page: Page): Promise<boolean> {
 
 async function isCounterSkipButtonLeave(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector('.ytp-ad-preview-container', {
+    return !!(await page.waitForSelector('.ytp-skip-ad-button', {
       state: 'detached',
       timeout: 5000,
       strict: false,
@@ -139,7 +140,7 @@ export async function getSkipAdButton(
   page: Page
 ): Promise<ElementHandle<HTMLElement | SVGElement> | null> {
   try {
-    return await page.waitForSelector('.ytp-ad-skip-button-container', {
+    return await page.waitForSelector('.ytp-skip-ad-button', {
       state: 'attached',
       timeout: 1000,
     });
