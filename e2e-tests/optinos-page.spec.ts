@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import {
   fillInputsWithChangedValues,
   getOptionFilePath,
@@ -188,3 +188,41 @@ test('should NOT keep the values if user close the page and return to the back t
   expect(newPageShouldOverrideKeysCheckbox).not.toBeChecked();
   expect(newPageShouldOverrideMediaKeysCheckbox).not.toBeChecked();
 });
+
+test('should open the by me coffee page when clicking on the buy me a coffee link', async ({
+  page,
+  context,
+}) => {
+  const shadowHost = await getShadowHostSupportLinks(page);
+  const byMeCoffeeButton = shadowHost.locator(
+    'a:has(img[alt="Buy Me A Coffee"])'
+  );
+  await expect(byMeCoffeeButton).toBeVisible();
+
+  await byMeCoffeeButton.click();
+  const newPage = await context.waitForEvent('page');
+
+  expect(newPage).toHaveURL('https://buymeacoffee.com/leizerovich.mendy');
+});
+
+test('should open the the chrome extension page when clicking on the link', async ({
+  page,
+  context,
+}) => {
+  const shadowHost = await getShadowHostSupportLinks(page);
+  const rateUsLink = shadowHost.locator('a#rate-us');
+  await expect(rateUsLink).toBeVisible();
+
+  await rateUsLink.click();
+  const newPage = await context.waitForEvent('page');
+
+  expect(newPage).toHaveURL(
+    'https://chromewebstore.google.com/detail/youtube-rewind-fast-forwa/bmdiaadnpgbbfepggiiajgadlhhcphgk/reviews'
+  );
+});
+
+async function getShadowHostSupportLinks(page: Page) {
+  const shadowHost = page.locator('support-links');
+  await shadowHost.waitFor(); // Ensure the custom element itself is in the DOM
+  return shadowHost;
+}
