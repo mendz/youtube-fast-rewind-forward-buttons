@@ -9,7 +9,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 
-const EXTENSION_PATH = `../../dist/webext-dev`;
+const EXTENSION_PATH = `../dist/webext-dev`;
 export const YOUTUBE_URL = 'https://www.youtube.com/watch?v=HGl75kurxok';
 
 export const OPTIONS_DEFAULT_VALUES = {
