@@ -1,4 +1,4 @@
-export function openOptionsPage() {
+function openOptionsPage() {
   chrome.runtime.openOptionsPage();
 }
 
