@@ -50,7 +50,7 @@
         "<all_urls>"
       ],
       "resources": [
-        "background/updates-page/updates-page.html",
+        "background/whats-new-page/whats-new-page.html",
         "web-components/support-links.css"
       ]
     }

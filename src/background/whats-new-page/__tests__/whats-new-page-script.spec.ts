@@ -1,5 +1,5 @@
-import { MOCK_HTML } from '../__utils__/updates-page-tests-helper';
-import { getDate, renderUpdate, setUpdates } from '../updates-page-script';
+import { MOCK_HTML } from '../__utils__/whats-new-page-tests-helper';
+import { getDate, renderUpdate, setUpdates } from '../whats-new-page-script';
 
 describe('Updates page', () => {
   beforeEach(() => {
