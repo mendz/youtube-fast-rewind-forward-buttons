@@ -15,6 +15,8 @@ chrome.runtime.onInstalled.addListener(({ reason, previousVersion }) => {
 
 function showReadme() {
   chrome.tabs.create({
-    url: chrome.runtime.getURL('/background/readme-update.html'),
+    url: chrome.runtime.getURL(
+      '/background/whats-new-page/whats-new-page.html'
+    ),
   });
 }

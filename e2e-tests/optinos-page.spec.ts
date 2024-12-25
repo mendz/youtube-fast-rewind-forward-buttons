@@ -1,12 +1,13 @@
-import { expect, Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 import {
+  BUTTON_SUBMIT_SELECTOR,
   fillInputsWithChangedValues,
   getOptionFilePath,
   getOptionsInputs,
+  getShadowHostSupportLinks,
   OPTIONS_CHANGED_VALUES,
   OPTIONS_DEFAULT_VALUES,
   test,
-  BUTTON_SUBMIT_SELECTOR,
 } from './helpers';
 
 test.beforeEach(async ({ page, extensionId }) => {
@@ -220,9 +221,3 @@ test('should open the the chrome extension page when clicking on the link', asyn
     'https://chromewebstore.google.com/detail/youtube-rewind-fast-forwa/bmdiaadnpgbbfepggiiajgadlhhcphgk/reviews'
   );
 });
-
-async function getShadowHostSupportLinks(page: Page) {
-  const shadowHost = page.locator('support-links');
-  await shadowHost.waitFor(); // Ensure the custom element itself is in the DOM
-  return shadowHost;
-}

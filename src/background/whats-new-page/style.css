@@ -1,7 +1,9 @@
 :root {
   --gray: #f1f3f5;
   --light-gray: #dee2e6;
-  --blue: #0d6efd;
+
+  --blue: #81b2fd;
+  --orange: #fda65e;
 
   --primary-color: #212529;
   --secondary-color: #6c757d;
@@ -40,7 +42,7 @@ h2 {
 }
 
 main {
-  max-width: 800px;
+  max-width: 50%;
   margin: 0 auto;
   background-color: var(--secondary-background-color);
   padding: 30px;
@@ -51,17 +53,38 @@ main {
 div#updates {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 
-  & h3 {
-    margin: 0;
-  }
+  & article {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 
-  & .card {
-    background-color: var(--gray);
-    border-left: 4px solid var(--blue);
-    padding: 15px;
-    border-radius: 4px;
+    & h3.version-date {
+      margin: 0;
+      background-color: var(--secondary-background-color);
+      border-bottom: 2px solid var(--secondary-color);
+      padding: 5px 10px;
+      font-size: 1.1em;
+    }
+
+    & .card {
+      background-color: var(--gray);
+      border-left: 4px solid var(--blue);
+      padding: 15px;
+      border-radius: 4px;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transform: scale(1.01);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+    }
+
+    & .card:nth-of-type(even) {
+      border-color: var(--orange);
+    }
   }
 }
 

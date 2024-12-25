@@ -38,7 +38,7 @@ export const test = base.extend<{
       args: [
         // the new headless arg for chrome v109+. Use '--headless=chrome'
         // as arg for browsers v94-108.
-        `--headless=new`,
+        // `--headless=new`,
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
       ],
@@ -248,13 +248,28 @@ export async function handleAds(page: Page) {
 }
 
 export async function getOptionFilePath(extensionId: string): Promise<string> {
-  const extFolderPath = path.join(__dirname, EXTENSION_PATH);
+  return geFilePath(extensionId, 'options');
+}
+
+export async function getWhatsNewFilePath(
+  extensionId: string
+): Promise<string> {
+  return geFilePath(extensionId, 'whats-new-page', 'background/whats-new-page');
+}
+
+async function geFilePath(
+  extensionId: string,
+  fileName: 'options' | 'whats-new-page',
+  folderPath = ''
+): Promise<string> {
+  const extFolderPath = path.join(__dirname, EXTENSION_PATH, `/${folderPath}/`);
   const files = await fs.promises.readdir(extFolderPath);
-  const optionFileName = files.find((file: string) =>
-    /options.*html$/.test(file)
+  const foundedFileName = files.find((file: string) =>
+    new RegExp(`${fileName}.*html$`).test(file)
   );
-  if (optionFileName) {
-    return `chrome-extension://${extensionId}/${optionFileName}`;
+  if (fileName) {
+    const path = folderPath?.length ? `${folderPath}/` : '';
+    return `chrome-extension://${extensionId}/${path}${foundedFileName}`;
   }
   throw new Error(`Couldn't find the option page!`);
 }
@@ -313,4 +328,10 @@ export async function clickOnNewVideoOnMainPage(newPage: Page) {
     await newPage.reload();
     await newPage.locator('div.ytd-rich-item-renderer').nth(1).click();
   }
+}
+
+export async function getShadowHostSupportLinks(page: Page) {
+  const shadowHost = page.locator('support-links');
+  await shadowHost.waitFor(); // Ensure the custom element itself is in the DOM
+  return shadowHost;
 }
