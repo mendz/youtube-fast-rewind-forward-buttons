@@ -72,14 +72,7 @@ div#updates {
       border-left: 4px solid var(--blue);
       padding: 15px;
       border-radius: 4px;
-
-      &:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        transform: scale(1.01);
-        transition:
-          transform 0.2s ease,
-          box-shadow 0.2s ease;
-      }
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     & .card:nth-of-type(even) {

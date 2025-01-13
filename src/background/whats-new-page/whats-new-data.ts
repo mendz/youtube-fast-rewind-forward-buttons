@@ -10,11 +10,6 @@ export const versionUpdates: IVersionUpdates[] = [
         description:
           'Now you can click on the extension icon in the top right corner. This will open a popup with a button that will open the options page.',
       },
-      {
-        title: 'Support Buttons Added',
-        description: `We've added two new buttons in the options page and the new popup to make it easier for you to support the
-        development of this extension.`,
-      },
     ],
   },
 ];

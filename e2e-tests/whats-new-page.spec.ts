@@ -66,7 +66,13 @@ test('should render the amounts of list items per the version updates', async ({
 
 test('should show the correct title', async ({ page }) => {
   const firstUpdate = versionUpdates.reverse().at(0);
-
   const titleText = await page.locator('h3.version-date').first().textContent();
+
   expect(titleText).toBe(`${firstUpdate?.version} - ${firstUpdate?.date}`);
 });
+
+// test('should include the correct text', async ({ page }) => {});
+
+// test('should open the whats new page when update new version', async ({
+//   page,
+// }) => {});
