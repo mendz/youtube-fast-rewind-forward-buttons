@@ -14,7 +14,7 @@ export const versionUpdates: IVersionUpdates[] = [
   },
 ];
 
-function getDate(dateStr: string) {
+export function getDate(dateStr: string) {
   const date = new Date(dateStr);
   return new Intl.DateTimeFormat('en-IL', {
     month: 'long',

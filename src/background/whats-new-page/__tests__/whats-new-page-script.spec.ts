@@ -1,5 +1,6 @@
 import { MOCK_HTML } from '../__utils__/whats-new-page-tests-helper';
-import { getDate, renderUpdate, setUpdates } from '../whats-new-page-script';
+import { getDate } from '../whats-new-data';
+import { renderUpdate, setUpdates } from '../whats-new-page-script';
 
 describe('Updates page', () => {
   beforeEach(() => {
