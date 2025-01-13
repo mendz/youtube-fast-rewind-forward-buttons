@@ -8,6 +8,7 @@ import {
   getTooltip,
   handleAds,
   YOUTUBE_URL,
+  clickOnNewVideoOnMainPage,
 } from './helpers';
 
 test.setTimeout(60 * 1000);
@@ -104,17 +105,18 @@ test('should show the tooltip with correct text', async ({ page }) => {
   });
 });
 
-test('Should add arrows when entering a video from the main page', async ({
+test('should add arrows when entering a video from the main page', async ({
   page,
   context,
 }) => {
+  test.slow();
   page.close();
   const newPage = await context.newPage();
-  await newPage.goto('https://www.youtube.com/');
-  await newPage.locator('div.ytd-rich-item-renderer').first().click();
-  const video = newPage.locator('ytd-player video');
-  // pause the video
+  await clickOnNewVideoOnMainPage(newPage);
   await handleAds(newPage);
+
+  // pause the video
+  const video = newPage.locator('ytd-player video');
   await resetVideo(video, newPage);
   const { forwardButton, rewindButton } = getVideoLocatorElements(newPage);
 

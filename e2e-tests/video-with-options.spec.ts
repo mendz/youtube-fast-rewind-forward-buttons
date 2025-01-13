@@ -18,6 +18,7 @@ import {
 const ANIMATION_ARROW_SELECTOR = 'ytd-player .ytp-doubletap-ui-legacy';
 
 test.setTimeout(60 * 1000);
+test.slow();
 
 test('should changed options affect the video without refresh', async ({
   page: videoPage,
@@ -270,6 +271,7 @@ test('should options change affect new youtube page', async ({
     await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
     await shouldOverrideArrowKeysCheckbox.check();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+    await videoPage.waitForTimeout(1000);
 
     expect(optionPage.isClosed()).toBe(true);
   });

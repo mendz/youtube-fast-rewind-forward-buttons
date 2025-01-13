@@ -27,12 +27,16 @@
     "128": "icons/fast-forward-128.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": true,
     "browser_style": true
+  },
+  "action": {
+    "default_popup": "popup/popup.html"
   },
   "web_accessible_resources": [
     {
@@ -40,6 +44,18 @@
         "https://www.youtube.com/*"
       ],
       "resources": []
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "resources": [
+        "background/whats-new-page/whats-new-page.html",
+        "web-components/support-links.css"
+      ]
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background/service-worker.ts"
+  }
 }

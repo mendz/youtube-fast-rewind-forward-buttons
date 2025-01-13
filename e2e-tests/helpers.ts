@@ -9,7 +9,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 
-const EXTENSION_PATH = `../../dist/webext-dev`;
+const EXTENSION_PATH = `../dist/webext-dev`;
 export const YOUTUBE_URL = 'https://www.youtube.com/watch?v=HGl75kurxok';
 
 export const OPTIONS_DEFAULT_VALUES = {
@@ -38,7 +38,7 @@ export const test = base.extend<{
       args: [
         // the new headless arg for chrome v109+. Use '--headless=chrome'
         // as arg for browsers v94-108.
-        `--headless=new`,
+        // `--headless=new`,
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
       ],
@@ -105,7 +105,14 @@ async function isAdsInPage(page: Page): Promise<boolean> {
       state: 'attached',
       timeout: 3000,
     });
-    return !!(await Promise.any([firstSpan, secondSpan]));
+    const videoAdsContainer = page.waitForSelector(
+      '.ytp-ad-player-overlay-layout',
+      {
+        state: 'attached',
+        timeout: 3000,
+      }
+    );
+    return !!(await Promise.any([firstSpan, secondSpan, videoAdsContainer]));
   } catch (error) {
     return false;
   }
@@ -113,11 +120,15 @@ async function isAdsInPage(page: Page): Promise<boolean> {
 
 async function isCounterSkipButton(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector('.ytp-ad-preview-container', {
-      state: 'attached',
-      timeout: 5000,
-      strict: false,
-    }));
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    return !!(await page.waitForSelector(
+      '.ytp-skip-ad-button:not([style*="display: none"])',
+      {
+        state: 'attached',
+        timeout: 5000,
+        strict: false,
+      }
+    ));
   } catch (error) {
     return false;
   }
@@ -125,7 +136,7 @@ async function isCounterSkipButton(page: Page): Promise<boolean> {
 
 async function isCounterSkipButtonLeave(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector('.ytp-ad-preview-container', {
+    return !!(await page.waitForSelector('.ytp-skip-ad-button', {
       state: 'detached',
       timeout: 5000,
       strict: false,
@@ -139,10 +150,13 @@ export async function getSkipAdButton(
   page: Page
 ): Promise<ElementHandle<HTMLElement | SVGElement> | null> {
   try {
-    return await page.waitForSelector('.ytp-ad-skip-button-container', {
-      state: 'attached',
-      timeout: 1000,
-    });
+    return await page.waitForSelector(
+      '.ytp-skip-ad-button:not([style*="display: none"])',
+      {
+        state: 'attached',
+        timeout: 1000,
+      }
+    );
   } catch (error) {
     return null;
   }
@@ -156,13 +170,38 @@ export async function isAdsLeavePage(page: Page): Promise<boolean> {
     const secondSpan = page.waitForSelector('.ytp-ad-duration-remaining', {
       state: 'detached',
     });
-    return !!(await Promise.any([firstSpan, secondSpan]));
+    const videoAdsContainer = page.waitForSelector(
+      '.ytp-ad-player-overlay-layout',
+      {
+        state: 'detached',
+        timeout: 3000,
+      }
+    );
+    return !!(await Promise.any([firstSpan, secondSpan, videoAdsContainer]));
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isSponsorAds(page: Page): Promise<boolean> {
+  try {
+    return !!(await page.waitForSelector(
+      '.ytp-ad-player-overlay-layout__ad-info-container',
+      {
+        state: 'detached',
+      }
+    ));
   } catch (error) {
     return false;
   }
 }
 
 export async function handleAds(page: Page) {
+  const isShouldWait = await isSponsorAds(page);
+  if (isShouldWait) {
+    await page.waitForTimeout(20 * 1000);
+  }
+
   const [isFirstAdExists, isCounterSkipButtonExists, firstSkipButton] =
     await Promise.all([
       isAdsInPage(page),
@@ -209,17 +248,46 @@ export async function handleAds(page: Page) {
 }
 
 export async function getOptionFilePath(extensionId: string): Promise<string> {
-  const extFolderPath = path.join(__dirname, EXTENSION_PATH);
+  return geFilePath(extensionId, 'options');
+}
+
+export async function getWhatsNewFilePath(
+  extensionId: string
+): Promise<string> {
+  return geFilePath(extensionId, 'whats-new-page', 'background/whats-new-page');
+}
+
+async function geFilePath(
+  extensionId: string,
+  fileName: 'options' | 'whats-new-page',
+  folderPath = ''
+): Promise<string> {
+  const extFolderPath = path.join(__dirname, EXTENSION_PATH, `/${folderPath}/`);
   const files = await fs.promises.readdir(extFolderPath);
-  const optionFileName = files.find((file: string) =>
-    /options.*html$/.test(file)
+  const foundedFileName = files.find((file: string) =>
+    new RegExp(`${fileName}.*html$`).test(file)
   );
-  if (optionFileName) {
-    return `chrome-extension://${extensionId}/${optionFileName}`;
+  if (fileName) {
+    const path = folderPath?.length ? `${folderPath}/` : '';
+    return `chrome-extension://${extensionId}/${path}${foundedFileName}`;
   }
   throw new Error(`Couldn't find the option page!`);
 }
 
+/**
+ * Fill the inputs with the new values to test the options page.
+ *
+ * This function will fill the inputs of the options page with the values
+ * that are not the default values. The values are stored in the
+ * `OPTIONS_CHANGED_VALUES` object.
+ *
+ * @param rewindSecondsInput The input element for the rewind seconds.
+ * @param forwardSecondsInput The input element for the forward seconds.
+ * @param shouldOverrideKeysCheckbox The checkbox element for overriding the
+ *   arrow keys.
+ * @param shouldOverrideMediaKeysCheckbox The checkbox element for overriding
+ *   the media keys.
+ */
 export async function fillInputsWithChangedValues(
   rewindSecondsInput: Locator,
   forwardSecondsInput: Locator,
@@ -247,4 +315,23 @@ export function getOptionsInputs(page: Page) {
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
   };
+}
+
+export async function clickOnNewVideoOnMainPage(newPage: Page) {
+  await newPage.goto('https://www.youtube.com/');
+  try {
+    await newPage.locator('div.ytd-rich-item-renderer').nth(1).click({
+      timeout: 10000,
+    }); // click on the second video because the first is an ad
+  } catch (error) {
+    console.warn(`Couldn't click on the new video, search issue ${error}`);
+    await newPage.reload();
+    await newPage.locator('div.ytd-rich-item-renderer').nth(1).click();
+  }
+}
+
+export async function getShadowHostSupportLinks(page: Page) {
+  const shadowHost = page.locator('support-links');
+  await shadowHost.waitFor(); // Ensure the custom element itself is in the DOM
+  return shadowHost;
 }
