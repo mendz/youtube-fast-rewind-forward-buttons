@@ -60,7 +60,7 @@ describe('Updates page', () => {
         updatesElement?.querySelector('h3.version-date')?.textContent
       ).toMatch(`${versionToTest} - ${dateToTest}`);
       expect(updatesElement?.querySelectorAll('div.card')?.length).toBe(2);
-      expect(firstCard?.querySelector('h3')?.textContent).toBe(titleToCheck);
+      expect(firstCard?.querySelector('h4')?.textContent).toBe(titleToCheck);
       expect(firstCard?.querySelector('p')?.textContent).toBe(descToCheck);
     });
   });
@@ -77,8 +77,8 @@ describe('Updates page', () => {
       };
 
       const result = renderUpdate(mockUpdate);
-      expect(result).toMatch(`<h3>${titleToCheck}</h3>`);
-      expect(result).toMatch(`<p>${descToCheck}</p>`);
+      expect(result).toContain(`<h4>${titleToCheck}</h4>`);
+      expect(result).toContain(`<p>${descToCheck}</p>`);
     });
   });
 });
