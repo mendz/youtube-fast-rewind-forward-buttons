@@ -4,7 +4,7 @@
   "short_name": "YouTube Rewind&Forward Buttons",
   "name": "YouTube Rewind & Fast Forward Buttons",
   "description": "Add Rewind & Fast Forward buttons to videos player in a YouTube site",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "content_scripts": [
     {
       "matches": [
