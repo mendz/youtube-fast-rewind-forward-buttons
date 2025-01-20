@@ -2,6 +2,7 @@ import {
   isShouldSkipOverrideArrowKeys,
   overrideArrowKeys,
   overrideMediaKeys,
+  shouldSkipDueToFocus,
   simulateKey,
 } from '../event-keys';
 import { ArrowKey, KEY_CODES, MediaTrackKey } from '../types';
@@ -354,5 +355,43 @@ describe('overrideMediaKeys', () => {
     );
 
     expect(updateVideoTimeSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('shouldSkipDueToFocus', () => {
+  // Helper function to create and focus an element
+  const createAndFocusElement = (tag: string, isContentEditable = false) => {
+    const element = document.createElement(tag);
+    if (isContentEditable) {
+      element.setAttribute('contenteditable', 'true');
+    }
+    document.body.appendChild(element);
+    element.focus();
+    return element;
+  };
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('returns true when an input element is focused', () => {
+    createAndFocusElement('input');
+    expect(shouldSkipDueToFocus()).toBe(true);
+  });
+
+  it('returns true when a contenteditable div is focused', () => {
+    createAndFocusElement('div', true);
+    expect(shouldSkipDueToFocus()).toBe(true);
+  });
+
+  it('returns false when a non-input, non-contenteditable element is focused', () => {
+    createAndFocusElement('div');
+    expect(shouldSkipDueToFocus()).toBe(false);
+  });
+
+  it('returns false when no element is focused', () => {
+    // Ensure no element is focused
+    document.body.focus();
+    expect(shouldSkipDueToFocus()).toBe(false);
   });
 });

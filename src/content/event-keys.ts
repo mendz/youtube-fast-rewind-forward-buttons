@@ -31,6 +31,20 @@ export function simulateKey(key: ArrowKey): void {
 }
 
 /**
+ * Determines whether the current focus is on an input element or an element with contenteditable enabled.
+ * This function helps in deciding whether to skip certain operations based on the focus state.
+ *
+ * @returns {boolean} `true` if the active element is an input or contenteditable; otherwise, `false`.
+ */
+export function shouldSkipDueToFocus(): boolean {
+  const activeElement = document.activeElement as HTMLElement;
+  const isInput = activeElement instanceof HTMLInputElement;
+  const isContentEditable = activeElement.hasAttribute('contenteditable');
+
+  return isInput || isContentEditable;
+}
+
+/**
  * Checks:
  * * The event key is part of the ArrowLeft / ArrowRight keys
  * * For the correct event key if its 5 seconds or not

@@ -18,6 +18,7 @@ test.beforeEach(async ({ page }) => {
   const video = page.locator('ytd-player video');
   // pause the video
   await resetVideo(video, page);
+  await handleAds(page);
 });
 
 test('should change the video time by clicking the arrows', async ({
@@ -122,6 +123,61 @@ test('should add arrows when entering a video from the main page', async ({
 
   await testClickingButtons(video, forwardButton, rewindButton);
   await testPressingArrowKeys(video, newPage);
+});
+
+test('should not change video time when input or contenteditable element is focused', async ({
+  page,
+}) => {
+  // Helper function to test time remains unchanged
+  const testTimeUnchanged = async (element: Locator) => {
+    const { video } = getVideoLocatorElements(page);
+    await setVideoTime(video, 10);
+    const initialTime = await getVideoTime(video);
+
+    await element.focus();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowLeft');
+
+    const finalTime = await getVideoTime(video);
+    expect(finalTime).toBe(initialTime);
+  };
+
+  // Test with input element
+  await test.step('Focus on input element and press arrow keys', async () => {
+    await page.evaluate(() => {
+      const input = document.createElement('input');
+      input.id = 'test-input';
+      document.body.appendChild(input);
+    });
+    const inputLocator = page.locator('#test-input');
+    await testTimeUnchanged(inputLocator);
+
+    await page.evaluate(() => {
+      const input = document.getElementById('test-input');
+      if (input) {
+        input.remove();
+      }
+    });
+  });
+
+  // Test with contenteditable element
+  await test.step('Focus on contenteditable element and press arrow keys', async () => {
+    await page.evaluate(() => {
+      const div = document.createElement('div');
+      div.id = 'test-contenteditable';
+      div.contentEditable = 'true';
+      document.body.appendChild(div);
+    });
+    const contentEditableLocator = page.locator('#test-contenteditable');
+    await testTimeUnchanged(contentEditableLocator);
+
+    await page.evaluate(() => {
+      const div = document.getElementById('test-contenteditable');
+      if (div) {
+        div.remove();
+      }
+    });
+  });
 });
 
 test.setTimeout(30 * 1000);

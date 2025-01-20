@@ -16,7 +16,7 @@ class SupportLinks extends HTMLElement {
                     src="https://cdn.buymeacoffee.com/buttons/v2/lato-yellow.png" alt="Buy Me A Coffee"
                     style="height: 60px !important; width: 217px !important" /></a>
             <a href="https://chromewebstore.google.com/detail/youtube-rewind-fast-forwa/bmdiaadnpgbbfepggiiajgadlhhcphgk/reviews"
-            target="_blank" id="rate-us">Love the Extension? Please leave a review on the Chrome Web Store!</a>
+            target="_blank" id="rate-us">Love the extension? Please leave a review on the Chrome Web Store!</a>
         </div>
 `;
   }

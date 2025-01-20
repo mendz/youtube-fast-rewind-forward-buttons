@@ -38,7 +38,7 @@ export const test = base.extend<{
       args: [
         // the new headless arg for chrome v109+. Use '--headless=chrome'
         // as arg for browsers v94-108.
-        // `--headless=new`,
+        `--headless=new`,
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
       ],

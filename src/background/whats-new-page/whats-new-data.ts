@@ -2,13 +2,18 @@ import { IVersionUpdates } from './whats-new-page-script';
 
 export const versionUpdates: IVersionUpdates[] = [
   {
-    version: '1.3.2',
-    date: getDate('2024-10-20'),
+    version: 'v1.4.0',
+    date: getDate('2025-01-14'),
     updates: [
       {
         title: 'New way to open the options page',
         description:
-          'Now you can click on the extension icon in the top right corner. This will open a popup with a button that will open the options page.',
+          'Now, you can click on the extension icon in the top right corner to open a popup with a button that directs you to the options page.',
+      },
+      {
+        title:
+          'Fixed the issue where using the arrow key while adding a comment affects the video playback.',
+        description: '',
       },
     ],
   },

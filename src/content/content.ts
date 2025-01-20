@@ -1,5 +1,9 @@
 import { addButtonsToVideo, updateButtons } from './buttons';
-import { overrideArrowKeys, overrideMediaKeys } from './event-keys';
+import {
+  overrideArrowKeys,
+  overrideMediaKeys,
+  shouldSkipDueToFocus,
+} from './event-keys';
 import {
   ButtonClassesIds,
   ChromeStorageChanges,
@@ -138,6 +142,10 @@ function observeVideoSrcChange() {
 }
 
 function keyDownHandler(event: KeyboardEvent, video: HTMLVideoElement) {
+  if (shouldSkipDueToFocus()) {
+    return;
+  }
+
   if (['MediaTrackPrevious', 'MediaTrackNext'].includes(event.key)) {
     overrideMediaKeys(event, loadedOptions, video);
     return;
