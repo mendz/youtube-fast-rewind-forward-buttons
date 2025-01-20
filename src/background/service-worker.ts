@@ -2,21 +2,19 @@ chrome.runtime.onInstalled.addListener(({ reason, previousVersion }) => {
   const currentVersion = chrome.runtime.getManifest().version;
   const isUpdate =
     reason === chrome.runtime.OnInstalledReason.UPDATE &&
-    previousVersion === '1.3.0' &&
-    previousVersion !== currentVersion;
+    previousVersion === '1.3.0';
 
   console.info(`Previous Version: ${previousVersion}`);
   console.info(`Current Version: ${currentVersion}`);
 
   if (isUpdate) {
-    showReadme();
+    openWhatsNewPage();
   }
 });
 
-function showReadme() {
+function openWhatsNewPage() {
+  const WHATS_NEW_PAGE_URL = '/background/whats-new-page/whats-new-page.html';
   chrome.tabs.create({
-    url: chrome.runtime.getURL(
-      '/background/whats-new-page/whats-new-page.html'
-    ),
+    url: chrome.runtime.getURL(WHATS_NEW_PAGE_URL),
   });
 }

@@ -1,6 +1,6 @@
 # YouTube Rewind & Fast Forward Buttons
 
-Enhance your YouTube experience with the _Rewind & Fast Forward Chrome_ extension. This tool adds dedicated buttons to rewinding and fast forwarding the video.
+Enhance your YouTube experience with the _Rewind & Fast Forward Chrome_ extension. This tool adds dedicated buttons for rewinding and fast forwarding the video.
 
 ### Features:
 
@@ -14,13 +14,15 @@ Decide whether to synchronize arrow keys with the extension buttons' seconds. (D
 Optimize control by mapping the keyboard media keys to mirror the extension buttons' behavior.
 
 ### How to Access the Options Page:
-1. If you've pinned the extension, click the extension icon and select "Options".
-2. If you haven't pinned it, click the Chrome extension icon, then click the three dots near the "YouTube Rewind & Fast Forward Buttons" extension, and select "Options."
+1. If you've pinned the extension, click the extension icon and then click the "Open the option page" button.
+2. If you haven't pinned it, click the Chrome extension icon, and you will have 2 options:
+   1. Click the three dots near the "YouTube Rewind & Fast Forward Buttons" extension, and select "Options".
+   2. Click on the extension name, then click on the "Open the option page" button.
 
-(Refer to the picture for guidance.)
+(Refer to the pictures for guidance.)
 
 SVG icons are from: [Heroicons](https://heroicons.dev/).
 
 ![Options Page & Rewind Fast Forward buttons](./screenshots/screenshot-1400x560.png "Options Page & Rewind Fast Forward buttons")
 ![Ways to open the Options page](screenshots/screenshot-1280x800-2.png)
-
+![Ways to open the Options page 2](screenshots/screenshot-1280x800-3.png)
