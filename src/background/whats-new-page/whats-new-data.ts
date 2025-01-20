@@ -3,7 +3,7 @@ import { IVersionUpdates } from './whats-new-page-script';
 export const versionUpdates: IVersionUpdates[] = [
   {
     version: 'v1.4.0',
-    date: getDate('2025-01-14'),
+    date: getDate('2025-01-21'),
     updates: [
       {
         title: 'New way to open the options page',
