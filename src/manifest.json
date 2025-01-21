@@ -27,8 +27,7 @@
     "128": "icons/fast-forward-128.png"
   },
   "permissions": [
-    "storage",
-    "tabs"
+    "storage"
   ],
   "options_ui": {
     "page": "options/options.html",
