@@ -34,6 +34,7 @@ manifest version ${manifest.version}
 
 packageJson.version = newVersion;
 packageJsonLock.version = newVersion;
+packageJsonLock.packages[''].version = newVersion;
 manifest.version = newVersion;
 
 fs.writeFileSync(
