@@ -3,6 +3,12 @@
     "transformers": {
         "*.{ts,tsx}": [
             "@parcel/transformer-typescript-tsc"
+        ],
+        "*.svg": [
+            "@parcel/transformer-svg"
+        ],
+        "url:*.svg": [
+            "@parcel/transformer-raw"
         ]
     },
     "validators": {

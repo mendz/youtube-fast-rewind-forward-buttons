@@ -83,9 +83,10 @@ export async function loadInputStorageOptions(): Promise<void> {
     inputShouldOverrideMediaKeys,
   } = getInputs();
   try {
-    const storageOptions: IStorageOptions = (await chrome.storage.sync.get(
-      Object.keys(OPTIONS_DEFAULT_VALUES)
-    )) as IStorageOptions;
+    const keys = Object.keys(OPTIONS_DEFAULT_VALUES) as Array<
+      keyof IStorageOptions
+    >;
+    const storageOptions = await chrome.storage.sync.get<IStorageOptions>(keys);
 
     // set the inputs with the loaded options
     inputRewindSeconds.value =
