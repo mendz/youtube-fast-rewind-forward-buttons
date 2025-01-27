@@ -52,9 +52,8 @@ export async function loadOptions(): Promise<IOptions> {
   };
 
   try {
-    const storageOptions: IStorageOptions = (await chrome.storage.sync.get(
-      Object.keys(defaultOptions)
-    )) as IStorageOptions;
+    const keys = Object.keys(defaultOptions) as Array<keyof IStorageOptions>;
+    const storageOptions = await chrome.storage.sync.get<IStorageOptions>(keys);
 
     const rewindSeconds: number = parseInt(storageOptions?.rewindSeconds, 10);
     const forwardSeconds: number = parseInt(storageOptions?.forwardSeconds, 10);

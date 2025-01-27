@@ -4,7 +4,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
-    'plugin:sonarjs/recommended',
+    'plugin:sonarjs/recommended-legacy',
   ],
   plugins: ['@typescript-eslint', 'html', 'prettier', 'sonarjs'],
   parserOptions: {
@@ -23,6 +23,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     semi: 2,
     'no-console': 0,
+    'sonarjs/todo-tag': 1,
     'prettier/prettier': [
       0,
       {
