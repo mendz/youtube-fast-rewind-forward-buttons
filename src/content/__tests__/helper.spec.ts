@@ -1,21 +1,22 @@
 import {
+  createSvgMock,
+  DEFAULT_OPTIONS_MOCK,
+  removeSpaces,
+  SVG_CLASSES_MOCK,
+  SVG_FORWARD_USE_HTML_MOCK,
+  SVG_PATH_CLASSES_MOCK,
+  X_LINK_ATTR,
+} from '../__utils__/tests-helper';
+import {
   createButton,
   createFastForwardSVG,
   createFastRewindSVG,
   createForwardButtonTitle,
   createRewindButtonTitle,
   getSeconds,
+  numberFormat,
 } from '../helper';
 import { ArrowKey, ButtonClassesIds } from '../types';
-import {
-  createSvgMock,
-  DEFAULT_OPTIONS_MOCK,
-  removeSpaces,
-  SVG_CLASSES_MOCK,
-  SVG_PATH_CLASSES_MOCK,
-  SVG_FORWARD_USE_HTML_MOCK,
-  X_LINK_ATTR,
-} from '../__utils__/tests-helper';
 
 describe('createButton', () => {
   const testTitle = 'test-title';
@@ -280,5 +281,25 @@ describe('createForwardButtonTitle return the correct text', () => {
   it('should return with 10 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(10, false);
     expect(result).toBe(shortTextTenSeconds);
+  });
+});
+
+fdescribe('numberFormat', () => {
+  it('should format seconds correctly', () => {
+    expect(numberFormat(5)).toBe('5 seconds');
+    expect(numberFormat(59)).toBe('59 seconds');
+    expect(numberFormat(59.9999)).toBe('1 minute');
+  });
+
+  it('should format minutes correctly', () => {
+    expect(numberFormat(60)).toBe('1 minute');
+    expect(numberFormat(120)).toBe('2 minutes');
+    expect(numberFormat(3599)).toBe('1 hour');
+  });
+
+  it('should format hours correctly', () => {
+    expect(numberFormat(3600)).toBe('1 hour');
+    expect(numberFormat(7200)).toBe('2 hours');
+    expect(numberFormat(10800)).toBe('3 hours');
   });
 });

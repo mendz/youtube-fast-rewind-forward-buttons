@@ -58,6 +58,17 @@ body {
   }
 }
 
+.duration {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  & > * {
+    width: min-content;
+    width: 100%;
+  }
+}
+
 @media screen and (max-width: 800px) {
   body {
     grid-auto-columns: 1fr;

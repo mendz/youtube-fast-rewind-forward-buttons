@@ -46,27 +46,76 @@
             As a default, the arrow keys rewind (left arrow) & forward (right
             arrow) are set to <strong>5 seconds</strong>.
           </p>
+          <label id="rewindRange"
+            >Rewind
+            <input
+              type="range"
+              id="rewind-range"
+              min="1"
+              max="7200"
+              value="5"
+              step="1"
+            />
+            <input
+              type="number"
+              id="rewind-range-value"
+              min="1"
+              max="7200"
+              value="5"
+            />
+            <output id="rewindRangeValue" for="rewind-range">5 seconds</output>
+          </label>
+          <label class="duration" id="rewind-container"
+            >Rewind:
+            <input
+              type="number"
+              id="durationHours"
+              min="0"
+              placeholder="Hours"
+            />:
+            <input
+              type="number"
+              id="durationMinutes"
+              min="0"
+              max="59"
+              placeholder="Minutes"
+            />:
+            <input
+              type="number"
+              id="durationSeconds"
+              min="1"
+              max="59"
+              value="5"
+              placeholder="Seconds"
+              title="Seconds"
+            />
+            H:MM:SS
+          </label>
           <label
-            >Rewind seconds (between 1 and 60):
+            >Rewind seconds:
             <input
               type="number"
               id="rewind"
               name="rewind"
               min="1"
-              max="60"
+              max="7200"
               value="5"
+              placeholder="Seconds"
             />
+            <output id="rewindValue" for="rewind">5 seconds</output>
           </label>
           <label
-            >Forward seconds (between 1 and 60):
+            >Forward seconds:
             <input
               type="number"
               id="forward"
               name="forward"
               min="1"
-              max="60"
+              max="7200"
               value="5"
+              placeholder="Seconds"
             />
+            <output id="forwardValue" for="forward">5 seconds</output>
           </label>
         </div>
         <div class="checkbox-container">

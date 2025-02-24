@@ -1,3 +1,4 @@
+import { numberFormat } from '../content/helper';
 import { IOptions, IStorageOptions } from '../content/types';
 
 const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
@@ -142,10 +143,38 @@ export function submit(event: Event): void {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function setSecondsInputsListeners(id: string): void {
+  const input = document.querySelector(`#${id}`) as HTMLInputElement;
+  const value = document.querySelector(`#${id}Value`) as HTMLOutputElement;
+  value.textContent = numberFormat(Number(input.value));
+  input.addEventListener('input', (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value.textContent = numberFormat(Number(target.value));
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   document.querySelector('form.container')?.addEventListener('submit', submit);
   document
     .querySelector('button#reset-values')
     ?.addEventListener('click', resetToDefaultOptions);
-  loadInputStorageOptions();
+  await loadInputStorageOptions();
+  setSecondsInputsListeners('rewind');
+  setSecondsInputsListeners('forward');
+  setSecondsInputsListeners('rewindRange');
+});
+
+const range = document.querySelector(
+  '#rewindRange input[type="range"]'
+) as HTMLInputElement;
+const number = document.querySelector(
+  '#rewindRange input[type="number"]'
+) as HTMLInputElement;
+range.addEventListener('input', (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  number.value = target.value;
+});
+number.addEventListener('input', (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  range.value = target.value;
 });

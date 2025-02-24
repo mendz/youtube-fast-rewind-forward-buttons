@@ -66,7 +66,7 @@ export function createRewindButtonTitle(
 ): string {
   const title: string =
     shouldOverrideArrowKeys || seconds === 5 ? ' (left arrow)' : '';
-  return `Go back ${seconds} seconds${title}`;
+  return `Go back ${numberFormat(seconds)}${title}`;
 }
 
 export function createForwardButtonTitle(
@@ -75,5 +75,31 @@ export function createForwardButtonTitle(
 ): string {
   const title: string =
     shouldOverrideArrowKeys || seconds === 5 ? ' (right arrow)' : '';
-  return `Go forward ${seconds} seconds${title}`;
+  return `Go forward ${numberFormat(seconds)}${title}`;
+}
+
+export function numberFormat(value: number): string {
+  const units: Intl.NumberFormatOptions['unit'][] = [
+    'second',
+    'minute',
+    'hour',
+  ];
+  let amount = value;
+  let unitIndex = 0;
+
+  // Iteratively convert the value by dividing by 60 while it exceeds 60
+  while (Math.round(amount * 2) / 2 >= 60 && unitIndex < units.length - 1) {
+    amount /= 60;
+    unitIndex++;
+  }
+
+  const rounded = Math.round(amount * 2) / 2;
+  const options: Intl.NumberFormatOptions = {
+    style: 'unit',
+    unit: units[unitIndex],
+    unitDisplay: 'long',
+    maximumFractionDigits: 2,
+  };
+
+  return new Intl.NumberFormat('en-US', options).format(Math.max(1, rounded));
 }
