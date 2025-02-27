@@ -90,6 +90,7 @@ export async function resetVideo(video: Locator, page: Page) {
         'button[data-title-no-tooltip="Mute"].ytp-mute-button.ytp-button'
       )
       .click({ timeout: 10000 });
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     console.info('Video is already muted');
   }
@@ -113,6 +114,7 @@ async function isAdsInPage(page: Page): Promise<boolean> {
       }
     );
     return !!(await Promise.any([firstSpan, secondSpan, videoAdsContainer]));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -129,6 +131,7 @@ async function isCounterSkipButton(page: Page): Promise<boolean> {
         strict: false,
       }
     ));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -141,6 +144,7 @@ async function isCounterSkipButtonLeave(page: Page): Promise<boolean> {
       timeout: 5000,
       strict: false,
     }));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -157,6 +161,7 @@ export async function getSkipAdButton(
         timeout: 1000,
       }
     );
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return null;
   }
@@ -178,6 +183,7 @@ export async function isAdsLeavePage(page: Page): Promise<boolean> {
       }
     );
     return !!(await Promise.any([firstSpan, secondSpan, videoAdsContainer]));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -191,6 +197,7 @@ async function isSponsorAds(page: Page): Promise<boolean> {
         state: 'detached',
       }
     ));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -309,11 +316,15 @@ export function getOptionsInputs(page: Page) {
   const shouldOverrideMediaKeysCheckbox = page.locator(
     'input#override-media-keys'
   );
+  const rewindOutput = page.locator('output#rewindValue');
+  const forwardOutput = page.locator('output#forwardValue');
   return {
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindOutput,
+    forwardOutput,
   };
 }
 

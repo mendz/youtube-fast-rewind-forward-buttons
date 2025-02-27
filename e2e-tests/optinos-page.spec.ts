@@ -221,3 +221,111 @@ test('should open the the chrome extension page when clicking on the link', asyn
     'https://chromewebstore.google.com/detail/youtube-rewind-fast-forwa/bmdiaadnpgbbfepggiiajgadlhhcphgk/reviews'
   );
 });
+
+test('should allow user to enter between 1-7200 seconds', async ({ page }) => {
+  const { rewindSecondsInput, forwardSecondsInput } = getOptionsInputs(page);
+
+  await rewindSecondsInput.fill('1');
+  await expect(rewindSecondsInput).toHaveValue('1');
+
+  await rewindSecondsInput.fill('7200');
+  await expect(rewindSecondsInput).toHaveValue('7200');
+
+  await forwardSecondsInput.fill('1');
+  await expect(forwardSecondsInput).toHaveValue('1');
+
+  await forwardSecondsInput.fill('7200');
+  await expect(forwardSecondsInput).toHaveValue('7200');
+});
+
+test('should keep the old value when user enters a value above 7200', async ({
+  page,
+}) => {
+  const { rewindSecondsInput, forwardSecondsInput } = getOptionsInputs(page);
+
+  await rewindSecondsInput.fill('5');
+  await forwardSecondsInput.fill('5');
+
+  await rewindSecondsInput.fill('7201');
+  await expect(rewindSecondsInput).toHaveValue('5');
+
+  await forwardSecondsInput.fill('7201');
+  await expect(forwardSecondsInput).toHaveValue('5');
+});
+
+test('should format the output text to seconds, minutes, and hours', async ({
+  page,
+}) => {
+  const {
+    rewindSecondsInput,
+    forwardSecondsInput,
+    rewindOutput,
+    forwardOutput,
+  } = getOptionsInputs(page);
+
+  await rewindSecondsInput.fill('5');
+  await expect(rewindOutput).toHaveText('(5 seconds)');
+
+  await rewindSecondsInput.fill('60');
+  await expect(rewindOutput).toHaveText('(1 minute)');
+
+  await rewindSecondsInput.fill('3600');
+  await expect(rewindOutput).toHaveText('(1 hour)');
+
+  await forwardSecondsInput.fill('5');
+  await expect(forwardOutput).toHaveText('(5 seconds)');
+
+  await forwardSecondsInput.fill('60');
+  await expect(forwardOutput).toHaveText('(1 minute)');
+
+  await forwardSecondsInput.fill('3600');
+  await expect(forwardOutput).toHaveText('(1 hour)');
+});
+
+test('should not submit form when user enters a value below 1', async ({
+  page,
+}) => {
+  const { rewindSecondsInput } = getOptionsInputs(page);
+
+  await rewindSecondsInput.fill('10');
+  await rewindSecondsInput.fill('0');
+
+  await page.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+  expect(page.isClosed()).toBe(false);
+});
+
+test('should handle singular and plural time units correctly', async ({
+  page,
+}) => {
+  const {
+    rewindSecondsInput,
+    forwardSecondsInput,
+    rewindOutput,
+    forwardOutput,
+  } = getOptionsInputs(page);
+
+  // Test single units
+  await rewindSecondsInput.fill('1');
+  await expect(rewindOutput).toHaveText('(1 second)');
+
+  await rewindSecondsInput.fill('5');
+  await expect(rewindOutput).toHaveText('(5 seconds)');
+
+  await forwardSecondsInput.fill('60');
+  await expect(forwardOutput).toHaveText('(1 minute)');
+
+  await forwardSecondsInput.fill('3600');
+  await expect(forwardOutput).toHaveText('(1 hour)');
+
+  // Test composite units
+  await rewindSecondsInput.fill('62');
+  await expect(rewindOutput).toHaveText('(1m 2s)');
+
+  await forwardSecondsInput.fill('3661');
+  await expect(forwardOutput).toHaveText('(1h 1m 1s)');
+
+  // Use 7199 which is within the maximum allowed value (7200)
+  await rewindSecondsInput.fill('7199');
+  await expect(rewindOutput).toHaveText('(1h 59m 59s)');
+});
