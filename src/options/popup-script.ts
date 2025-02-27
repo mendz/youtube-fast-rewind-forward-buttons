@@ -16,6 +16,11 @@ type InputsOptionsPage = {
   inputShouldOverrideMediaKeys: HTMLInputElement;
 };
 
+const prevSecondsValues = {
+  rewind: '5',
+  forward: '5',
+};
+
 export function getInputs(): InputsOptionsPage {
   const inputRewindSeconds: HTMLInputElement = document.querySelector(
     '#rewind'
@@ -143,13 +148,23 @@ export function submit(event: Event): void {
   }
 }
 
-function setSecondsInputsListeners(id: string): void {
+function setSecondsInputsListeners(id: 'forward' | 'rewind'): void {
   const input = document.querySelector(`#${id}`) as HTMLInputElement;
   const value = document.querySelector(`#${id}Value`) as HTMLOutputElement;
-  value.textContent = numberFormat(Number(input.value));
+  value.textContent = `(${numberFormat(Number(input.value))})`;
+
   input.addEventListener('input', (event: Event) => {
     const target = event.target as HTMLInputElement;
-    value.textContent = numberFormat(Number(target.value));
+    let valueNumber = Number(target.value);
+
+    if (valueNumber > 7200) {
+      target.value = prevSecondsValues[id];
+      valueNumber = Number(prevSecondsValues[id]);
+    } else {
+      prevSecondsValues[id] = target.value;
+    }
+
+    value.textContent = `(${numberFormat(valueNumber)})`;
   });
 }
 
@@ -161,20 +176,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadInputStorageOptions();
   setSecondsInputsListeners('rewind');
   setSecondsInputsListeners('forward');
-  setSecondsInputsListeners('rewindRange');
-});
-
-const range = document.querySelector(
-  '#rewindRange input[type="range"]'
-) as HTMLInputElement;
-const number = document.querySelector(
-  '#rewindRange input[type="number"]'
-) as HTMLInputElement;
-range.addEventListener('input', (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  number.value = target.value;
-});
-number.addEventListener('input', (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  range.value = target.value;
 });

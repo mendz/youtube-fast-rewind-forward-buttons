@@ -284,7 +284,7 @@ describe('createForwardButtonTitle return the correct text', () => {
   });
 });
 
-fdescribe('numberFormat', () => {
+describe('numberFormat', () => {
   it('should format seconds correctly', () => {
     expect(numberFormat(5)).toBe('5 seconds');
     expect(numberFormat(59)).toBe('59 seconds');

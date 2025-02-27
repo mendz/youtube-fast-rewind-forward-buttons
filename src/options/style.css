@@ -58,17 +58,6 @@ body {
   }
 }
 
-.duration {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-
-  & > * {
-    width: min-content;
-    width: 100%;
-  }
-}
-
 @media screen and (max-width: 800px) {
   body {
     grid-auto-columns: 1fr;
@@ -182,6 +171,27 @@ input[type='checkbox'] {
   place-content: space-evenly;
   place-items: center;
   height: max-content;
+
+  & .seconds-change-label {
+    height: max-content;
+    display: flex;
+    justify-content: center;
+    place-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    overflow-wrap: break-word;
+
+    & input {
+      flex: 2;
+      max-width: 100px;
+      margin: 0;
+    }
+
+    & output {
+      max-width: 110px;
+      flex: 1;
+    }
+  }
 }
 
 .checkbox-container {
