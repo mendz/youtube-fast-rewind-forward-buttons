@@ -79,27 +79,46 @@ export function createForwardButtonTitle(
 }
 
 export function numberFormat(value: number): string {
-  const units: Intl.NumberFormatOptions['unit'][] = [
-    'second',
-    'minute',
-    'hour',
-  ];
-  let amount = value;
-  let unitIndex = 0;
-
-  // Iteratively convert the value by dividing by 60 while it exceeds 60
-  while (Math.round(amount * 2) / 2 >= 60 && unitIndex < units.length - 1) {
-    amount /= 60;
-    unitIndex++;
-  }
-
-  const rounded = Math.round(amount * 2) / 2;
-  const options: Intl.NumberFormatOptions = {
-    style: 'unit',
-    unit: units[unitIndex],
-    unitDisplay: 'long',
-    maximumFractionDigits: 2,
+  // Define unit values in seconds as well as corresponding full unit names and abbreviations.
+  const unitValues = [1, 60, 3600]; // seconds, minutes, hours
+  const unitNames: { [key: number]: Intl.NumberFormatOptions['unit'] } = {
+    0: 'second',
+    1: 'minute',
+    2: 'hour',
+  };
+  const unitAbbr: { [key: number]: string } = {
+    0: 's',
+    1: 'm',
+    2: 'h',
   };
 
-  return new Intl.NumberFormat('en-US', options).format(Math.max(1, rounded));
+  let remainingValue = value;
+  const parts: { amount: number; index: number }[] = [];
+
+  for (let i = unitValues.length - 1; i >= 0; i--) {
+    const unitAmount = Math.floor(remainingValue / unitValues[i]);
+    if (unitAmount > 0) {
+      parts.push({ amount: unitAmount, index: i });
+      remainingValue %= unitValues[i];
+    }
+  }
+
+  // If no units were found, return "0 seconds".
+  if (parts.length === 0) return '0 seconds';
+
+  // For a single unit, use the full internationalized format.
+  if (parts.length === 1) {
+    const { amount, index } = parts[0];
+    const options: Intl.NumberFormatOptions = {
+      style: 'unit',
+      unit: unitNames[index],
+      unitDisplay: 'long',
+      maximumFractionDigits: 0,
+    };
+    return new Intl.NumberFormat('en-US', options).format(amount);
+  }
+
+  // For multiple units, use the compact format "1h 12m 1s".
+  // Note: parts are in descending order (hours -> minutes -> seconds).
+  return parts.map((part) => `${part.amount}${unitAbbr[part.index]}`).join(' ');
 }

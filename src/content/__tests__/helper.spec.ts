@@ -288,18 +288,24 @@ describe('numberFormat', () => {
   it('should format seconds correctly', () => {
     expect(numberFormat(5)).toBe('5 seconds');
     expect(numberFormat(59)).toBe('59 seconds');
-    expect(numberFormat(59.9999)).toBe('1 minute');
+    expect(numberFormat(59.9999)).toBe('59 seconds');
   });
 
   it('should format minutes correctly', () => {
     expect(numberFormat(60)).toBe('1 minute');
     expect(numberFormat(120)).toBe('2 minutes');
-    expect(numberFormat(3599)).toBe('1 hour');
+    expect(numberFormat(3599)).toBe('59m 59s');
   });
 
   it('should format hours correctly', () => {
     expect(numberFormat(3600)).toBe('1 hour');
     expect(numberFormat(7200)).toBe('2 hours');
     expect(numberFormat(10800)).toBe('3 hours');
+  });
+
+  it('should format mixed units correctly', () => {
+    expect(numberFormat(3661)).toBe('1h 1m 1s');
+    expect(numberFormat(7322)).toBe('2h 2m 2s');
+    expect(numberFormat(3605)).toBe('1h 5s');
   });
 });
