@@ -265,6 +265,10 @@ describe('createForwardButtonTitle return the correct text', () => {
   const fullTextFiveSeconds = 'Go forward 5 seconds (right arrow)';
   const fullTextTenSeconds = 'Go forward 10 seconds (right arrow)';
   const shortTextTenSeconds = 'Go forward 10 seconds';
+  const fullTextMinuteSeconds = 'Go forward 1 minute (right arrow)';
+  const shortTextMinuteSeconds = 'Go forward 1 minute';
+  const fullTextComplexSeconds = 'Go forward 1h 8m 41s (right arrow)';
+  const shortTextComplexSeconds = 'Go forward 1h 8m 41s';
 
   it('should return with 5 seconds without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(5, false);
@@ -281,6 +285,22 @@ describe('createForwardButtonTitle return the correct text', () => {
   it('should return with 10 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(10, false);
     expect(result).toBe(shortTextTenSeconds);
+  });
+  it('should return with 60 seconds & without overrideArrowKeys', () => {
+    const result: string = createForwardButtonTitle(60, true);
+    expect(result).toBe(fullTextMinuteSeconds);
+  });
+  it('should return with 60 seconds & without overrideArrowKeys', () => {
+    const result: string = createForwardButtonTitle(60, false);
+    expect(result).toBe(shortTextMinuteSeconds);
+  });
+  it('should return with 4121 seconds & without overrideArrowKeys', () => {
+    const result: string = createForwardButtonTitle(4121, true);
+    expect(result).toBe(fullTextComplexSeconds);
+  });
+  it('should return with 4121 seconds & without overrideArrowKeys', () => {
+    const result: string = createForwardButtonTitle(4121, false);
+    expect(result).toBe(shortTextComplexSeconds);
   });
 });
 
