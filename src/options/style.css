@@ -173,23 +173,25 @@ input[type='checkbox'] {
   height: max-content;
 
   & .seconds-change-label {
-    height: max-content;
     display: flex;
     justify-content: center;
-    place-items: center;
     gap: 0.75rem;
     width: 100%;
-    overflow-wrap: break-word;
 
     & input {
-      flex: 2;
       max-width: 100px;
       margin: 0;
+      width: 40%;
     }
 
     & output {
-      max-width: 110px;
-      flex: 1;
+      max-width: 200px;
+      width: 20%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      text-wrap: nowrap;
+      text-align: left;
     }
   }
 }

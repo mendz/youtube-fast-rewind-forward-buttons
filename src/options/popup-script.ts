@@ -16,11 +16,6 @@ type InputsOptionsPage = {
   inputShouldOverrideMediaKeys: HTMLInputElement;
 };
 
-const prevSecondsValues = {
-  rewind: '5',
-  forward: '5',
-};
-
 export function getInputs(): InputsOptionsPage {
   const inputRewindSeconds: HTMLInputElement = document.querySelector(
     '#rewind'
@@ -155,15 +150,7 @@ function setSecondsInputsListeners(id: 'forward' | 'rewind'): void {
 
   input.addEventListener('input', (event: Event) => {
     const target = event.target as HTMLInputElement;
-    let valueNumber = Number(target.value);
-
-    if (valueNumber > 7200) {
-      target.value = prevSecondsValues[id];
-      valueNumber = Number(prevSecondsValues[id]);
-    } else {
-      prevSecondsValues[id] = target.value;
-    }
-
+    const valueNumber = Number(target.value);
     value.textContent = `(${numberFormat(valueNumber)})`;
   });
 }

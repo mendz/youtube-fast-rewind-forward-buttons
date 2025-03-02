@@ -20,7 +20,9 @@ export const OPTIONS_DEFAULT_VALUES = {
 
 export const OPTIONS_CHANGED_VALUES = {
   rewindSecondsInput: '40',
+  complexRewindSecondsInput: '70',
   forwardSecondsInput: '50',
+  complexForwardSecondsInput: '4121',
   shouldOverrideKeysCheckbox: true,
 };
 
@@ -294,15 +296,27 @@ async function geFilePath(
  *   arrow keys.
  * @param shouldOverrideMediaKeysCheckbox The checkbox element for overriding
  *   the media keys.
+ * @param isComplex If true, the function will fill the inputs with the
+ *   `complexRewindSecondsInput` and `complexForwardSecondsInput` values.
  */
 export async function fillInputsWithChangedValues(
   rewindSecondsInput: Locator,
   forwardSecondsInput: Locator,
   shouldOverrideKeysCheckbox: Locator,
-  shouldOverrideMediaKeysCheckbox: Locator
+  shouldOverrideMediaKeysCheckbox: Locator,
+  isComplex = false
 ) {
-  await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
-  await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+  if (isComplex) {
+    await rewindSecondsInput.fill(
+      OPTIONS_CHANGED_VALUES.complexRewindSecondsInput
+    );
+    await forwardSecondsInput.fill(
+      OPTIONS_CHANGED_VALUES.complexForwardSecondsInput
+    );
+  } else {
+    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+  }
   await shouldOverrideKeysCheckbox.check();
   await shouldOverrideMediaKeysCheckbox.check();
 }
