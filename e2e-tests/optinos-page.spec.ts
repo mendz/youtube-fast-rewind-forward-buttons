@@ -109,7 +109,7 @@ test('should NOT reset all input values when pressing the button and dismiss the
   expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
 });
 
-test('should keep the values after pressing the submit button and return to the page', async ({
+test('should keep the values after pressing the submit button and return to the page with smaller numbers', async ({
   page,
   extensionId,
   context,
@@ -140,15 +140,68 @@ test('should keep the values after pressing the submit button and return to the 
     forwardSecondsInput: newPageForwardSecondsInput,
     shouldOverrideArrowKeysCheckbox: newPageShouldOverrideKeysCheckbox,
     shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
+    rewindOutput,
+    forwardOutput,
   } = getOptionsInputs(newPage);
-  expect(newPageRewindSecondsInput).toHaveValue(
+  await expect(newPageRewindSecondsInput).toHaveValue(
     OPTIONS_CHANGED_VALUES.rewindSecondsInput
   );
-  expect(newPageForwardSecondsInput).toHaveValue(
+  await expect(rewindOutput).toHaveText('(40 seconds)');
+  await expect(newPageForwardSecondsInput).toHaveValue(
     OPTIONS_CHANGED_VALUES.forwardSecondsInput
   );
-  expect(newPageShouldOverrideKeysCheckbox).toBeChecked();
-  expect(newPageShouldOverrideMediaKeysCheckbox).toBeChecked();
+  await expect(forwardOutput).toHaveText('(50 seconds)');
+  await expect(newPageShouldOverrideKeysCheckbox).toBeChecked();
+  await expect(newPageShouldOverrideMediaKeysCheckbox).toBeChecked();
+});
+
+test('should keep the values after pressing the submit button and return to the page with large numbers', async ({
+  page,
+  extensionId,
+  context,
+}) => {
+  const {
+    rewindSecondsInput,
+    forwardSecondsInput,
+    shouldOverrideArrowKeysCheckbox,
+    shouldOverrideMediaKeysCheckbox,
+  } = getOptionsInputs(page);
+
+  await fillInputsWithChangedValues(
+    rewindSecondsInput,
+    forwardSecondsInput,
+    shouldOverrideArrowKeysCheckbox,
+    shouldOverrideMediaKeysCheckbox,
+    true
+  );
+
+  const newPage = await context.newPage();
+  await page.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+  expect(page.isClosed()).toBe(true);
+
+  const optionFilePath = await getOptionFilePath(extensionId);
+  await newPage.goto(optionFilePath);
+
+  const {
+    rewindSecondsInput: newPageRewindSecondsInput,
+    forwardSecondsInput: newPageForwardSecondsInput,
+    shouldOverrideArrowKeysCheckbox: newPageShouldOverrideKeysCheckbox,
+    shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
+    rewindOutput,
+    forwardOutput,
+  } = getOptionsInputs(newPage);
+
+  await expect(newPageRewindSecondsInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.complexRewindSecondsInput
+  );
+  await expect(rewindOutput).toHaveText('(1m 10s)');
+  await expect(newPageForwardSecondsInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.complexForwardSecondsInput
+  );
+  await expect(forwardOutput).toHaveText('(1h 8m 41s)');
+  await expect(newPageShouldOverrideKeysCheckbox).toBeChecked();
+  await expect(newPageShouldOverrideMediaKeysCheckbox).toBeChecked();
 });
 
 test('should NOT keep the values if user close the page and return to the back to it', async ({
@@ -238,21 +291,6 @@ test('should allow user to enter between 1-7200 seconds', async ({ page }) => {
   await expect(forwardSecondsInput).toHaveValue('7200');
 });
 
-test('should keep the old value when user enters a value above 7200', async ({
-  page,
-}) => {
-  const { rewindSecondsInput, forwardSecondsInput } = getOptionsInputs(page);
-
-  await rewindSecondsInput.fill('5');
-  await forwardSecondsInput.fill('5');
-
-  await rewindSecondsInput.fill('7201');
-  await expect(rewindSecondsInput).toHaveValue('5');
-
-  await forwardSecondsInput.fill('7201');
-  await expect(forwardSecondsInput).toHaveValue('5');
-});
-
 test('should format the output text to seconds, minutes, and hours', async ({
   page,
 }) => {
@@ -295,6 +333,24 @@ test('should not submit form when user enters a value below 1', async ({
   expect(page.isClosed()).toBe(false);
 });
 
+test('should not submit form when user enters a value above 7200', async ({
+  page,
+}) => {
+  const { rewindSecondsInput, forwardSecondsInput } = getOptionsInputs(page);
+
+  await rewindSecondsInput.fill('7201');
+
+  await page.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+  expect(page.isClosed()).toBe(false);
+
+  await forwardSecondsInput.fill('7201');
+
+  await page.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+  expect(page.isClosed()).toBe(false);
+});
+
 test('should handle singular and plural time units correctly', async ({
   page,
 }) => {
@@ -325,7 +381,6 @@ test('should handle singular and plural time units correctly', async ({
   await forwardSecondsInput.fill('3661');
   await expect(forwardOutput).toHaveText('(1h 1m 1s)');
 
-  // Use 7199 which is within the maximum allowed value (7200)
-  await rewindSecondsInput.fill('7199');
-  await expect(rewindOutput).toHaveText('(1h 59m 59s)');
+  await rewindSecondsInput.fill('7313');
+  await expect(rewindOutput).toHaveText('(2h 1m 53s)');
 });
