@@ -36,14 +36,14 @@ test('should changed options affect the video without refresh', async ({
 
   await test.step('Change the options values', async () => {
     const {
-      forwardSecondsInput,
       rewindSecondsInput,
+      forwardSecondsInput,
       shouldOverrideArrowKeysCheckbox,
       shouldOverrideMediaKeysCheckbox,
     } = getOptionsInputs(optionPage);
     await fillInputsWithChangedValues(
-      forwardSecondsInput,
       rewindSecondsInput,
+      forwardSecondsInput,
       shouldOverrideArrowKeysCheckbox,
       shouldOverrideMediaKeysCheckbox
     );
@@ -58,10 +58,44 @@ test('should changed options affect the video without refresh', async ({
     await forwardButton.click();
     await forwardButton.click();
     let currentTime: number = await getVideoTime(video);
-    expect(currentTime).toBe(80);
+    expect(currentTime).toBe(100); // 50 + 50
     await rewindButton.click();
     currentTime = await getVideoTime(video);
-    expect(currentTime).toBe(30);
+    expect(currentTime).toBe(60); // 100 - 40
+  });
+
+  await test.step('Reopen the options page and set complex values', async () => {
+    optionPage = await context.newPage();
+    await optionPage.goto(optionFilePath);
+
+    const {
+      rewindSecondsInput,
+      forwardSecondsInput,
+      shouldOverrideArrowKeysCheckbox,
+      shouldOverrideMediaKeysCheckbox,
+    } = getOptionsInputs(optionPage);
+
+    await fillInputsWithChangedValues(
+      rewindSecondsInput,
+      forwardSecondsInput,
+      shouldOverrideArrowKeysCheckbox,
+      shouldOverrideMediaKeysCheckbox,
+      true
+    );
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await test.step('Verify the youtube page with the new options without refresh', async () => {
+    const { forwardButton, video, rewindButton } =
+      getVideoLocatorElements(videoPage);
+    await setVideoTime(video, 0);
+    await forwardButton.click();
+    let currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(4121);
+    await rewindButton.click();
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(4051); // 4121 - 70
   });
 
   await test.step('Reopen the options page to reset the values', async () => {
@@ -86,7 +120,7 @@ test('should changed options affect the video without refresh', async ({
   });
 });
 
-test('should override the arrow keys when seconds set not to 5 and not override if set to 5', async ({
+test('should override the ArrowRight key when seconds set not to 5 and not override if set to 5 or both', async ({
   page: videoPage,
   context,
   extensionId,
@@ -104,8 +138,8 @@ test('should override the arrow keys when seconds set not to 5 and not override 
     const { forwardSecondsInput, shouldOverrideArrowKeysCheckbox } =
       getOptionsInputs(optionPage);
 
-    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
     await shouldOverrideArrowKeysCheckbox.check();
+    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
@@ -122,35 +156,6 @@ test('should override the arrow keys when seconds set not to 5 and not override 
     await expect(animationArrow).not.toBeVisible();
 
     await videoPage.keyboard.press('ArrowLeft');
-    currentTime = await getVideoTime(video);
-    await expect(animationArrow).toBeVisible();
-    expect(currentTime).toBe(45);
-  });
-
-  await test.step('Change the options to override and ArrowLeft seconds', async () => {
-    optionPage = await context.newPage();
-    await optionPage.goto(optionFilePath);
-    const { rewindSecondsInput, forwardSecondsInput } =
-      getOptionsInputs(optionPage);
-
-    await forwardSecondsInput.fill(OPTIONS_DEFAULT_VALUES.forwardSecondsInput);
-    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
-    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
-
-    expect(optionPage.isClosed()).toBe(true);
-  });
-
-  await test.step('Verify the youtube page press left arrow should be override while right not override', async () => {
-    const { video } = getVideoLocatorElements(videoPage);
-    await setVideoTime(video, 80);
-
-    await videoPage.keyboard.press('ArrowLeft');
-    let currentTime: number = await getVideoTime(video);
-    expect(currentTime).toBe(40);
-    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
-    await expect(animationArrow).not.toBeVisible();
-
-    await videoPage.keyboard.press('ArrowRight');
     currentTime = await getVideoTime(video);
     await expect(animationArrow).toBeVisible();
     expect(currentTime).toBe(45);
@@ -194,6 +199,54 @@ test('should override the arrow keys when seconds set not to 5 and not override 
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(20);
     await expect(animationArrow).not.toBeVisible();
+  });
+});
+
+test('should override the ArrowLeft key when seconds set not to 5 and not override if set to 5', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToYoutubeOptionsPagesSteps(
+    videoPage,
+    optionPage,
+    optionFilePath
+  );
+
+  await test.step('Change the options to override and ArrowLeft seconds', async () => {
+    await optionPage.goto(optionFilePath);
+    const {
+      rewindSecondsInput,
+      forwardSecondsInput,
+      shouldOverrideArrowKeysCheckbox,
+    } = getOptionsInputs(optionPage);
+
+    await shouldOverrideArrowKeysCheckbox.check();
+    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+    await forwardSecondsInput.fill(OPTIONS_DEFAULT_VALUES.forwardSecondsInput);
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await test.step('Verify the youtube page press left arrow should be override while right not override', async () => {
+    const { video } = getVideoLocatorElements(videoPage);
+    await setVideoTime(video, 80);
+
+    await videoPage.keyboard.press('ArrowLeft');
+    let currentTime: number = await getVideoTime(video);
+    expect(currentTime).toBe(40);
+    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
+    await expect(animationArrow).not.toBeVisible();
+
+    await videoPage.keyboard.press('ArrowRight');
+    currentTime = await getVideoTime(video);
+    console.log('💜 ~ await test.step ~ currentTime:', currentTime);
+    await expect(animationArrow).toBeVisible();
+    expect(currentTime).toBe(45);
   });
 });
 
@@ -295,9 +348,11 @@ test('should options change affect new youtube page', async ({
   await test.step('Change the options, one of the arrows', async () => {
     optionPage = await context.newPage();
     await optionPage.goto(optionFilePath);
-    const { rewindSecondsInput } = getOptionsInputs(optionPage);
+    const { rewindSecondsInput, shouldOverrideArrowKeysCheckbox } =
+      getOptionsInputs(optionPage);
 
     await rewindSecondsInput.fill(OPTIONS_DEFAULT_VALUES.rewindSecondsInput);
+    await shouldOverrideArrowKeysCheckbox.check();
     await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
 
     expect(optionPage.isClosed()).toBe(true);
@@ -316,20 +371,72 @@ test('should options change affect new youtube page', async ({
     );
     await videoPage.locator('ytd-compact-video-renderer img').first().click();
     await expect(videoPage).toHaveURL(url);
+    await videoPage.reload();
+
     const { video, rewindButton, forwardButton } =
       getVideoLocatorElements(videoPage);
 
     await handleAds(videoPage);
     await resetVideo(video, videoPage);
     await setVideoTime(video, 10);
+
     await rewindButton.click();
     let currentTime = await getVideoTime(video);
     expect(currentTime).toBe(5);
 
     await forwardButton.click();
-    forwardButton;
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(55);
+  });
+});
+
+test('should show the correct title for the buttons when hover', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToOptionsPageStep(optionPage, optionFilePath);
+
+  await test.step('Change the options', async () => {
+    const {
+      forwardSecondsInput,
+      rewindSecondsInput,
+      shouldOverrideArrowKeysCheckbox,
+    } = getOptionsInputs(optionPage);
+
+    await forwardSecondsInput.fill(
+      OPTIONS_CHANGED_VALUES.complexForwardSecondsInput
+    );
+    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+    await shouldOverrideArrowKeysCheckbox.check();
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+    await videoPage.waitForTimeout(1000);
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await navigateToYoutubeStep(videoPage);
+
+  await test.step('Verify new youtube page show correct titles and aria-label', async () => {
+    const { video, forwardButton, rewindButton } =
+      getVideoLocatorElements(videoPage);
+    await setVideoTime(video, 0);
+
+    expect(await forwardButton.getAttribute('aria-label')).toBe(
+      'Go forward 1h 8m 41s (right arrow)'
+    );
+    expect(await forwardButton.getAttribute('title')).toBe(
+      'Go forward 1h 8m 41s (right arrow)'
+    );
+    expect(await rewindButton.getAttribute('aria-label')).toBe(
+      'Go back 40 seconds (left arrow)'
+    );
+    expect(await rewindButton.getAttribute('title')).toBe(
+      'Go back 40 seconds (left arrow)'
+    );
   });
 });
 

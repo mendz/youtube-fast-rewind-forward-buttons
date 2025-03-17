@@ -72,17 +72,28 @@ export function getVideoTime(video: Locator): Promise<number> {
   return video.evaluate((video: HTMLVideoElement) => video.currentTime);
 }
 
-export function setVideoTime(
+export async function setVideoTime(
   video: Locator,
   newTimeInSeconds: number
 ): Promise<void> {
-  return video.evaluate((video: HTMLVideoElement, newTimeInSeconds) => {
-    video.currentTime = newTimeInSeconds;
-  }, newTimeInSeconds);
+  try {
+    await video.waitFor({ state: 'visible' });
+    await video.evaluate((video: HTMLVideoElement, newTimeInSeconds) => {
+      video.pause();
+      video.currentTime = newTimeInSeconds;
+    }, newTimeInSeconds);
+  } catch (error) {
+    console.error('Error in setVideoTime evaluate:', error);
+    throw error;
+  }
 }
 
 export async function resetVideo(video: Locator, page: Page) {
+  await video.waitFor({ state: 'attached' });
   await video.click();
+  await video.evaluate((video: HTMLVideoElement) => {
+    video.play();
+  });
   // reset the time
   await setVideoTime(video, 0);
   try {
@@ -92,6 +103,10 @@ export async function resetVideo(video: Locator, page: Page) {
         'button[data-title-no-tooltip="Mute"].ytp-mute-button.ytp-button'
       )
       .click({ timeout: 10000 });
+    return video.evaluate((video: HTMLVideoElement) => {
+      video.volume = 0;
+      video.muted = true;
+    });
     // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     console.info('Video is already muted');
