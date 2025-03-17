@@ -34,12 +34,12 @@ export function createFastRewindSVG(
   svgPathClasses: string[]
 ): string {
   return `
-    <svg class="${svgClasses}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
+    <svg class="${svgClasses.join(' ')}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
        ${svgUseHtml.replace(
          /xlink:href="#.*"/,
          'xlink:href="#custom-path-rewind"'
        )}
-      <path id="custom-path-rewind" class="${svgPathClasses}" d="M856-240 505.33-480 856-720v480Zm-401.33 0L104-480l350.67-240v480Z" />
+      <path id="custom-path-rewind" class="${svgPathClasses.join(' ')}" d="M856-240 505.33-480 856-720v480Zm-401.33 0L104-480l350.67-240v480Z" />
     </svg>
   `;
 }
@@ -50,12 +50,12 @@ export function createFastForwardSVG(
   svgPathClasses: string[]
 ): string {
   return `
-    <svg class="${svgClasses}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
+    <svg class="${svgClasses.join(' ')}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
       ${svgUseHtml.replace(
         /xlink:href="#.*"/,
         'xlink:href="#custom-path-fast-forward"'
       )}
-      <path id="custom-path-fast-forward" class="${svgPathClasses}" d="M102.67-240v-480l350.66 240-350.66 240Zm404.66 0v-480L858-480 507.33-240Z" />
+      <path id="custom-path-fast-forward" class="${svgPathClasses.join(' ')}" d="M102.67-240v-480l350.66 240-350.66 240Zm404.66 0v-480L858-480 507.33-240Z" />
     </svg>
   `;
 }
