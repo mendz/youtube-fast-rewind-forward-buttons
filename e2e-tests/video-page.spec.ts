@@ -80,6 +80,8 @@ test('should have the arrows and work when navigate to another video', async ({
   });
   await page.locator('ytd-compact-video-renderer img').first().click();
   await expect(page).toHaveURL(url);
+  await page.reload();
+
   const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
 
   await handleAds(page);
@@ -114,6 +116,7 @@ test('should add arrows when entering a video from the main page', async ({
   page.close();
   const newPage = await context.newPage();
   await clickOnNewVideoOnMainPage(newPage);
+  await newPage.reload();
   await handleAds(newPage);
 
   // pause the video

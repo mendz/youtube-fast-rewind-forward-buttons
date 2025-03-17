@@ -46,27 +46,33 @@
             As a default, the arrow keys rewind (left arrow) & forward (right
             arrow) are set to <strong>5 seconds</strong>.
           </p>
-          <label
-            >Rewind seconds (between 1 and 60):
+          <label class="seconds-change-label"
+            >Rewind seconds (1-7200 sec):
             <input
+              required
               type="number"
               id="rewind"
               name="rewind"
               min="1"
-              max="60"
+              max="7200"
               value="5"
+              placeholder="Seconds"
             />
+            <output id="rewindValue" for="rewind">(5 seconds)</output>
           </label>
-          <label
-            >Forward seconds (between 1 and 60):
+          <label class="seconds-change-label"
+            >Forward seconds (1-7200 sec):
             <input
+              required
               type="number"
               id="forward"
               name="forward"
               min="1"
-              max="60"
+              max="7200"
               value="5"
+              placeholder="Seconds"
             />
+            <output id="forwardValue" for="forward">(5 seconds)</output>
           </label>
         </div>
         <div class="checkbox-container">

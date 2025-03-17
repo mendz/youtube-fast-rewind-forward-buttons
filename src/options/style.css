@@ -171,6 +171,29 @@ input[type='checkbox'] {
   place-content: space-evenly;
   place-items: center;
   height: max-content;
+
+  & .seconds-change-label {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+
+    & input {
+      max-width: 100px;
+      margin: 0;
+      width: 40%;
+    }
+
+    & output {
+      max-width: 200px;
+      width: 20%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      text-wrap: nowrap;
+      text-align: left;
+    }
+  }
 }
 
 .checkbox-container {

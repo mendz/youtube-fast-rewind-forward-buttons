@@ -20,7 +20,9 @@ export const OPTIONS_DEFAULT_VALUES = {
 
 export const OPTIONS_CHANGED_VALUES = {
   rewindSecondsInput: '40',
+  complexRewindSecondsInput: '70',
   forwardSecondsInput: '50',
+  complexForwardSecondsInput: '4121',
   shouldOverrideKeysCheckbox: true,
 };
 
@@ -70,17 +72,28 @@ export function getVideoTime(video: Locator): Promise<number> {
   return video.evaluate((video: HTMLVideoElement) => video.currentTime);
 }
 
-export function setVideoTime(
+export async function setVideoTime(
   video: Locator,
   newTimeInSeconds: number
 ): Promise<void> {
-  return video.evaluate((video: HTMLVideoElement, newTimeInSeconds) => {
-    video.currentTime = newTimeInSeconds;
-  }, newTimeInSeconds);
+  try {
+    await video.waitFor({ state: 'visible' });
+    await video.evaluate((video: HTMLVideoElement, newTimeInSeconds) => {
+      video.pause();
+      video.currentTime = newTimeInSeconds;
+    }, newTimeInSeconds);
+  } catch (error) {
+    console.error('Error in setVideoTime evaluate:', error);
+    throw error;
+  }
 }
 
 export async function resetVideo(video: Locator, page: Page) {
+  await video.waitFor({ state: 'attached' });
   await video.click();
+  await video.evaluate((video: HTMLVideoElement) => {
+    video.play();
+  });
   // reset the time
   await setVideoTime(video, 0);
   try {
@@ -90,6 +103,11 @@ export async function resetVideo(video: Locator, page: Page) {
         'button[data-title-no-tooltip="Mute"].ytp-mute-button.ytp-button'
       )
       .click({ timeout: 10000 });
+    return video.evaluate((video: HTMLVideoElement) => {
+      video.volume = 0;
+      video.muted = true;
+    });
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     console.info('Video is already muted');
   }
@@ -113,6 +131,7 @@ async function isAdsInPage(page: Page): Promise<boolean> {
       }
     );
     return !!(await Promise.any([firstSpan, secondSpan, videoAdsContainer]));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -129,6 +148,7 @@ async function isCounterSkipButton(page: Page): Promise<boolean> {
         strict: false,
       }
     ));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -141,6 +161,7 @@ async function isCounterSkipButtonLeave(page: Page): Promise<boolean> {
       timeout: 5000,
       strict: false,
     }));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -157,6 +178,7 @@ export async function getSkipAdButton(
         timeout: 1000,
       }
     );
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return null;
   }
@@ -178,6 +200,7 @@ export async function isAdsLeavePage(page: Page): Promise<boolean> {
       }
     );
     return !!(await Promise.any([firstSpan, secondSpan, videoAdsContainer]));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -191,6 +214,7 @@ async function isSponsorAds(page: Page): Promise<boolean> {
         state: 'detached',
       }
     ));
+    // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
   }
@@ -287,15 +311,27 @@ async function geFilePath(
  *   arrow keys.
  * @param shouldOverrideMediaKeysCheckbox The checkbox element for overriding
  *   the media keys.
+ * @param isComplex If true, the function will fill the inputs with the
+ *   `complexRewindSecondsInput` and `complexForwardSecondsInput` values.
  */
 export async function fillInputsWithChangedValues(
   rewindSecondsInput: Locator,
   forwardSecondsInput: Locator,
   shouldOverrideKeysCheckbox: Locator,
-  shouldOverrideMediaKeysCheckbox: Locator
+  shouldOverrideMediaKeysCheckbox: Locator,
+  isComplex = false
 ) {
-  await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
-  await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+  if (isComplex) {
+    await rewindSecondsInput.fill(
+      OPTIONS_CHANGED_VALUES.complexRewindSecondsInput
+    );
+    await forwardSecondsInput.fill(
+      OPTIONS_CHANGED_VALUES.complexForwardSecondsInput
+    );
+  } else {
+    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
+    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+  }
   await shouldOverrideKeysCheckbox.check();
   await shouldOverrideMediaKeysCheckbox.check();
 }
@@ -309,11 +345,15 @@ export function getOptionsInputs(page: Page) {
   const shouldOverrideMediaKeysCheckbox = page.locator(
     'input#override-media-keys'
   );
+  const rewindOutput = page.locator('output#rewindValue');
+  const forwardOutput = page.locator('output#forwardValue');
   return {
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindOutput,
+    forwardOutput,
   };
 }
 
