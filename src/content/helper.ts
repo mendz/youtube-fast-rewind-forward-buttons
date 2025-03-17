@@ -55,7 +55,7 @@ export function createFastForwardSVG(
         /xlink:href="#.*"/,
         'xlink:href="#custom-path-fast-forward"'
       )}
-      <path id="custom-path-fast-forward class="${svgPathClasses}" d="M102.67-240v-480l350.66 240-350.66 240Zm404.66 0v-480L858-480 507.33-240Z" "/>
+      <path id="custom-path-fast-forward" class="${svgPathClasses}" d="M102.67-240v-480l350.66 240-350.66 240Zm404.66 0v-480L858-480 507.33-240Z" />
     </svg>
   `;
 }
