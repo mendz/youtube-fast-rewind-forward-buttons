@@ -71,6 +71,11 @@ export const DEFAULT_OPTIONS_MOCK: IOptions = {
   rewindSeconds: 5,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
+  secondarySeconds: {
+    checkboxIsEnabled: false,
+    rewindSeconds: 5,
+    forwardSeconds: 5,
+  },
 };
 
 export function removeSpaces(text: string) {

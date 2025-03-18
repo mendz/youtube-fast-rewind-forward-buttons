@@ -86,6 +86,11 @@ export const DEFAULT_OPTIONS_MOCK: IOptions = {
   rewindSeconds: 5,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
+  secondarySeconds: {
+    checkboxIsEnabled: false,
+    rewindSeconds: 5,
+    forwardSeconds: 5,
+  },
 };
 
 export const DEFAULT_STORAGE_OPTIONS_MOCK: IStorageOptions = {
@@ -94,4 +99,9 @@ export const DEFAULT_STORAGE_OPTIONS_MOCK: IStorageOptions = {
   shouldOverrideKeys: true,
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
+  secondarySeconds: {
+    checkboxIsEnabled: false,
+    rewindSeconds: '5',
+    forwardSeconds: '5',
+  },
 };

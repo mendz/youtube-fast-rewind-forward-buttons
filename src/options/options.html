@@ -75,6 +75,50 @@
             <output id="forwardValue" for="forward">(5 seconds)</output>
           </label>
         </div>
+        <div class="secondary-seconds-container">
+          <label>
+            <input
+              type="checkbox"
+              name="enable-more-buttons"
+              id="enable-more-buttons"
+            />
+            Enable the secondary buttons
+          </label>
+          <fieldset disabled>
+            <label class="seconds-change-label"
+              >Rewind seconds (1-7200 sec):
+              <input
+                required
+                type="number"
+                id="rewind-secondary"
+                name="rewind-secondary"
+                min="1"
+                max="7200"
+                value="5"
+                placeholder="Seconds"
+              />
+              <output id="rewind-secondaryValue" for="rewind-secondary"
+                >(5 seconds)</output
+              >
+            </label>
+            <label class="seconds-change-label"
+              >Forward seconds (1-7200 sec):
+              <input
+                required
+                type="number"
+                id="forward-secondary"
+                name="forward-secondary"
+                min="1"
+                max="7200"
+                value="5"
+                placeholder="Seconds"
+              />
+              <output id="forward-secondaryValue" for="forward-secondary"
+                >(5 seconds)</output
+              >
+            </label>
+          </fieldset>
+        </div>
         <div class="checkbox-container">
           <label>
             <input

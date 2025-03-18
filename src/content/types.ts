@@ -1,15 +1,32 @@
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 export interface IOptions {
   rewindSeconds: number;
   forwardSeconds: number;
+  secondarySeconds: {
+    checkboxIsEnabled: boolean;
+    rewindSeconds: number;
+    forwardSeconds: number;
+  };
   shouldOverrideKeys?: boolean; // TODO: old one, should removed in the next version
   shouldOverrideArrowKeys: boolean;
   shouldOverrideMediaKeys: boolean;
 }
 
 export interface IStorageOptions
-  extends Omit<IOptions, 'rewindSeconds' | 'forwardSeconds'> {
+  extends Omit<
+    IOptions,
+    'rewindSeconds' | 'forwardSeconds' | 'secondarySeconds'
+  > {
   rewindSeconds: string;
   forwardSeconds: string;
+  secondarySeconds: {
+    checkboxIsEnabled: boolean;
+    rewindSeconds: string;
+    forwardSeconds: string;
+  };
 }
 
 export enum ArrowKey {
