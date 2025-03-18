@@ -34,12 +34,12 @@ export function createFastRewindSVG(
   svgPathClasses: string[]
 ): string {
   return `
-    <svg class="${svgClasses}" height="100%" width="100%" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      ${svgUseHtml.replace(
-        /xlink:href="#.*"/,
-        'xlink:href="#custom-path-rewind"'
-      )}
-      <path class="${svgPathClasses}" id="custom-path-rewind" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
+    <svg class="${svgClasses.join(' ')}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
+       ${svgUseHtml.replace(
+         /xlink:href="#.*"/,
+         'xlink:href="#custom-path-rewind"'
+       )}
+      <path id="custom-path-rewind" class="${svgPathClasses.join(' ')}" d="M856-240 505.33-480 856-720v480Zm-401.33 0L104-480l350.67-240v480Z" />
     </svg>
   `;
 }
@@ -50,12 +50,12 @@ export function createFastForwardSVG(
   svgPathClasses: string[]
 ): string {
   return `
-    <svg class="${svgClasses}" height="100%" width="100%" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    ${svgUseHtml.replace(
-      /xlink:href="#.*"/,
-      'xlink:href="#custom-path-fast-forward"'
-    )}
-      <path class="${svgPathClasses}" id="custom-path-fast-forward" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+    <svg class="${svgClasses.join(' ')}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
+      ${svgUseHtml.replace(
+        /xlink:href="#.*"/,
+        'xlink:href="#custom-path-fast-forward"'
+      )}
+      <path id="custom-path-fast-forward" class="${svgPathClasses.join(' ')}" d="M102.67-240v-480l350.66 240-350.66 240Zm404.66 0v-480L858-480 507.33-240Z" />
     </svg>
   `;
 }
