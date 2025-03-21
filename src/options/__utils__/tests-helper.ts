@@ -6,31 +6,7 @@ export const MOCK_HTML = /* HTML */ `
     Reset input values to default
   </button>
   <form class="container">
-    <div class="seconds-change">
-      <label
-        >Rewind seconds (between 1 and 60):
-        <input
-          type="number"
-          id="rewind"
-          name="rewind"
-          min="1"
-          max="60"
-          value="5"
-        />
-      </label>
-      <label
-        >Forward seconds (between 1 and 60):
-        <input
-          type="number"
-          id="forward"
-          name="forward"
-          min="1"
-          max="60"
-          value="5"
-        />
-      </label>
-    </div>
-    <div class="override-keys-container">
+    <div class="seconds-change-container">
       <p>
         <svg
           id="information"
@@ -48,6 +24,80 @@ export const MOCK_HTML = /* HTML */ `
         As a default, the arrow keys rewind (left arrow) & forward (right arrow)
         are set to <strong>5 seconds</strong>.
       </p>
+      <label class="seconds-change-label"
+        >Rewind seconds (1-7200 sec):
+        <input
+          required
+          type="number"
+          id="rewind"
+          name="rewind"
+          min="1"
+          max="7200"
+          value="5"
+          placeholder="Seconds"
+        />
+        <output id="rewindValue" for="rewind">(5 seconds)</output>
+      </label>
+      <label class="seconds-change-label"
+        >Forward seconds (1-7200 sec):
+        <input
+          required
+          type="number"
+          id="forward"
+          name="forward"
+          min="1"
+          max="7200"
+          value="5"
+          placeholder="Seconds"
+        />
+        <output id="forwardValue" for="forward">(5 seconds)</output>
+      </label>
+    </div>
+    <div class="secondary-seconds-container">
+      <label>
+        <input
+          type="checkbox"
+          name="enable-more-buttons"
+          id="enable-more-buttons"
+        />
+        Enable the secondary buttons
+      </label>
+      <fieldset disabled>
+        <label class="seconds-change-label"
+          >Rewind seconds (1-7200 sec):
+          <input
+            required
+            type="number"
+            id="rewind-secondary"
+            name="rewind-secondary"
+            min="1"
+            max="7200"
+            value="5"
+            placeholder="Seconds"
+          />
+          <output id="rewind-secondaryValue" for="rewind-secondary"
+            >(5 seconds)</output
+          >
+        </label>
+        <label class="seconds-change-label"
+          >Forward seconds (1-7200 sec):
+          <input
+            required
+            type="number"
+            id="forward-secondary"
+            name="forward-secondary"
+            min="1"
+            max="7200"
+            value="5"
+            placeholder="Seconds"
+          />
+          <output id="forward-secondaryValue" for="forward-secondary"
+            >(5 seconds)</output
+          >
+        </label>
+      </fieldset>
+    </div>
+    <div class="checkbox-container">
       <label>
         <input
           type="checkbox"
@@ -62,11 +112,14 @@ export const MOCK_HTML = /* HTML */ `
           name="override-media-keys"
           id="override-media-keys"
         />
-        Should override the keyboard media keys above to behave as the arrow
-        keys?
+        Should override the keyboard media keys with the above seconds to behave
+        as the arrow keys?
       </label>
     </div>
     <div class="button-container">
+      <button type="button" class="danger" id="reset-values">
+        Reset input values to default
+      </button>
       <button type="submit">Save and close</button>
     </div>
   </form>
@@ -76,7 +129,10 @@ export enum InputId {
   REWIND = 'rewind',
   FORWARD = 'forward',
   OVERRIDE_ARROW_KEYS = 'override-arrow-keys',
-  OVERRIDE_MEDIA_KAYS = 'override-media-keys',
+  OVERRIDE_MEDIA_KEYS = 'override-media-keys',
+  ENABLE_MORE_BUTTONS = 'enable-more-buttons',
+  REWIND_SECONDARY = 'rewind-secondary',
+  FORWARD_SECONDARY = 'forward-secondary',
 }
 
 export const INPUTS_IDS = Object.values(InputId);
