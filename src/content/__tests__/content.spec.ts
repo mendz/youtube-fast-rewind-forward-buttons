@@ -176,6 +176,7 @@ describe('loadOptions', () => {
     const options: IOptions = {
       rewindSeconds: 10,
       forwardSeconds: 2,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: true,
     };
@@ -197,6 +198,7 @@ describe('loadOptions', () => {
       ...options,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
       shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
     });
 
     chrome.storage.sync.get.mockReturnValue({
@@ -209,6 +211,7 @@ describe('loadOptions', () => {
       ...options,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
       rewindSeconds: DEFAULT_OPTIONS_MOCK.rewindSeconds,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
     });
 
     const options2 = {
@@ -222,6 +225,7 @@ describe('loadOptions', () => {
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
       shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       shouldOverrideMediaKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideMediaKeys,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
     });
 
     const options3 = {
@@ -235,6 +239,7 @@ describe('loadOptions', () => {
       rewindSeconds: DEFAULT_OPTIONS_MOCK.rewindSeconds,
       forwardSeconds: DEFAULT_OPTIONS_MOCK.forwardSeconds,
       shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
     });
   });
 
@@ -255,6 +260,7 @@ describe('mergeOptions', () => {
     const optionsMock: IOptions = {
       forwardSeconds: 2,
       rewindSeconds: 7,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
     };
@@ -275,8 +281,10 @@ describe('mergeOptions', () => {
     const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
-      ...DEFAULT_OPTIONS_MOCK,
+      rewindSeconds: DEFAULT_OPTIONS_MOCK.rewindSeconds,
       forwardSeconds: optionsMock.forwardSeconds,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
+      shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
       shouldOverrideMediaKeys: true,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
@@ -286,6 +294,7 @@ describe('mergeOptions', () => {
     const optionsMock: IOptions = {
       forwardSeconds: 2,
       rewindSeconds: 7,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
     };
@@ -306,8 +315,11 @@ describe('mergeOptions', () => {
     const returnedOptions = mergeOptions(changeOptionsMock, optionsMock);
 
     const returnValueToTest = {
-      ...DEFAULT_OPTIONS_MOCK,
+      rewindSeconds: DEFAULT_OPTIONS_MOCK.rewindSeconds,
       forwardSeconds: optionsMock.forwardSeconds,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
+      shouldOverrideArrowKeys: DEFAULT_OPTIONS_MOCK.shouldOverrideArrowKeys,
+      shouldOverrideMediaKeys: optionsMock.shouldOverrideMediaKeys,
     };
     expect(returnedOptions).toMatchObject(returnValueToTest);
   });
@@ -318,6 +330,7 @@ describe('handleOverrideKeysMigration', () => {
     const defaultOptions: Readonly<IOptions> = {
       rewindSeconds: 5,
       forwardSeconds: 5,
+      secondarySeconds: DEFAULT_OPTIONS_MOCK.secondarySeconds,
       shouldOverrideKeys: false,
       shouldOverrideArrowKeys: false,
       shouldOverrideMediaKeys: false,
@@ -329,6 +342,11 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: true,
       shouldOverrideArrowKeys: false,
       shouldOverrideMediaKeys: false,
+      secondarySeconds: {
+        checkboxIsEnabled: false,
+        rewindSeconds: '5',
+        forwardSeconds: '5',
+      },
     };
 
     const result = handleOverrideKeysMigration(defaultOptions, storageOptions);
@@ -340,6 +358,11 @@ describe('handleOverrideKeysMigration', () => {
       forwardSeconds: '5',
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
+      secondarySeconds: {
+        checkboxIsEnabled: false,
+        rewindSeconds: '5',
+        forwardSeconds: '5',
+      },
     };
 
     const result2 = handleOverrideKeysMigration(defaultOptions, storageOptions);
@@ -352,6 +375,11 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: false,
       shouldOverrideArrowKeys: true,
       shouldOverrideMediaKeys: false,
+      secondarySeconds: {
+        checkboxIsEnabled: false,
+        rewindSeconds: '5',
+        forwardSeconds: '5',
+      },
     };
 
     const result3 = handleOverrideKeysMigration(defaultOptions, storageOptions);
@@ -364,6 +392,11 @@ describe('handleOverrideKeysMigration', () => {
       shouldOverrideKeys: false,
       shouldOverrideArrowKeys: false,
       shouldOverrideMediaKeys: true,
+      secondarySeconds: {
+        checkboxIsEnabled: false,
+        rewindSeconds: '5',
+        forwardSeconds: '5',
+      },
     };
 
     const result4 = handleOverrideKeysMigration(defaultOptions, storageOptions);

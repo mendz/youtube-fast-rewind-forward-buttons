@@ -23,9 +23,9 @@ describe('Options page', () => {
   });
 
   describe('getInputs', () => {
-    it('Should return all 4 inputs', () => {
+    it('Should return all 5 inputs', () => {
       const inputs = getInputs();
-      expect(Object.keys(inputs).length).toBe(4);
+      expect(Object.keys(inputs).length).toBe(5);
     });
 
     it('Should return the same amounts of inputs in the page', () => {
@@ -38,7 +38,16 @@ describe('Options page', () => {
 
     it('Should return inputs that match all the ids', () => {
       const inputs = getInputs();
-      const matchIds = Object.values(inputs).every((input) =>
+      const flattenedInputs = [
+        inputs.inputRewindSeconds,
+        inputs.inputForwardSeconds,
+        inputs.inputShouldOverrideArrowKeys,
+        inputs.inputShouldOverrideMediaKeys,
+        inputs.secondarySeconds.checkboxIsEnabled,
+        inputs.secondarySeconds.inputRewindSeconds,
+        inputs.secondarySeconds.inputForwardSeconds,
+      ];
+      const matchIds = flattenedInputs.every((input) =>
         INPUTS_IDS.includes(input.id as InputId)
       );
       expect(matchIds).toBe(true);
@@ -93,7 +102,7 @@ describe('Options page', () => {
       ) as HTMLInputElement;
       rewindInput.value = '10';
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
       overrideMediaKeysInput.checked = true;
 
@@ -167,7 +176,7 @@ describe('Options page', () => {
         (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
       ) as HTMLInputElement;
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
 
       expect(forwardInput.value).toBe('20');

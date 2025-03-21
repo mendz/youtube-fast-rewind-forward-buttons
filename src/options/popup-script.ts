@@ -1,9 +1,14 @@
 import { numberFormat } from '../content/helper';
-import { IOptions, IStorageOptions } from '../content/types';
+import { IOptions, IStorageOptions, Prettify } from '../content/types';
 
 const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
   rewindSeconds: 5,
   forwardSeconds: 5,
+  secondarySeconds: {
+    checkboxIsEnabled: false,
+    rewindSeconds: 5,
+    forwardSeconds: 5,
+  },
   shouldOverrideKeys: false, // TODO: old one, should removed in the next version
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
@@ -12,6 +17,11 @@ const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
 type InputsOptionsPage = {
   inputRewindSeconds: HTMLInputElement;
   inputForwardSeconds: HTMLInputElement;
+  secondarySeconds: {
+    checkboxIsEnabled: HTMLInputElement;
+    inputRewindSeconds: HTMLInputElement;
+    inputForwardSeconds: HTMLInputElement;
+  };
   inputShouldOverrideArrowKeys: HTMLInputElement;
   inputShouldOverrideMediaKeys: HTMLInputElement;
 };
@@ -23,6 +33,15 @@ export function getInputs(): InputsOptionsPage {
   const inputForwardSeconds: HTMLInputElement = document.querySelector(
     '#forward'
   ) as HTMLInputElement;
+  const inputSecondaryEnable: HTMLInputElement = document.querySelector(
+    '#enable-more-buttons'
+  ) as HTMLInputElement;
+  const inputSecondaryRewindSeconds: HTMLInputElement = document.querySelector(
+    '#rewind-secondary'
+  ) as HTMLInputElement;
+  const inputSecondaryForwardSeconds: HTMLInputElement = document.querySelector(
+    '#forward-secondary'
+  ) as HTMLInputElement;
   const inputShouldOverrideArrowKeys: HTMLInputElement = document.querySelector(
     '#override-arrow-keys'
   ) as HTMLInputElement;
@@ -33,6 +52,11 @@ export function getInputs(): InputsOptionsPage {
   return {
     inputRewindSeconds,
     inputForwardSeconds,
+    secondarySeconds: {
+      checkboxIsEnabled: inputSecondaryEnable,
+      inputRewindSeconds: inputSecondaryRewindSeconds,
+      inputForwardSeconds: inputSecondaryForwardSeconds,
+    },
     inputShouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys,
   };
@@ -42,13 +66,27 @@ export async function saveOptions(): Promise<void> {
   const {
     inputRewindSeconds: rewindSeconds,
     inputForwardSeconds: forwardSeconds,
+    secondarySeconds: {
+      checkboxIsEnabled: secondaryIsEnabled,
+      inputRewindSeconds: secondaryRewindSeconds,
+      inputForwardSeconds: secondaryForwardSeconds,
+    },
     inputShouldOverrideArrowKeys: shouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys: shouldOverrideMediaKeys,
   } = getInputs();
   try {
-    await chrome.storage.sync.set({
+    await chrome.storage.sync.set<IStorageOptions>({
       rewindSeconds: rewindSeconds.value,
       forwardSeconds: forwardSeconds.value,
+      secondarySeconds: {
+        checkboxIsEnabled: secondaryIsEnabled.checked,
+        rewindSeconds: secondaryIsEnabled.checked
+          ? secondaryRewindSeconds.value
+          : OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString(),
+        forwardSeconds: secondaryIsEnabled.checked
+          ? secondaryForwardSeconds.value
+          : OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString(),
+      },
       shouldOverrideArrowKeys: shouldOverrideArrowKeys.checked,
       shouldOverrideMediaKeys: shouldOverrideMediaKeys.checked,
     });
@@ -80,6 +118,7 @@ export async function loadInputStorageOptions(): Promise<void> {
   const {
     inputRewindSeconds,
     inputForwardSeconds,
+    secondarySeconds,
     inputShouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys,
   } = getInputs();
@@ -87,7 +126,8 @@ export async function loadInputStorageOptions(): Promise<void> {
     const keys = Object.keys(OPTIONS_DEFAULT_VALUES) as Array<
       keyof IStorageOptions
     >;
-    const storageOptions = await chrome.storage.sync.get<IStorageOptions>(keys);
+    const storageOptions =
+      await chrome.storage.sync.get<Prettify<IStorageOptions>>(keys);
 
     // set the inputs with the loaded options
     inputRewindSeconds.value =
@@ -96,7 +136,18 @@ export async function loadInputStorageOptions(): Promise<void> {
     inputForwardSeconds.value =
       storageOptions?.forwardSeconds ??
       OPTIONS_DEFAULT_VALUES.forwardSeconds.toString();
+
+    secondarySeconds.checkboxIsEnabled.checked =
+      storageOptions?.secondarySeconds?.checkboxIsEnabled ?? false;
+    secondarySeconds.inputRewindSeconds.value =
+      storageOptions?.secondarySeconds?.rewindSeconds ??
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString();
+    secondarySeconds.inputForwardSeconds.value =
+      storageOptions?.secondarySeconds?.forwardSeconds ??
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString();
+
     handleOverrideKeysMigration(inputShouldOverrideArrowKeys, storageOptions);
+
     inputShouldOverrideMediaKeys.checked =
       storageOptions?.shouldOverrideMediaKeys ??
       OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
@@ -143,7 +194,9 @@ export function submit(event: Event): void {
   }
 }
 
-function setSecondsInputsListeners(id: 'forward' | 'rewind'): void {
+function initializeSecondsInputOutputListeners(
+  id: 'forward' | 'rewind' | 'forward-secondary' | 'rewind-secondary'
+): void {
   const input = document.querySelector(`#${id}`) as HTMLInputElement;
   const value = document.querySelector(`#${id}Value`) as HTMLOutputElement;
   value.textContent = `(${numberFormat(Number(input.value))})`;
@@ -155,12 +208,29 @@ function setSecondsInputsListeners(id: 'forward' | 'rewind'): void {
   });
 }
 
+function initializeSecondaryEnable() {
+  const enableCheckbox = document.querySelector(
+    '#enable-more-buttons'
+  ) as HTMLInputElement;
+  const secondaryFieldset = document.querySelector(
+    '.secondary-seconds-container fieldset'
+  ) as HTMLFieldSetElement;
+
+  secondaryFieldset.disabled = !enableCheckbox.checked;
+  enableCheckbox.addEventListener('change', () => {
+    secondaryFieldset.disabled = !enableCheckbox.checked;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   document.querySelector('form.container')?.addEventListener('submit', submit);
   document
     .querySelector('button#reset-values')
     ?.addEventListener('click', resetToDefaultOptions);
   await loadInputStorageOptions();
-  setSecondsInputsListeners('rewind');
-  setSecondsInputsListeners('forward');
+  initializeSecondsInputOutputListeners('rewind');
+  initializeSecondsInputOutputListeners('forward');
+  initializeSecondsInputOutputListeners('rewind-secondary');
+  initializeSecondsInputOutputListeners('forward-secondary');
+  initializeSecondaryEnable();
 });
