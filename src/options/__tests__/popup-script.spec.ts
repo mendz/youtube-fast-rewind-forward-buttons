@@ -30,9 +30,18 @@ describe('Options page', () => {
 
     it('Should return the same amounts of inputs in the page', () => {
       const pageInputs = document.querySelectorAll<HTMLInputElement>('input');
-      const functionInputs = getInputs();
+      const inputs = getInputs();
+      const flattenedInputs = [
+        inputs.inputRewindSeconds,
+        inputs.inputForwardSeconds,
+        inputs.secondarySeconds.checkboxIsEnabled,
+        inputs.secondarySeconds.inputRewindSeconds,
+        inputs.secondarySeconds.inputForwardSeconds,
+        inputs.inputShouldOverrideArrowKeys,
+        inputs.inputShouldOverrideMediaKeys,
+      ];
       expect(Array.from(pageInputs)).toStrictEqual(
-        Object.values(functionInputs)
+        Object.values(flattenedInputs)
       );
     });
 
@@ -112,6 +121,11 @@ describe('Options page', () => {
         forwardSeconds: '5',
         shouldOverrideArrowKeys: false,
         shouldOverrideMediaKeys: true,
+        secondarySeconds: {
+          checkboxIsEnabled: false,
+          forwardSeconds: '5',
+          rewindSeconds: '5',
+        },
       });
     });
   });
