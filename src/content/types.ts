@@ -43,12 +43,14 @@ export type CreateButtonArg = {
   svg: string;
   title: string;
   id?: string;
+  isSecondary?: boolean;
 };
 
 export type VideoTimeArg = {
   seconds: number;
   video: HTMLVideoElement;
   updateType: ArrowKey;
+  isForceUpdate?: boolean;
 };
 
 export type ButtonExtraStylesArg = {
@@ -73,6 +75,8 @@ export enum ButtonClassesIds {
   CLASS = `ml-custom-rewind-forward-buttons`,
   REWIND_ID = 'ml-custom-rewind-button',
   FORWARD_ID = 'ml-custom-forward-button',
+  DOUBLE_REWIND_ID = 'ml-custom-double-rewind-button',
+  DOUBLE_FORWARD_ID = 'ml-custom-double-forward-button',
 }
 
 export type ChromeStorageChanges = {

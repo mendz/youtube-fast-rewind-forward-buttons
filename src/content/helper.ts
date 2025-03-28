@@ -60,13 +60,53 @@ export function createFastForwardSVG(
   `;
 }
 
+export function createFastDoubleRewindSVG(
+  svgClasses: string[],
+  svgUseHtml: string,
+  svgPathClasses: string[]
+): string {
+  return `
+  <svg class="${svgClasses.join(' ')}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
+      ${svgUseHtml.replace(
+        /xlink:href="#.*"/,
+        'xlink:href="#custom-path-double-rewind"'
+      )}
+    <path id="custom-path-double-rewind" class="${svgPathClasses.join(' ')}" d="m448.67-240.67-240-240 240-240L495.33-674l-193 193.33 193 193.34-46.66 46.66Zm256.66 0-240-240 240-240L752-674 559-480.67l193 193.34-46.67 46.66Z"/>
+  </svg>
+  `;
+}
+
+export function createFastDoubleForwardSVG(
+  svgClasses: string[],
+  svgUseHtml: string,
+  svgPathClasses: string[]
+): string {
+  return `
+  <svg class="${svgClasses.join(' ')}" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
+   ${svgUseHtml.replace(
+     /xlink:href="#.*"/,
+     'xlink:href="#custom-path-double-forward"'
+   )}
+    <path id="custom-path-double-forward" class="${svgPathClasses.join(' ')}" d="M401.67-480.67 208.67-674l46.66-46.67 240 240-240 240-46.66-46.66 193-193.34Zm256.66 0L465.33-674 512-720.67l240 240-240 240-46.67-46.66 193-193.34Z"/>
+  </svg>
+  `;
+}
+
+export function createTitle(
+  seconds: number,
+  direction: 'back' | 'forward',
+  suffix = ''
+): string {
+  return `Go ${direction} ${numberFormat(seconds)}${suffix}`;
+}
+
 export function createRewindButtonTitle(
   seconds: number,
   shouldOverrideArrowKeys: boolean
 ): string {
   const title: string =
     shouldOverrideArrowKeys || seconds === 5 ? ' (left arrow)' : '';
-  return `Go back ${numberFormat(seconds)}${title}`;
+  return createTitle(seconds, 'back', title);
 }
 
 export function createForwardButtonTitle(
@@ -75,7 +115,7 @@ export function createForwardButtonTitle(
 ): string {
   const title: string =
     shouldOverrideArrowKeys || seconds === 5 ? ' (right arrow)' : '';
-  return `Go forward ${numberFormat(seconds)}${title}`;
+  return createTitle(seconds, 'forward', title);
 }
 
 export function numberFormat(value: number): string {
