@@ -5,6 +5,9 @@ import {
   createRewindButtonTitle,
   createFastForwardSVG,
   createForwardButtonTitle,
+  createTitle,
+  createFastDoubleRewindSVG,
+  createFastDoubleForwardSVG,
 } from './helper';
 import { updateVideoTime } from './handle-video-player';
 import { handleTooltipOnMouseOver, handleTooltipOnMouseLeave } from './tooltip';
@@ -20,8 +23,9 @@ export function handleArrowButtons({
   seconds,
   video,
   updateType,
+  isForceUpdate,
 }: VideoTimeArg): void {
-  if (seconds === 5) {
+  if (seconds === 5 && !isForceUpdate) {
     simulateKey(updateType);
   } else {
     updateVideoTime({ seconds, video, updateType });
@@ -37,6 +41,41 @@ export function getButtons(
   fastForwardButton: HTMLButtonElement;
 } {
   const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } = options;
+  return createMainButtons(video, extraStyles, {
+    shouldOverrideArrowKeys,
+    rewindSeconds,
+    forwardSeconds,
+  });
+}
+
+export function getSecondaryButtons(
+  options: IOptions,
+  video: HTMLVideoElement,
+  extraStyles: ButtonExtraStylesArg
+): {
+  doubleRewindButton: HTMLButtonElement;
+  doubleForwardButton: HTMLButtonElement;
+} {
+  const { shouldOverrideArrowKeys, secondarySeconds } = options;
+  const { rewindSeconds, forwardSeconds } = secondarySeconds;
+  return createSecondaryButtons(video, extraStyles, {
+    shouldOverrideArrowKeys,
+    rewindSeconds,
+    forwardSeconds,
+  });
+}
+
+function createMainButtons(
+  video: HTMLVideoElement,
+  extraStyles: ButtonExtraStylesArg,
+  secondsData: {
+    shouldOverrideArrowKeys: boolean;
+    rewindSeconds: number;
+    forwardSeconds: number;
+  }
+) {
+  const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } =
+    secondsData;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
   // set the buttons
@@ -72,6 +111,54 @@ export function getButtons(
   fastForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
 
   return { fastRewindButton, fastForwardButton };
+}
+
+function createSecondaryButtons(
+  video: HTMLVideoElement,
+  extraStyles: ButtonExtraStylesArg,
+  secondsData: {
+    shouldOverrideArrowKeys: boolean;
+    rewindSeconds: number;
+    forwardSeconds: number;
+  }
+) {
+  const { rewindSeconds, forwardSeconds } = secondsData;
+  const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
+
+  // set the buttons
+  const doubleRewindButton: HTMLButtonElement = createButton({
+    svg: createFastDoubleRewindSVG(svgClasses, svgUseHtml, svgPathClasses),
+    title: createTitle(rewindSeconds, 'back'),
+    id: ButtonClassesIds.DOUBLE_REWIND_ID,
+  });
+  const doubleForwardButton: HTMLButtonElement = createButton({
+    svg: createFastDoubleForwardSVG(svgClasses, svgUseHtml, svgPathClasses),
+    title: createTitle(forwardSeconds, 'forward'),
+    id: ButtonClassesIds.DOUBLE_FORWARD_ID,
+  });
+
+  // add events listener
+  doubleRewindButton.addEventListener('click', () => {
+    updateVideoTime({
+      seconds: rewindSeconds,
+      video,
+      updateType: ArrowKey.ARROW_LEFT_KEY,
+    });
+  });
+  doubleForwardButton.addEventListener('click', () => {
+    updateVideoTime({
+      seconds: forwardSeconds,
+      video,
+      updateType: ArrowKey.ARROW_RIGHT_KEY,
+    });
+  });
+
+  doubleRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+  doubleRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+  doubleForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+  doubleForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+
+  return { doubleRewindButton, doubleForwardButton };
 }
 
 export function updateButtonsTitles(newOptions: IOptions): void {
@@ -129,9 +216,22 @@ export function addButtonsToVideo(
     }
   );
 
-  // add the buttons to the player
-  playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
-  playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+  // add the buttons to the player, if checkboxIsEnabled is true add also the secondary buttons
+  if (newOptions.secondarySeconds.checkboxIsEnabled) {
+    const { doubleRewindButton, doubleForwardButton } =
+      exportFunctions.getSecondaryButtons(newOptions, video, {
+        svgClasses,
+        svgPathClasses,
+        svgUseHtml,
+      });
+    playerNextButton.insertAdjacentElement('afterend', doubleForwardButton);
+    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
+    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+    playerNextButton.insertAdjacentElement('afterend', doubleRewindButton);
+  } else {
+    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
+    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+  }
 }
 
 export function updateButtons(
@@ -153,6 +253,7 @@ export function updateButtons(
 const exportFunctions = {
   handleArrowButtons,
   getButtons,
+  getSecondaryButtons,
   updateButtonsTitles,
   addButtonsToVideo,
 };

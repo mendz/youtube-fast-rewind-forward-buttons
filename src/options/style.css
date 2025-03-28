@@ -1,10 +1,11 @@
 :root {
   --white: #fff;
   --black: #212529;
-  --blue: #0d6efd;
-  --dark-blue: #0c5ae9;
-  --red: #ec474f;
-  --dark-red: #dc3545;
+  --gray: #f8f9fa;
+  --blue: #0b5ed7;
+  --dark-blue: #0a58ca;
+  --red: #f03e3e;
+  --dark-red: #c92a2a;
 }
 
 *,
@@ -127,6 +128,7 @@ input[type='checkbox'] {
   grid-auto-columns: 1fr;
   grid-template-areas:
     'seconds'
+    'secondary-seconds'
     'checkboxes'
     'buttons';
   place-content: center;
@@ -152,6 +154,7 @@ input[type='checkbox'] {
     grid-auto-columns: 1fr;
     grid-template-areas:
       'seconds'
+      'secondary-seconds'
       'checkboxes'
       'buttons';
     margin-top: 0.5rem;
@@ -165,6 +168,32 @@ input[type='checkbox'] {
 
 .seconds-change-container {
   grid-area: seconds;
+}
+
+.secondary-seconds-container {
+  grid-area: secondary-seconds;
+  width: 100%;
+
+  & fieldset {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &:disabled {
+      background-color: var(--gray);
+      cursor: not-allowed;
+      user-select: none;
+
+      & > *,
+      & input {
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+:is(.seconds-change-container, .secondary-seconds-container) {
   display: flex;
   gap: 0.5rem;
   flex-direction: column;
