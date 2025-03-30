@@ -244,8 +244,16 @@ export function updateButtons(
   const currentForwardButton = document.querySelector(
     `button#${ButtonClassesIds.FORWARD_ID}`
   );
+  const currentDoubleRewindButton = document.querySelector(
+    `button#${ButtonClassesIds.DOUBLE_REWIND_ID}`
+  );
+  const currentDoubleForwardButton = document.querySelector(
+    `button#${ButtonClassesIds.DOUBLE_FORWARD_ID}`
+  );
   currentRewindButton?.remove();
   currentForwardButton?.remove();
+  currentDoubleRewindButton?.remove();
+  currentDoubleForwardButton?.remove();
   addButtonsToVideo(newOptions, video);
 }
 
