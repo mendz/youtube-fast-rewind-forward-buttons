@@ -1,19 +1,19 @@
 import { chrome } from 'jest-chrome';
-import { ArrowKey, ButtonClassesIds } from '../types';
 import {
   DEFAULT_OPTIONS_MOCK,
-  SVG_CLASSES_MOCK,
-  SVG_PATH_CLASSES_MOCK,
-  SVG_FORWARD_USE_HTML_MOCK,
-  SVG_REWIND_USE_HTML_MOCK,
   HTML_PLAYER_FULL,
-  SVG_DOUBLE_REWIND_USE_HTML_MOCK,
+  SVG_CLASSES_MOCK,
   SVG_DOUBLE_FORWARD_USE_HTML_MOCK,
+  SVG_DOUBLE_REWIND_USE_HTML_MOCK,
+  SVG_FORWARD_USE_HTML_MOCK,
+  SVG_PATH_CLASSES_MOCK,
+  SVG_REWIND_USE_HTML_MOCK,
 } from '../__utils__/tests-helper';
-import * as eventKeys from '../event-keys';
-import * as handleVideoPlayer from '../handle-video-player';
 import buttons, { addButtonsToVideo, handleArrowButtons } from '../buttons';
 import { loadOptions } from '../content';
+import * as eventKeys from '../event-keys';
+import * as handleVideoPlayer from '../handle-video-player';
+import { ArrowKey, ButtonClassesIds } from '../types';
 
 describe('handleArrowButtons', () => {
   const videoElement = document.createElement('video');
@@ -216,5 +216,60 @@ describe('addButtonsToVideo', () => {
       svgPathClasses: ['ytp-svg-fill'],
       svgUseHtml: '<use></use>',
     });
+  });
+});
+
+describe('addButtonsToVideo order insertion', () => {
+  let dummyVideo: HTMLVideoElement;
+  beforeEach(() => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    dummyVideo = document.createElement('video');
+  });
+
+  function getSiblingsAfterNextButton(): HTMLElement[] {
+    const nextButton = document.querySelector('a.ytp-next-button');
+    const siblings: HTMLElement[] = [];
+    let el = nextButton?.nextElementSibling as HTMLElement | null;
+    while (el) {
+      siblings.push(el);
+      el = el.nextElementSibling as HTMLElement | null;
+    }
+    return siblings;
+  }
+
+  it('inserts buttons in correct order when secondary checkbox is enabled', () => {
+    addButtonsToVideo(
+      {
+        ...DEFAULT_OPTIONS_MOCK,
+        secondarySeconds: {
+          checkboxIsEnabled: true,
+          rewindSeconds: 5,
+          forwardSeconds: 5,
+        },
+      },
+      dummyVideo
+    );
+    const siblings = getSiblingsAfterNextButton();
+    // Insertion calls produce final order: [DOUBLE_REWIND, REWIND, FORWARD, DOUBLE_FORWARD]
+    const expectedOrder = [
+      ButtonClassesIds.DOUBLE_REWIND_ID,
+      ButtonClassesIds.REWIND_ID,
+      ButtonClassesIds.FORWARD_ID,
+      ButtonClassesIds.DOUBLE_FORWARD_ID,
+    ];
+    const actualOrder = siblings.map((el) => el.id);
+    expect(actualOrder).toEqual(expectedOrder);
+  });
+
+  it('inserts buttons in correct order when secondary checkbox is disabled', () => {
+    addButtonsToVideo(DEFAULT_OPTIONS_MOCK, dummyVideo);
+    const siblings = getSiblingsAfterNextButton();
+    // Insertion calls produce final order: [REWIND, FORWARD]
+    const expectedOrder = [
+      ButtonClassesIds.REWIND_ID,
+      ButtonClassesIds.FORWARD_ID,
+    ];
+    const actualOrder = siblings.map((el) => el.id);
+    expect(actualOrder).toEqual(expectedOrder);
   });
 });

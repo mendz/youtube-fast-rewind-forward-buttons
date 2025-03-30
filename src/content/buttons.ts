@@ -1,16 +1,16 @@
 import { simulateKey } from './event-keys';
+import { updateVideoTime } from './handle-video-player';
 import {
   createButton,
-  createFastRewindSVG,
-  createRewindButtonTitle,
-  createFastForwardSVG,
-  createForwardButtonTitle,
-  createTitle,
-  createFastDoubleRewindSVG,
   createFastDoubleForwardSVG,
+  createFastDoubleRewindSVG,
+  createFastForwardSVG,
+  createFastRewindSVG,
+  createForwardButtonTitle,
+  createRewindButtonTitle,
+  createTitle,
 } from './helper';
-import { updateVideoTime } from './handle-video-player';
-import { handleTooltipOnMouseOver, handleTooltipOnMouseLeave } from './tooltip';
+import { handleTooltipOnMouseLeave, handleTooltipOnMouseOver } from './tooltip';
 import {
   ArrowKey,
   ButtonClassesIds,
