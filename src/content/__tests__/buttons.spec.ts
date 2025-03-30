@@ -7,6 +7,8 @@ import {
   SVG_FORWARD_USE_HTML_MOCK,
   SVG_REWIND_USE_HTML_MOCK,
   HTML_PLAYER_FULL,
+  SVG_DOUBLE_REWIND_USE_HTML_MOCK,
+  SVG_DOUBLE_FORWARD_USE_HTML_MOCK,
 } from '../__utils__/tests-helper';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
@@ -113,6 +115,75 @@ describe('getButtons', () => {
     expect(rewindSvg?.querySelector('use')?.outerHTML).toBe(
       SVG_REWIND_USE_HTML_MOCK
     );
+  });
+});
+
+describe('getSecondaryButtons', () => {
+  const video = document.createElement('video');
+
+  const { doubleRewindButton, doubleForwardButton } =
+    buttons.getSecondaryButtons(DEFAULT_OPTIONS_MOCK, video, {
+      svgClasses: SVG_CLASSES_MOCK,
+      svgPathClasses: SVG_PATH_CLASSES_MOCK,
+      svgUseHtml: SVG_FORWARD_USE_HTML_MOCK,
+    });
+
+  it('Should get the doubleRewindButton values and the correct svg', () => {
+    const rewindSvg = doubleRewindButton.querySelector('svg');
+
+    expect(doubleForwardButton.id).toBe(ButtonClassesIds.DOUBLE_FORWARD_ID);
+    expect(doubleRewindButton.title.toLowerCase()).toContain('back');
+    expect(doubleForwardButton.title.toLowerCase()).toContain('forward');
+    expect(rewindSvg).not.toBeNull();
+    // check svg element classes
+    expect(rewindSvg?.classList.contains(SVG_CLASSES_MOCK[0])).toBe(true);
+    expect(
+      rewindSvg
+        ?.querySelector('path')
+        ?.classList.contains(SVG_PATH_CLASSES_MOCK[0])
+    ).toBe(true);
+    expect(rewindSvg?.querySelector('use')?.outerHTML).toBe(
+      SVG_DOUBLE_REWIND_USE_HTML_MOCK
+    );
+  });
+
+  it('Should get the doubleForwardButton values and the correct svg', () => {
+    const forwardSvg = doubleForwardButton.querySelector('svg');
+
+    expect(doubleForwardButton.id).toBe(ButtonClassesIds.DOUBLE_FORWARD_ID);
+    expect(doubleRewindButton.title.toLowerCase()).toContain('back');
+    expect(doubleForwardButton.title.toLowerCase()).toContain('forward');
+    expect(forwardSvg).not.toBeNull();
+    // check svg element classes
+    expect(forwardSvg?.classList.contains(SVG_CLASSES_MOCK[0])).toBe(true);
+    expect(
+      forwardSvg
+        ?.querySelector('path')
+        ?.classList.contains(SVG_PATH_CLASSES_MOCK[0])
+    ).toBe(true);
+    expect(forwardSvg?.querySelector('use')?.outerHTML).toBe(
+      SVG_DOUBLE_FORWARD_USE_HTML_MOCK
+    );
+  });
+
+  it('should run updateVideoTime on button click', () => {
+    const updateVideoTimeSpy = jest.spyOn(handleVideoPlayer, 'updateVideoTime');
+    // simulate click on doubleRewindButton
+    doubleRewindButton.click();
+    expect(updateVideoTimeSpy).toHaveBeenCalledWith({
+      seconds: DEFAULT_OPTIONS_MOCK.secondarySeconds.rewindSeconds,
+      video,
+      updateType: ArrowKey.ARROW_LEFT_KEY,
+    });
+    updateVideoTimeSpy.mockClear();
+    // simulate click on doubleForwardButton
+    doubleForwardButton.click();
+    expect(updateVideoTimeSpy).toHaveBeenCalledWith({
+      seconds: DEFAULT_OPTIONS_MOCK.secondarySeconds.forwardSeconds,
+      video,
+      updateType: ArrowKey.ARROW_RIGHT_KEY,
+    });
+    updateVideoTimeSpy.mockRestore();
   });
 });
 
