@@ -218,23 +218,23 @@ export function updateButtons(
   newOptions: IOptions,
   video: HTMLVideoElement
 ): void {
-  const currentRewindButton = document.querySelector(
-    `button#${ButtonClassesIds.REWIND_ID}`
-  );
-  const currentForwardButton = document.querySelector(
-    `button#${ButtonClassesIds.FORWARD_ID}`
-  );
-  const currentDoubleRewindButton = document.querySelector(
-    `button#${ButtonClassesIds.DOUBLE_REWIND_ID}`
-  );
-  const currentDoubleForwardButton = document.querySelector(
-    `button#${ButtonClassesIds.DOUBLE_FORWARD_ID}`
-  );
-  currentRewindButton?.remove();
-  currentForwardButton?.remove();
-  currentDoubleRewindButton?.remove();
-  currentDoubleForwardButton?.remove();
-  addButtonsToVideo(newOptions, video);
+  // Ensure buttons are removed if they exist
+  const buttonIds = [
+    ButtonClassesIds.REWIND_ID,
+    ButtonClassesIds.FORWARD_ID,
+    ButtonClassesIds.DOUBLE_REWIND_ID,
+    ButtonClassesIds.DOUBLE_FORWARD_ID,
+  ];
+
+  buttonIds.forEach((id) => {
+    const button = document.querySelector(`button#${id}`);
+    if (button) {
+      button.remove();
+    }
+  });
+
+  // Add new buttons to the video
+  exportFunctions.addButtonsToVideo(newOptions, video);
 }
 
 // https://medium.com/@DavideRama/mock-spy-exported-functions-within-a-single-module-in-jest-cdf2b61af642

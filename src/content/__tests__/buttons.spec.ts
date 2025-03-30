@@ -9,7 +9,11 @@ import {
   SVG_PATH_CLASSES_MOCK,
   SVG_REWIND_USE_HTML_MOCK,
 } from '../__utils__/tests-helper';
-import buttons, { addButtonsToVideo, handleArrowButtons } from '../buttons';
+import buttons, {
+  addButtonsToVideo,
+  handleArrowButtons,
+  updateButtons,
+} from '../buttons';
 import { loadOptions } from '../content';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
@@ -196,7 +200,7 @@ describe('addButtonsToVideo', () => {
     document.querySelector('svg use')?.remove();
 
     addButtonsToVideo(options, video);
-    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
+    expect(getButtonsSpy).toHaveBeenCalledWith(DEFAULT_OPTIONS_MOCK, video, {
       svgClasses: [],
       svgPathClasses: [],
       svgUseHtml: '',
@@ -211,7 +215,7 @@ describe('addButtonsToVideo', () => {
     document.querySelector('svg')?.classList.add('test-class');
     video = document.querySelector('video') as HTMLVideoElement;
     addButtonsToVideo(options, video);
-    expect(getButtonsSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video, {
+    expect(getButtonsSpy).toHaveBeenCalledWith(DEFAULT_OPTIONS_MOCK, video, {
       svgClasses: ['test-class'],
       svgPathClasses: ['ytp-svg-fill'],
       svgUseHtml: '<use></use>',
@@ -271,5 +275,65 @@ describe('addButtonsToVideo order insertion', () => {
     ];
     const actualOrder = siblings.map((el) => el.id);
     expect(actualOrder).toEqual(expectedOrder);
+  });
+});
+
+describe('updateButtons', () => {
+  let removeSpyRewind: jest.SpyInstance;
+  let removeSpyForward: jest.SpyInstance;
+  let removeSpyDoubleRewind: jest.SpyInstance;
+  let removeSpyDoubleForward: jest.SpyInstance;
+  let addButtonsToVideoSpy: jest.SpyInstance;
+  let dummyVideo: HTMLVideoElement;
+  const newOptions = { ...DEFAULT_OPTIONS_MOCK };
+
+  beforeEach(() => {
+    removeSpyRewind = jest.fn();
+    removeSpyForward = jest.fn();
+    removeSpyDoubleRewind = jest.fn();
+    removeSpyDoubleForward = jest.fn();
+
+    document.body.innerHTML = HTML_PLAYER_FULL;
+
+    // Setup dummy buttons with spied remove methods.
+    const rewindButton = document.createElement('button');
+    rewindButton.id = ButtonClassesIds.REWIND_ID;
+    rewindButton.remove = removeSpyRewind as any;
+
+    const forwardButton = document.createElement('button');
+    forwardButton.id = ButtonClassesIds.FORWARD_ID;
+    forwardButton.remove = removeSpyForward as any;
+
+    const doubleRewindButton = document.createElement('button');
+    doubleRewindButton.id = ButtonClassesIds.DOUBLE_REWIND_ID;
+    doubleRewindButton.remove = removeSpyDoubleRewind as any;
+
+    const doubleForwardButton = document.createElement('button');
+    doubleForwardButton.id = ButtonClassesIds.DOUBLE_FORWARD_ID;
+    doubleForwardButton.remove = removeSpyDoubleForward as any;
+
+    document.body.append(
+      rewindButton,
+      forwardButton,
+      doubleRewindButton,
+      doubleForwardButton
+    );
+
+    dummyVideo = document.createElement('video');
+    addButtonsToVideoSpy = jest.spyOn(buttons, 'addButtonsToVideo');
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    addButtonsToVideoSpy.mockRestore();
+  });
+
+  it('calls remove on each button and then addButtonsToVideo with correct args', () => {
+    updateButtons(newOptions, dummyVideo);
+    expect(removeSpyRewind).toHaveBeenCalledTimes(1);
+    expect(removeSpyForward).toHaveBeenCalledTimes(1);
+    expect(removeSpyDoubleRewind).toHaveBeenCalledTimes(1);
+    expect(removeSpyDoubleForward).toHaveBeenCalledTimes(1);
+    expect(addButtonsToVideoSpy).toHaveBeenCalledWith(newOptions, dummyVideo);
   });
 });
