@@ -161,26 +161,6 @@ function createSecondaryButtons(
   return { doubleRewindButton, doubleForwardButton };
 }
 
-export function updateButtonsTitles(newOptions: IOptions): void {
-  const { forwardSeconds, rewindSeconds, shouldOverrideArrowKeys } = newOptions;
-  // set the buttons titles
-  const rewindButton = document.querySelector(
-    `button#${ButtonClassesIds.REWIND_ID}`
-  ) as HTMLButtonElement;
-  const forwardButton = document.querySelector(
-    `button#${ButtonClassesIds.FORWARD_ID}`
-  ) as HTMLButtonElement;
-
-  rewindButton.title = createRewindButtonTitle(
-    rewindSeconds,
-    shouldOverrideArrowKeys
-  );
-  forwardButton.title = createForwardButtonTitle(
-    forwardSeconds,
-    shouldOverrideArrowKeys
-  );
-}
-
 /**
  * @throws Error when there is no player next button
  */
@@ -262,7 +242,6 @@ const exportFunctions = {
   handleArrowButtons,
   getButtons,
   getSecondaryButtons,
-  updateButtonsTitles,
   addButtonsToVideo,
 };
 
