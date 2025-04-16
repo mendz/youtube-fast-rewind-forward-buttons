@@ -16,6 +16,11 @@ export const OPTIONS_DEFAULT_VALUES = {
   rewindSecondsInput: '5',
   forwardSecondsInput: '5',
   shouldOverrideKeysCheckbox: false,
+  secondarySeconds: {
+    checkboxIsEnabled: false,
+    rewindSeconds: '5',
+    forwardSeconds: '5',
+  },
 };
 
 export const OPTIONS_CHANGED_VALUES = {
@@ -24,6 +29,13 @@ export const OPTIONS_CHANGED_VALUES = {
   forwardSecondsInput: '50',
   complexForwardSecondsInput: '4121',
   shouldOverrideKeysCheckbox: true,
+  secondarySeconds: {
+    checkboxIsEnabled: false,
+    rewindSeconds: '15',
+    forwardSeconds: '20',
+    complexForwardSecondaryInput: '4121',
+    complexRewindSecondaryInput: '4121',
+  },
 };
 
 export const BUTTON_SUBMIT_SELECTOR = 'button[type="submit"]';
@@ -319,21 +331,38 @@ export async function fillInputsWithChangedValues(
   forwardSecondsInput: Locator,
   shouldOverrideKeysCheckbox: Locator,
   shouldOverrideMediaKeysCheckbox: Locator,
-  isComplex = false
-) {
-  if (isComplex) {
-    await rewindSecondsInput.fill(
-      OPTIONS_CHANGED_VALUES.complexRewindSecondsInput
-    );
-    await forwardSecondsInput.fill(
-      OPTIONS_CHANGED_VALUES.complexForwardSecondsInput
-    );
-  } else {
-    await rewindSecondsInput.fill(OPTIONS_CHANGED_VALUES.rewindSecondsInput);
-    await forwardSecondsInput.fill(OPTIONS_CHANGED_VALUES.forwardSecondsInput);
+  isComplex = false,
+  secondarySeconds?: {
+    checkboxIsEnabledInput: Locator;
+    rewindSecondsInput?: Locator;
+    forwardSecondsInput?: Locator;
   }
+) {
+  const rewindValue = isComplex
+    ? OPTIONS_CHANGED_VALUES.complexRewindSecondsInput
+    : OPTIONS_CHANGED_VALUES.rewindSecondsInput;
+  const forwardValue = isComplex
+    ? OPTIONS_CHANGED_VALUES.complexForwardSecondsInput
+    : OPTIONS_CHANGED_VALUES.forwardSecondsInput;
+
+  await rewindSecondsInput.fill(rewindValue);
+  await forwardSecondsInput.fill(forwardValue);
+
   await shouldOverrideKeysCheckbox.check();
   await shouldOverrideMediaKeysCheckbox.check();
+
+  if (secondarySeconds?.checkboxIsEnabledInput) {
+    await secondarySeconds.checkboxIsEnabledInput.check();
+    const secondaryRewindValue = isComplex
+      ? OPTIONS_CHANGED_VALUES.secondarySeconds.complexRewindSecondaryInput
+      : OPTIONS_CHANGED_VALUES.secondarySeconds.rewindSeconds;
+    const secondaryForwardValue = isComplex
+      ? OPTIONS_CHANGED_VALUES.secondarySeconds.complexForwardSecondaryInput
+      : OPTIONS_CHANGED_VALUES.secondarySeconds.forwardSeconds;
+
+    await secondarySeconds.rewindSecondsInput?.fill(secondaryRewindValue);
+    await secondarySeconds.forwardSecondsInput?.fill(secondaryForwardValue);
+  }
 }
 
 export function getOptionsInputs(page: Page) {
@@ -347,6 +376,14 @@ export function getOptionsInputs(page: Page) {
   );
   const rewindOutput = page.locator('output#rewindValue');
   const forwardOutput = page.locator('output#forwardValue');
+
+  const rewindSecondaryInput = page.locator('input#rewind-secondary');
+  const forwardSecondaryInput = page.locator('input#forward-secondary');
+
+  const rewindSecondaryOutput = page.locator('output#rewind-secondaryValue');
+  const forwardSecondaryOutput = page.locator('output#forward-secondaryValue');
+  const enableMoreButtonsCheckbox = page.locator('input#enable-more-buttons');
+
   return {
     rewindSecondsInput,
     forwardSecondsInput,
@@ -354,6 +391,11 @@ export function getOptionsInputs(page: Page) {
     shouldOverrideMediaKeysCheckbox,
     rewindOutput,
     forwardOutput,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    rewindSecondaryOutput,
+    forwardSecondaryOutput,
+    enableMoreButtonsCheckbox,
   };
 }
 
