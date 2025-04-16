@@ -440,6 +440,176 @@ test('should show the correct title for the buttons when hover', async ({
   });
 });
 
+test('should show secondary seconds buttons when enabled', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToOptionsPageStep(optionPage, optionFilePath);
+
+  await test.step('Enable secondary seconds buttons', async () => {
+    const {
+      enableMoreButtonsCheckbox,
+      rewindSecondaryInput,
+      forwardSecondaryInput,
+    } = getOptionsInputs(optionPage);
+
+    await enableMoreButtonsCheckbox.check();
+    await rewindSecondaryInput.fill('15');
+    await forwardSecondaryInput.fill('20');
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await navigateToYoutubeStep(videoPage);
+
+  await test.step('Verify secondary seconds buttons are present and functional', async () => {
+    const { video, secondaryForwardButton, secondaryRewindButton } =
+      getVideoLocatorElements(videoPage);
+
+    await setVideoTime(video, 0);
+
+    await secondaryForwardButton.click();
+    let currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(20);
+
+    await secondaryRewindButton.click();
+    currentTime = await getVideoTime(video);
+    expect(currentTime).toBe(5);
+  });
+});
+
+test('should hide secondary seconds buttons when disabled', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToOptionsPageStep(optionPage, optionFilePath);
+
+  await test.step('Disable secondary seconds buttons', async () => {
+    const { enableMoreButtonsCheckbox } = getOptionsInputs(optionPage);
+
+    await enableMoreButtonsCheckbox.uncheck();
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await navigateToYoutubeStep(videoPage);
+
+  await test.step('Verify secondary seconds buttons are not present', async () => {
+    const { secondaryForwardButton, secondaryRewindButton } =
+      getVideoLocatorElements(videoPage);
+
+    await expect(secondaryRewindButton).not.toBeVisible();
+    await expect(secondaryForwardButton).not.toBeVisible();
+  });
+});
+
+test('should toggle secondary seconds buttons dynamically', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToOptionsPageStep(optionPage, optionFilePath);
+
+  await test.step('Enable secondary seconds buttons', async () => {
+    const { enableMoreButtonsCheckbox } = getOptionsInputs(optionPage);
+
+    await enableMoreButtonsCheckbox.check();
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await navigateToYoutubeStep(videoPage);
+
+  await test.step('Verify secondary seconds buttons are present', async () => {
+    const { secondaryForwardButton, secondaryRewindButton } =
+      getVideoLocatorElements(videoPage);
+
+    await expect(secondaryRewindButton).toBeVisible();
+    await expect(secondaryForwardButton).toBeVisible();
+  });
+
+  await test.step('Disable secondary seconds buttons', async () => {
+    const optionPage = await context.newPage();
+    await optionPage.goto(optionFilePath);
+
+    const { enableMoreButtonsCheckbox } = getOptionsInputs(optionPage);
+
+    await enableMoreButtonsCheckbox.uncheck();
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await test.step('Verify secondary seconds buttons are not present', async () => {
+    const { secondaryForwardButton, secondaryRewindButton } =
+      getVideoLocatorElements(videoPage);
+
+    await expect(secondaryRewindButton).not.toBeVisible();
+    await expect(secondaryForwardButton).not.toBeVisible();
+  });
+});
+
+test('should show the correct title for the secondary buttons when hover', async ({
+  page: videoPage,
+  context,
+  extensionId,
+}) => {
+  const optionPage = await context.newPage();
+  const optionFilePath = await getOptionFilePath(extensionId);
+
+  await navigateToOptionsPageStep(optionPage, optionFilePath);
+
+  await test.step('Enable secondary seconds buttons and set values', async () => {
+    const {
+      enableMoreButtonsCheckbox,
+      rewindSecondaryInput,
+      forwardSecondaryInput,
+    } = getOptionsInputs(optionPage);
+
+    await enableMoreButtonsCheckbox.check();
+    await rewindSecondaryInput.fill('15');
+    await forwardSecondaryInput.fill('20');
+    await optionPage.locator(BUTTON_SUBMIT_SELECTOR).click();
+
+    expect(optionPage.isClosed()).toBe(true);
+  });
+
+  await navigateToYoutubeStep(videoPage);
+
+  await test.step('Verify secondary buttons show correct titles and aria-labels', async () => {
+    const { secondaryForwardButton, secondaryRewindButton } =
+      getVideoLocatorElements(videoPage);
+
+    expect(await secondaryForwardButton.getAttribute('aria-label')).toBe(
+      'Go forward 20 seconds'
+    );
+    expect(await secondaryForwardButton.getAttribute('title')).toBe(
+      'Go forward 20 seconds'
+    );
+
+    expect(await secondaryRewindButton.getAttribute('aria-label')).toBe(
+      'Go back 15 seconds'
+    );
+    expect(await secondaryRewindButton.getAttribute('title')).toBe(
+      'Go back 15 seconds'
+    );
+  });
+});
+
 function navigateToYoutubeStep(videoPage: Page) {
   return test.step('Navigate to YouTube page', async () => {
     await videoPage.goto(YOUTUBE_URL);

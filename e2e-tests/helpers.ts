@@ -73,7 +73,17 @@ export function getVideoLocatorElements(page: Page) {
   const video = page.locator('ytd-player video');
   const rewindButton = page.locator('#ml-custom-rewind-button');
   const forwardButton = page.locator('#ml-custom-forward-button');
-  return { forwardButton, video, rewindButton };
+  const secondaryRewindButton = page.locator('#ml-custom-double-rewind-button');
+  const secondaryForwardButton = page.locator(
+    '#ml-custom-double-forward-button'
+  );
+  return {
+    forwardButton,
+    video,
+    rewindButton,
+    secondaryRewindButton,
+    secondaryForwardButton,
+  };
 }
 
 export function getTooltip(page: Page): Locator {
