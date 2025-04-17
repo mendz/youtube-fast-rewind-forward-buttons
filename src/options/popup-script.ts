@@ -76,19 +76,18 @@ export async function saveOptions(): Promise<void> {
   } = getInputs();
   try {
     const secondarySeconds = {
-      checkboxIsEnabled: secondaryIsEnabled.checked,
-      rewindSeconds: '',
-      forwardSeconds: '',
+      checkboxIsEnabled:
+        OPTIONS_DEFAULT_VALUES.secondarySeconds.checkboxIsEnabled,
+      rewindSeconds:
+        OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString(),
+      forwardSeconds:
+        OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString(),
     };
 
     if (secondaryIsEnabled.checked) {
+      secondarySeconds.checkboxIsEnabled = secondaryIsEnabled.checked;
       secondarySeconds.rewindSeconds = secondaryRewindSeconds.value;
       secondarySeconds.forwardSeconds = secondaryForwardSeconds.value;
-    } else {
-      secondarySeconds.rewindSeconds =
-        OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString();
-      secondarySeconds.forwardSeconds =
-        OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString();
     }
 
     await chrome.storage.sync.set<IStorageOptions>({
