@@ -214,6 +214,15 @@ export function addButtonsToVideo(
   }
 }
 
+function removeButtonsByIds(buttonIds: string[]): void {
+  buttonIds.forEach((id) => {
+    const button = document.querySelector(`button#${id}`);
+    if (button) {
+      button.remove();
+    }
+  });
+}
+
 export function updateButtons(
   newOptions: IOptions,
   video: HTMLVideoElement
@@ -226,12 +235,7 @@ export function updateButtons(
     ButtonClassesIds.DOUBLE_FORWARD_ID,
   ];
 
-  buttonIds.forEach((id) => {
-    const button = document.querySelector(`button#${id}`);
-    if (button) {
-      button.remove();
-    }
-  });
+  removeButtonsByIds(buttonIds);
 
   // Add new buttons to the video
   exportFunctions.addButtonsToVideo(newOptions, video);

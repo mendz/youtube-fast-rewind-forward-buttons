@@ -75,18 +75,26 @@ export async function saveOptions(): Promise<void> {
     inputShouldOverrideMediaKeys: shouldOverrideMediaKeys,
   } = getInputs();
   try {
+    const secondarySeconds = {
+      checkboxIsEnabled: secondaryIsEnabled.checked,
+      rewindSeconds: '',
+      forwardSeconds: '',
+    };
+
+    if (secondaryIsEnabled.checked) {
+      secondarySeconds.rewindSeconds = secondaryRewindSeconds.value;
+      secondarySeconds.forwardSeconds = secondaryForwardSeconds.value;
+    } else {
+      secondarySeconds.rewindSeconds =
+        OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString();
+      secondarySeconds.forwardSeconds =
+        OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString();
+    }
+
     await chrome.storage.sync.set<IStorageOptions>({
       rewindSeconds: rewindSeconds.value,
       forwardSeconds: forwardSeconds.value,
-      secondarySeconds: {
-        checkboxIsEnabled: secondaryIsEnabled.checked,
-        rewindSeconds: secondaryIsEnabled.checked
-          ? secondaryRewindSeconds.value
-          : OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString(),
-        forwardSeconds: secondaryIsEnabled.checked
-          ? secondaryForwardSeconds.value
-          : OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString(),
-      },
+      secondarySeconds,
       shouldOverrideArrowKeys: shouldOverrideArrowKeys.checked,
       shouldOverrideMediaKeys: shouldOverrideMediaKeys.checked,
     });
