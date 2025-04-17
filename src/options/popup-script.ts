@@ -186,6 +186,7 @@ export async function resetToDefaultOptions(): Promise<void> {
     inputShouldOverrideMediaKeys.checked =
       OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
 
+    initializeOutputs();
     updateDisabledState();
   } catch (error) {
     console.error(error);
@@ -209,6 +210,8 @@ function initializeSecondsInputOutputListeners(
   const input = document.querySelector(`#${id}`) as HTMLInputElement;
   const value = document.querySelector(`#${id}Value`) as HTMLOutputElement;
   value.textContent = `(${numberFormat(Number(input.value))})`;
+
+  input.removeEventListener('input', () => {}); // Remove any previous listeners
 
   input.addEventListener('input', (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -234,7 +237,15 @@ function initializeSecondaryEnable() {
   ) as HTMLInputElement;
 
   updateDisabledState();
+
   enableCheckbox.addEventListener('change', updateDisabledState);
+}
+
+function initializeOutputs() {
+  initializeSecondsInputOutputListeners('rewind');
+  initializeSecondsInputOutputListeners('forward');
+  initializeSecondsInputOutputListeners('rewind-secondary');
+  initializeSecondsInputOutputListeners('forward-secondary');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -243,9 +254,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .querySelector('button#reset-values')
     ?.addEventListener('click', resetToDefaultOptions);
   await loadInputStorageOptions();
-  initializeSecondsInputOutputListeners('rewind');
-  initializeSecondsInputOutputListeners('forward');
-  initializeSecondsInputOutputListeners('rewind-secondary');
-  initializeSecondsInputOutputListeners('forward-secondary');
+  initializeOutputs();
   initializeSecondaryEnable();
 });
