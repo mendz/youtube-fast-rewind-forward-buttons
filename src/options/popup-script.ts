@@ -75,25 +75,14 @@ export async function saveOptions(): Promise<void> {
     inputShouldOverrideMediaKeys: shouldOverrideMediaKeys,
   } = getInputs();
   try {
-    const secondarySeconds = {
-      checkboxIsEnabled:
-        OPTIONS_DEFAULT_VALUES.secondarySeconds.checkboxIsEnabled,
-      rewindSeconds:
-        OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString(),
-      forwardSeconds:
-        OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString(),
-    };
-
-    if (secondaryIsEnabled.checked) {
-      secondarySeconds.checkboxIsEnabled = secondaryIsEnabled.checked;
-      secondarySeconds.rewindSeconds = secondaryRewindSeconds.value;
-      secondarySeconds.forwardSeconds = secondaryForwardSeconds.value;
-    }
-
     await chrome.storage.sync.set<IStorageOptions>({
       rewindSeconds: rewindSeconds.value,
       forwardSeconds: forwardSeconds.value,
-      secondarySeconds,
+      secondarySeconds: {
+        checkboxIsEnabled: secondaryIsEnabled.checked,
+        rewindSeconds: secondaryRewindSeconds.value,
+        forwardSeconds: secondaryForwardSeconds.value,
+      },
       shouldOverrideArrowKeys: shouldOverrideArrowKeys.checked,
       shouldOverrideMediaKeys: shouldOverrideMediaKeys.checked,
     });
@@ -172,6 +161,11 @@ export async function resetToDefaultOptions(): Promise<void> {
   const {
     inputRewindSeconds,
     inputForwardSeconds,
+    secondarySeconds: {
+      checkboxIsEnabled: inputSecondaryEnable,
+      inputRewindSeconds: inputSecondaryRewindSeconds,
+      inputForwardSeconds: inputSecondaryForwardSeconds,
+    },
     inputShouldOverrideArrowKeys,
     inputShouldOverrideMediaKeys,
   } = getInputs();
@@ -181,10 +175,18 @@ export async function resetToDefaultOptions(): Promise<void> {
     inputRewindSeconds.value = OPTIONS_DEFAULT_VALUES.rewindSeconds.toString();
     inputForwardSeconds.value =
       OPTIONS_DEFAULT_VALUES.forwardSeconds.toString();
+    inputSecondaryEnable.checked =
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.checkboxIsEnabled;
+    inputSecondaryRewindSeconds.value =
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds.toString();
+    inputSecondaryForwardSeconds.value =
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds.toString();
     inputShouldOverrideArrowKeys.checked =
       OPTIONS_DEFAULT_VALUES.shouldOverrideArrowKeys;
     inputShouldOverrideMediaKeys.checked =
       OPTIONS_DEFAULT_VALUES.shouldOverrideMediaKeys;
+
+    updateDisabledState();
   } catch (error) {
     console.error(error);
   }
@@ -215,7 +217,7 @@ function initializeSecondsInputOutputListeners(
   });
 }
 
-function initializeSecondaryEnable() {
+function updateDisabledState() {
   const enableCheckbox = document.querySelector(
     '#enable-more-buttons'
   ) as HTMLInputElement;
@@ -224,9 +226,15 @@ function initializeSecondaryEnable() {
   ) as HTMLFieldSetElement;
 
   secondaryFieldset.disabled = !enableCheckbox.checked;
-  enableCheckbox.addEventListener('change', () => {
-    secondaryFieldset.disabled = !enableCheckbox.checked;
-  });
+}
+
+function initializeSecondaryEnable() {
+  const enableCheckbox = document.querySelector(
+    '#enable-more-buttons'
+  ) as HTMLInputElement;
+
+  updateDisabledState();
+  enableCheckbox.addEventListener('change', updateDisabledState);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

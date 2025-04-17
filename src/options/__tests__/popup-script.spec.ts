@@ -228,34 +228,30 @@ describe('Options page', () => {
 
     it('should reset DOM with the default values', async () => {
       // setup
-      const pageInputs = Array.from(
-        document.querySelectorAll<HTMLInputElement>('input')
-      );
-      const forwardInput = pageInputs.find(
-        (input) => input.id === InputId.FORWARD
-      ) as HTMLInputElement;
-      forwardInput.value = '10';
-      const overrideArrowKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
-      ) as HTMLInputElement;
-      overrideArrowKeysInput.checked = true;
+      setInputValue(InputId.FORWARD, '10');
+      setInputValue(InputId.OVERRIDE_ARROW_KEYS, true);
+      setInputValue(InputId.ENABLE_MORE_BUTTONS, true);
+      setInputValue(InputId.REWIND_SECONDARY, '15');
+      setInputValue(InputId.FORWARD_SECONDARY, '20');
+
+      // verify setup values
+      expect(getInputValue(InputId.FORWARD)).toBe('10');
+      expect(getInputValue(InputId.OVERRIDE_ARROW_KEYS)).toBe(true);
+      expect(getInputValue(InputId.ENABLE_MORE_BUTTONS)).toBe(true);
+      expect(getInputValue(InputId.REWIND_SECONDARY)).toBe('15');
+      expect(getInputValue(InputId.FORWARD_SECONDARY)).toBe('20');
+
       (window.confirm as jest.Mock).mockReturnValue(true);
 
       // run
       await resetToDefaultOptions();
 
-      // test
-      const pageInputs2 = Array.from(
-        document.querySelectorAll<HTMLInputElement>('input')
-      );
-      const forwardInput2 = pageInputs2.find(
-        (input) => input.id === InputId.FORWARD
-      ) as HTMLInputElement;
-      const overrideArrowKeysInput2 = pageInputs2.find(
-        (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
-      ) as HTMLInputElement;
-      expect(forwardInput2.value).toBe('5');
-      expect(overrideArrowKeysInput2.checked).toBe(false);
+      // test default values
+      expect(getInputValue(InputId.FORWARD)).toBe('5');
+      expect(getInputValue(InputId.OVERRIDE_ARROW_KEYS)).toBe(false);
+      expect(getInputValue(InputId.ENABLE_MORE_BUTTONS)).toBe(false);
+      expect(getInputValue(InputId.REWIND_SECONDARY)).toBe('5');
+      expect(getInputValue(InputId.FORWARD_SECONDARY)).toBe('5');
     });
   });
 
@@ -269,3 +265,17 @@ describe('Options page', () => {
     });
   });
 });
+
+function setInputValue(id: InputId, value: string | boolean): void {
+  const input = document.querySelector<HTMLInputElement>(`#${id}`);
+  if (typeof value === 'boolean') {
+    input!.checked = value;
+  } else {
+    input!.value = value;
+  }
+}
+
+function getInputValue(id: InputId): string | boolean {
+  const input = document.querySelector<HTMLInputElement>(`#${id}`);
+  return input!.type === 'checkbox' ? input!.checked : input!.value;
+}
