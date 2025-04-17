@@ -1,13 +1,16 @@
 import { simulateKey } from './event-keys';
+import { updateVideoTime } from './handle-video-player';
 import {
   createButton,
-  createFastRewindSVG,
-  createRewindButtonTitle,
+  createFastDoubleForwardSVG,
+  createFastDoubleRewindSVG,
   createFastForwardSVG,
+  createFastRewindSVG,
   createForwardButtonTitle,
+  createRewindButtonTitle,
+  createTitle,
 } from './helper';
-import { updateVideoTime } from './handle-video-player';
-import { handleTooltipOnMouseOver, handleTooltipOnMouseLeave } from './tooltip';
+import { handleTooltipOnMouseLeave, handleTooltipOnMouseOver } from './tooltip';
 import {
   ArrowKey,
   ButtonClassesIds,
@@ -20,8 +23,9 @@ export function handleArrowButtons({
   seconds,
   video,
   updateType,
+  isForceUpdate,
 }: VideoTimeArg): void {
-  if (seconds === 5) {
+  if (seconds === 5 && !isForceUpdate) {
     simulateKey(updateType);
   } else {
     updateVideoTime({ seconds, video, updateType });
@@ -37,6 +41,41 @@ export function getButtons(
   fastForwardButton: HTMLButtonElement;
 } {
   const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } = options;
+  return createMainButtons(video, extraStyles, {
+    shouldOverrideArrowKeys,
+    rewindSeconds,
+    forwardSeconds,
+  });
+}
+
+export function getSecondaryButtons(
+  options: IOptions,
+  video: HTMLVideoElement,
+  extraStyles: ButtonExtraStylesArg
+): {
+  doubleRewindButton: HTMLButtonElement;
+  doubleForwardButton: HTMLButtonElement;
+} {
+  const { shouldOverrideArrowKeys, secondarySeconds } = options;
+  const { rewindSeconds, forwardSeconds } = secondarySeconds;
+  return createSecondaryButtons(video, extraStyles, {
+    shouldOverrideArrowKeys,
+    rewindSeconds,
+    forwardSeconds,
+  });
+}
+
+function createMainButtons(
+  video: HTMLVideoElement,
+  extraStyles: ButtonExtraStylesArg,
+  secondsData: {
+    shouldOverrideArrowKeys: boolean;
+    rewindSeconds: number;
+    forwardSeconds: number;
+  }
+) {
+  const { shouldOverrideArrowKeys, rewindSeconds, forwardSeconds } =
+    secondsData;
   const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
   // set the buttons
@@ -74,24 +113,52 @@ export function getButtons(
   return { fastRewindButton, fastForwardButton };
 }
 
-export function updateButtonsTitles(newOptions: IOptions): void {
-  const { forwardSeconds, rewindSeconds, shouldOverrideArrowKeys } = newOptions;
-  // set the buttons titles
-  const rewindButton = document.querySelector(
-    `button#${ButtonClassesIds.REWIND_ID}`
-  ) as HTMLButtonElement;
-  const forwardButton = document.querySelector(
-    `button#${ButtonClassesIds.FORWARD_ID}`
-  ) as HTMLButtonElement;
+function createSecondaryButtons(
+  video: HTMLVideoElement,
+  extraStyles: ButtonExtraStylesArg,
+  secondsData: {
+    shouldOverrideArrowKeys: boolean;
+    rewindSeconds: number;
+    forwardSeconds: number;
+  }
+) {
+  const { rewindSeconds, forwardSeconds } = secondsData;
+  const { svgClasses, svgUseHtml, svgPathClasses } = extraStyles;
 
-  rewindButton.title = createRewindButtonTitle(
-    rewindSeconds,
-    shouldOverrideArrowKeys
-  );
-  forwardButton.title = createForwardButtonTitle(
-    forwardSeconds,
-    shouldOverrideArrowKeys
-  );
+  // set the buttons
+  const doubleRewindButton: HTMLButtonElement = createButton({
+    svg: createFastDoubleRewindSVG(svgClasses, svgUseHtml, svgPathClasses),
+    title: createTitle(rewindSeconds, 'back'),
+    id: ButtonClassesIds.DOUBLE_REWIND_ID,
+  });
+  const doubleForwardButton: HTMLButtonElement = createButton({
+    svg: createFastDoubleForwardSVG(svgClasses, svgUseHtml, svgPathClasses),
+    title: createTitle(forwardSeconds, 'forward'),
+    id: ButtonClassesIds.DOUBLE_FORWARD_ID,
+  });
+
+  // add events listener
+  doubleRewindButton.addEventListener('click', () => {
+    updateVideoTime({
+      seconds: rewindSeconds,
+      video,
+      updateType: ArrowKey.ARROW_LEFT_KEY,
+    });
+  });
+  doubleForwardButton.addEventListener('click', () => {
+    updateVideoTime({
+      seconds: forwardSeconds,
+      video,
+      updateType: ArrowKey.ARROW_RIGHT_KEY,
+    });
+  });
+
+  doubleRewindButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+  doubleRewindButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+  doubleForwardButton.addEventListener('mouseenter', handleTooltipOnMouseOver);
+  doubleForwardButton.addEventListener('mouseleave', handleTooltipOnMouseLeave);
+
+  return { doubleRewindButton, doubleForwardButton };
 }
 
 /**
@@ -129,31 +196,56 @@ export function addButtonsToVideo(
     }
   );
 
-  // add the buttons to the player
-  playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
-  playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+  // add the buttons to the player, if checkboxIsEnabled is true add also the secondary buttons
+  if (newOptions.secondarySeconds.checkboxIsEnabled) {
+    const { doubleRewindButton, doubleForwardButton } =
+      exportFunctions.getSecondaryButtons(newOptions, video, {
+        svgClasses,
+        svgPathClasses,
+        svgUseHtml,
+      });
+    playerNextButton.insertAdjacentElement('afterend', doubleForwardButton);
+    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
+    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+    playerNextButton.insertAdjacentElement('afterend', doubleRewindButton);
+  } else {
+    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
+    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+  }
+}
+
+function removeButtonsByIds(buttonIds: string[]): void {
+  buttonIds.forEach((id) => {
+    const button = document.querySelector(`button#${id}`);
+    if (button) {
+      button.remove();
+    }
+  });
 }
 
 export function updateButtons(
   newOptions: IOptions,
   video: HTMLVideoElement
 ): void {
-  const currentRewindButton = document.querySelector(
-    `button#${ButtonClassesIds.REWIND_ID}`
-  );
-  const currentForwardButton = document.querySelector(
-    `button#${ButtonClassesIds.FORWARD_ID}`
-  );
-  currentRewindButton?.remove();
-  currentForwardButton?.remove();
-  addButtonsToVideo(newOptions, video);
+  // Ensure buttons are removed if they exist
+  const buttonIds = [
+    ButtonClassesIds.REWIND_ID,
+    ButtonClassesIds.FORWARD_ID,
+    ButtonClassesIds.DOUBLE_REWIND_ID,
+    ButtonClassesIds.DOUBLE_FORWARD_ID,
+  ];
+
+  removeButtonsByIds(buttonIds);
+
+  // Add new buttons to the video
+  exportFunctions.addButtonsToVideo(newOptions, video);
 }
 
 // https://medium.com/@DavideRama/mock-spy-exported-functions-within-a-single-module-in-jest-cdf2b61af642
 const exportFunctions = {
   handleArrowButtons,
   getButtons,
-  updateButtonsTitles,
+  getSecondaryButtons,
   addButtonsToVideo,
 };
 

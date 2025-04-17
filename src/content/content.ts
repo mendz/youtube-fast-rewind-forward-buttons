@@ -46,6 +46,11 @@ export async function loadOptions(): Promise<IOptions> {
   const defaultOptions: Readonly<IOptions> = {
     rewindSeconds: 5,
     forwardSeconds: 5,
+    secondarySeconds: {
+      checkboxIsEnabled: false,
+      forwardSeconds: 5,
+      rewindSeconds: 5,
+    },
     shouldOverrideKeys: false, // todo: removed in the next version
     shouldOverrideArrowKeys: false,
     shouldOverrideMediaKeys: false,
@@ -57,6 +62,14 @@ export async function loadOptions(): Promise<IOptions> {
 
     const rewindSeconds: number = parseInt(storageOptions?.rewindSeconds, 10);
     const forwardSeconds: number = parseInt(storageOptions?.forwardSeconds, 10);
+    const secondaryRewindSeconds: number = parseInt(
+      storageOptions?.secondarySeconds?.rewindSeconds,
+      10
+    );
+    const secondaryForwardSeconds: number = parseInt(
+      storageOptions?.secondarySeconds?.forwardSeconds,
+      10
+    );
 
     return {
       rewindSeconds: !Number.isNaN(rewindSeconds)
@@ -65,6 +78,17 @@ export async function loadOptions(): Promise<IOptions> {
       forwardSeconds: !Number.isNaN(forwardSeconds)
         ? forwardSeconds
         : defaultOptions.forwardSeconds,
+      secondarySeconds: {
+        checkboxIsEnabled:
+          storageOptions?.secondarySeconds?.checkboxIsEnabled ??
+          defaultOptions.secondarySeconds.checkboxIsEnabled,
+        rewindSeconds: !Number.isNaN(secondaryRewindSeconds)
+          ? secondaryRewindSeconds
+          : defaultOptions.secondarySeconds.rewindSeconds,
+        forwardSeconds: !Number.isNaN(secondaryForwardSeconds)
+          ? secondaryForwardSeconds
+          : defaultOptions.secondarySeconds.forwardSeconds,
+      },
       shouldOverrideArrowKeys: handleOverrideKeysMigration(
         defaultOptions,
         storageOptions
@@ -84,11 +108,19 @@ export function mergeOptions(
   currentOptions: IOptions
 ): IOptions {
   let changeForwardSeconds: Nullable<number> = parseInt(
-    newChangesOptions['forwardSeconds']?.newValue,
+    newChangesOptions.forwardSeconds?.newValue,
     10
   );
   let changeRewindSeconds: Nullable<number> = parseInt(
-    newChangesOptions['rewindSeconds']?.newValue,
+    newChangesOptions.rewindSeconds?.newValue,
+    10
+  );
+  let changeSecondaryForwardSeconds: Nullable<number> = parseInt(
+    newChangesOptions.secondarySeconds?.newValue?.forwardSeconds,
+    10
+  );
+  let changeSecondaryRewindSeconds: Nullable<number> = parseInt(
+    newChangesOptions.secondarySeconds?.newValue?.rewindSeconds,
     10
   );
 
@@ -98,10 +130,27 @@ export function mergeOptions(
   if (isNaN(changeRewindSeconds)) {
     changeRewindSeconds = null;
   }
+  if (isNaN(changeSecondaryForwardSeconds)) {
+    changeSecondaryForwardSeconds = null;
+  }
+  if (isNaN(changeSecondaryRewindSeconds)) {
+    changeSecondaryRewindSeconds = null;
+  }
 
   const newOptions: IOptions = {
     forwardSeconds: changeForwardSeconds ?? currentOptions.forwardSeconds,
     rewindSeconds: changeRewindSeconds ?? currentOptions.rewindSeconds,
+    secondarySeconds: {
+      checkboxIsEnabled:
+        newChangesOptions.secondarySeconds?.newValue?.checkboxIsEnabled ??
+        currentOptions.secondarySeconds.checkboxIsEnabled,
+      forwardSeconds:
+        changeSecondaryForwardSeconds ??
+        currentOptions.secondarySeconds.forwardSeconds,
+      rewindSeconds:
+        changeSecondaryRewindSeconds ??
+        currentOptions.secondarySeconds.rewindSeconds,
+    },
     shouldOverrideArrowKeys:
       newChangesOptions.shouldOverrideArrowKeys?.newValue ??
       currentOptions.shouldOverrideArrowKeys,

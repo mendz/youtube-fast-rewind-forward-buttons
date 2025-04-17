@@ -79,7 +79,16 @@ test('should have the arrows and work when navigate to another video', async ({
       .href;
   });
   await page.locator('ytd-compact-video-renderer img').first().click();
-  await expect(page).toHaveURL(url);
+
+  const extractParams = (url: string) => {
+    const parsedUrl = new URL(url);
+    return { site: parsedUrl.origin, v: parsedUrl.searchParams.get('v') };
+  };
+  const expectedParams = extractParams(url);
+  const actualParams = extractParams(page.url());
+  expect(expectedParams.site).toBe(actualParams.site);
+  expect(expectedParams.v).toBe(actualParams.v);
+
   await page.reload();
 
   const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);

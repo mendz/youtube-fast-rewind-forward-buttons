@@ -23,22 +23,40 @@ describe('Options page', () => {
   });
 
   describe('getInputs', () => {
-    it('Should return all 4 inputs', () => {
+    it('Should return all 5 inputs', () => {
       const inputs = getInputs();
-      expect(Object.keys(inputs).length).toBe(4);
+      expect(Object.keys(inputs).length).toBe(5);
     });
 
     it('Should return the same amounts of inputs in the page', () => {
       const pageInputs = document.querySelectorAll<HTMLInputElement>('input');
-      const functionInputs = getInputs();
+      const inputs = getInputs();
+      const flattenedInputs = [
+        inputs.inputRewindSeconds,
+        inputs.inputForwardSeconds,
+        inputs.secondarySeconds.checkboxIsEnabled,
+        inputs.secondarySeconds.inputRewindSeconds,
+        inputs.secondarySeconds.inputForwardSeconds,
+        inputs.inputShouldOverrideArrowKeys,
+        inputs.inputShouldOverrideMediaKeys,
+      ];
       expect(Array.from(pageInputs)).toStrictEqual(
-        Object.values(functionInputs)
+        Object.values(flattenedInputs)
       );
     });
 
     it('Should return inputs that match all the ids', () => {
       const inputs = getInputs();
-      const matchIds = Object.values(inputs).every((input) =>
+      const flattenedInputs = [
+        inputs.inputRewindSeconds,
+        inputs.inputForwardSeconds,
+        inputs.inputShouldOverrideArrowKeys,
+        inputs.inputShouldOverrideMediaKeys,
+        inputs.secondarySeconds.checkboxIsEnabled,
+        inputs.secondarySeconds.inputRewindSeconds,
+        inputs.secondarySeconds.inputForwardSeconds,
+      ];
+      const matchIds = flattenedInputs.every((input) =>
         INPUTS_IDS.includes(input.id as InputId)
       );
       expect(matchIds).toBe(true);
@@ -93,7 +111,7 @@ describe('Options page', () => {
       ) as HTMLInputElement;
       rewindInput.value = '10';
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
       overrideMediaKeysInput.checked = true;
 
@@ -103,6 +121,11 @@ describe('Options page', () => {
         forwardSeconds: '5',
         shouldOverrideArrowKeys: false,
         shouldOverrideMediaKeys: true,
+        secondarySeconds: {
+          checkboxIsEnabled: false,
+          forwardSeconds: '5',
+          rewindSeconds: '5',
+        },
       });
     });
   });
@@ -167,7 +190,7 @@ describe('Options page', () => {
         (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
       ) as HTMLInputElement;
       const overrideMediaKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_MEDIA_KAYS
+        (input) => input.id === InputId.OVERRIDE_MEDIA_KEYS
       ) as HTMLInputElement;
 
       expect(forwardInput.value).toBe('20');
@@ -205,34 +228,30 @@ describe('Options page', () => {
 
     it('should reset DOM with the default values', async () => {
       // setup
-      const pageInputs = Array.from(
-        document.querySelectorAll<HTMLInputElement>('input')
-      );
-      const forwardInput = pageInputs.find(
-        (input) => input.id === InputId.FORWARD
-      ) as HTMLInputElement;
-      forwardInput.value = '10';
-      const overrideArrowKeysInput = pageInputs.find(
-        (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
-      ) as HTMLInputElement;
-      overrideArrowKeysInput.checked = true;
+      setInputValue(InputId.FORWARD, '10');
+      setInputValue(InputId.OVERRIDE_ARROW_KEYS, true);
+      setInputValue(InputId.ENABLE_MORE_BUTTONS, true);
+      setInputValue(InputId.REWIND_SECONDARY, '15');
+      setInputValue(InputId.FORWARD_SECONDARY, '20');
+
+      // verify setup values
+      expect(getInputValue(InputId.FORWARD)).toBe('10');
+      expect(getInputValue(InputId.OVERRIDE_ARROW_KEYS)).toBe(true);
+      expect(getInputValue(InputId.ENABLE_MORE_BUTTONS)).toBe(true);
+      expect(getInputValue(InputId.REWIND_SECONDARY)).toBe('15');
+      expect(getInputValue(InputId.FORWARD_SECONDARY)).toBe('20');
+
       (window.confirm as jest.Mock).mockReturnValue(true);
 
       // run
       await resetToDefaultOptions();
 
-      // test
-      const pageInputs2 = Array.from(
-        document.querySelectorAll<HTMLInputElement>('input')
-      );
-      const forwardInput2 = pageInputs2.find(
-        (input) => input.id === InputId.FORWARD
-      ) as HTMLInputElement;
-      const overrideArrowKeysInput2 = pageInputs2.find(
-        (input) => input.id === InputId.OVERRIDE_ARROW_KEYS
-      ) as HTMLInputElement;
-      expect(forwardInput2.value).toBe('5');
-      expect(overrideArrowKeysInput2.checked).toBe(false);
+      // test default values
+      expect(getInputValue(InputId.FORWARD)).toBe('5');
+      expect(getInputValue(InputId.OVERRIDE_ARROW_KEYS)).toBe(false);
+      expect(getInputValue(InputId.ENABLE_MORE_BUTTONS)).toBe(false);
+      expect(getInputValue(InputId.REWIND_SECONDARY)).toBe('5');
+      expect(getInputValue(InputId.FORWARD_SECONDARY)).toBe('5');
     });
   });
 
@@ -246,3 +265,17 @@ describe('Options page', () => {
     });
   });
 });
+
+function setInputValue(id: InputId, value: string | boolean): void {
+  const input = document.querySelector<HTMLInputElement>(`#${id}`);
+  if (typeof value === 'boolean') {
+    input!.checked = value;
+  } else {
+    input!.value = value;
+  }
+}
+
+function getInputValue(id: InputId): string | boolean {
+  const input = document.querySelector<HTMLInputElement>(`#${id}`);
+  return input!.type === 'checkbox' ? input!.checked : input!.value;
+}

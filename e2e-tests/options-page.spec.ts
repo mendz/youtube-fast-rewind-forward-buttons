@@ -15,10 +15,10 @@ test.beforeEach(async ({ page, extensionId }) => {
   await page.goto(optionFilePath);
 });
 
-test('should have 4 inputs', async ({ page }) => {
+test('should have 7 inputs', async ({ page }) => {
   const locateInputs = page.locator('input');
   const inputs = await locateInputs.all();
-  expect(inputs.length).toBe(4);
+  expect(inputs.length).toBe(7);
 });
 
 test('should have the default values', async ({ page }) => {
@@ -27,6 +27,10 @@ test('should have the default values', async ({ page }) => {
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    rewindSecondaryOutput,
+    forwardSecondaryOutput,
   } = getOptionsInputs(page);
   expect(rewindSecondsInput).toHaveValue(
     OPTIONS_DEFAULT_VALUES.rewindSecondsInput
@@ -36,6 +40,18 @@ test('should have the default values', async ({ page }) => {
   );
   expect(shouldOverrideArrowKeysCheckbox).not.toBeChecked();
   expect(shouldOverrideMediaKeysCheckbox).not.toBeChecked();
+  expect(rewindSecondaryInput).toHaveValue(
+    OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds
+  );
+  expect(rewindSecondaryOutput).toHaveText(
+    `(${OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds} seconds)`
+  );
+  expect(forwardSecondaryInput).toHaveValue(
+    OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds
+  );
+  expect(forwardSecondaryOutput).toHaveText(
+    `(${OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds} seconds)`
+  );
 });
 
 test('should reset all input values when pressing the button and accept the alert', async ({
@@ -46,6 +62,11 @@ test('should reset all input values when pressing the button and accept the aler
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    enableMoreButtonsCheckbox,
+    rewindSecondaryOutput,
+    forwardSecondaryOutput,
   } = getOptionsInputs(page);
 
   await test.step('Fill the input values', async () => {
@@ -53,31 +74,56 @@ test('should reset all input values when pressing the button and accept the aler
       rewindSecondsInput,
       forwardSecondsInput,
       shouldOverrideArrowKeysCheckbox,
-      shouldOverrideMediaKeysCheckbox
+      shouldOverrideMediaKeysCheckbox,
+      false,
+      {
+        checkboxIsEnabledInput: enableMoreButtonsCheckbox,
+        forwardSecondsInput: forwardSecondaryInput,
+        rewindSecondsInput: rewindSecondaryInput,
+      }
     );
 
-    expect(rewindSecondsInput).toHaveValue(
+    await expect(rewindSecondsInput).toHaveValue(
       OPTIONS_CHANGED_VALUES.rewindSecondsInput
     );
-    expect(forwardSecondsInput).toHaveValue(
+    await expect(forwardSecondsInput).toHaveValue(
       OPTIONS_CHANGED_VALUES.forwardSecondsInput
     );
-    expect(shouldOverrideArrowKeysCheckbox).toBeChecked();
-    expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
+    await expect(shouldOverrideArrowKeysCheckbox).toBeChecked();
+    await expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
+    await expect(enableMoreButtonsCheckbox).toBeChecked();
+    await expect(rewindSecondaryInput).toHaveValue(
+      OPTIONS_CHANGED_VALUES.secondarySeconds.rewindSeconds
+    );
+    await expect(forwardSecondaryInput).toHaveValue(
+      OPTIONS_CHANGED_VALUES.secondarySeconds.forwardSeconds
+    );
   });
 
   await test.step('Reset the values', async () => {
     page.on('dialog', (dialog) => dialog.accept());
     await page.locator('button#reset-values').click();
 
-    expect(rewindSecondsInput).toHaveValue(
+    await expect(rewindSecondsInput).toHaveValue(
       OPTIONS_DEFAULT_VALUES.rewindSecondsInput
     );
-    expect(forwardSecondsInput).toHaveValue(
+    await expect(forwardSecondsInput).toHaveValue(
       OPTIONS_DEFAULT_VALUES.forwardSecondsInput
     );
-    expect(shouldOverrideArrowKeysCheckbox).not.toBeChecked();
-    expect(shouldOverrideMediaKeysCheckbox).not.toBeChecked();
+    await expect(shouldOverrideArrowKeysCheckbox).not.toBeChecked();
+    await expect(shouldOverrideMediaKeysCheckbox).not.toBeChecked();
+    await expect(rewindSecondaryInput).toHaveValue(
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds
+    );
+    await expect(rewindSecondaryOutput).toHaveText(
+      `(${OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds} seconds)`
+    );
+    await expect(forwardSecondaryInput).toHaveValue(
+      OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds
+    );
+    await expect(forwardSecondaryOutput).toHaveText(
+      `(${OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds} seconds)`
+    );
   });
 });
 
@@ -89,12 +135,24 @@ test('should NOT reset all input values when pressing the button and dismiss the
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    rewindSecondaryOutput,
+    forwardSecondaryOutput,
+    enableMoreButtonsCheckbox,
   } = getOptionsInputs(page);
+
   await fillInputsWithChangedValues(
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
-    shouldOverrideMediaKeysCheckbox
+    shouldOverrideMediaKeysCheckbox,
+    false,
+    {
+      checkboxIsEnabledInput: enableMoreButtonsCheckbox,
+      forwardSecondsInput: forwardSecondaryInput,
+      rewindSecondsInput: rewindSecondaryInput,
+    }
   );
   page.on('dialog', (dialog) => dialog.dismiss());
   await page.locator('button#reset-values').click();
@@ -107,6 +165,20 @@ test('should NOT reset all input values when pressing the button and dismiss the
   );
   expect(shouldOverrideArrowKeysCheckbox).toBeChecked();
   expect(shouldOverrideMediaKeysCheckbox).toBeChecked();
+
+  expect(enableMoreButtonsCheckbox).toBeChecked();
+  expect(rewindSecondaryInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.secondarySeconds.rewindSeconds
+  );
+  expect(rewindSecondaryOutput).toHaveText(
+    `(${OPTIONS_CHANGED_VALUES.secondarySeconds.rewindSeconds} seconds)`
+  );
+  expect(forwardSecondaryInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.secondarySeconds.forwardSeconds
+  );
+  expect(forwardSecondaryOutput).toHaveText(
+    `(${OPTIONS_CHANGED_VALUES.secondarySeconds.forwardSeconds} seconds)`
+  );
 });
 
 test('should keep the values after pressing the submit button and return to the page with smaller numbers', async ({
@@ -119,12 +191,21 @@ test('should keep the values after pressing the submit button and return to the 
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    enableMoreButtonsCheckbox,
   } = getOptionsInputs(page);
   await fillInputsWithChangedValues(
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
-    shouldOverrideMediaKeysCheckbox
+    shouldOverrideMediaKeysCheckbox,
+    false,
+    {
+      checkboxIsEnabledInput: enableMoreButtonsCheckbox,
+      forwardSecondsInput: forwardSecondaryInput,
+      rewindSecondsInput: rewindSecondaryInput,
+    }
   );
 
   const newPage = await context.newPage();
@@ -142,7 +223,12 @@ test('should keep the values after pressing the submit button and return to the 
     shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
     rewindOutput,
     forwardOutput,
+    rewindSecondaryInput: newPageRewindSecondaryInput,
+    forwardSecondaryInput: newPageForwardSecondaryInput,
+    rewindSecondaryOutput: newPageRewindSecondaryOutput,
+    forwardSecondaryOutput: newPageForwardSecondaryOutput,
   } = getOptionsInputs(newPage);
+
   await expect(newPageRewindSecondsInput).toHaveValue(
     OPTIONS_CHANGED_VALUES.rewindSecondsInput
   );
@@ -153,6 +239,18 @@ test('should keep the values after pressing the submit button and return to the 
   await expect(forwardOutput).toHaveText('(50 seconds)');
   await expect(newPageShouldOverrideKeysCheckbox).toBeChecked();
   await expect(newPageShouldOverrideMediaKeysCheckbox).toBeChecked();
+  await expect(newPageRewindSecondaryInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.secondarySeconds.rewindSeconds
+  );
+  await expect(newPageRewindSecondaryOutput).toHaveText(
+    `(${OPTIONS_CHANGED_VALUES.secondarySeconds.rewindSeconds} seconds)`
+  );
+  await expect(newPageForwardSecondaryInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.secondarySeconds.forwardSeconds
+  );
+  await expect(newPageForwardSecondaryOutput).toHaveText(
+    `(${OPTIONS_CHANGED_VALUES.secondarySeconds.forwardSeconds} seconds)`
+  );
 });
 
 test('should keep the values after pressing the submit button and return to the page with large numbers', async ({
@@ -165,6 +263,9 @@ test('should keep the values after pressing the submit button and return to the 
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    enableMoreButtonsCheckbox,
   } = getOptionsInputs(page);
 
   await fillInputsWithChangedValues(
@@ -172,7 +273,12 @@ test('should keep the values after pressing the submit button and return to the 
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
-    true
+    true,
+    {
+      checkboxIsEnabledInput: enableMoreButtonsCheckbox,
+      forwardSecondsInput: forwardSecondaryInput,
+      rewindSecondsInput: rewindSecondaryInput,
+    }
   );
 
   const newPage = await context.newPage();
@@ -190,6 +296,10 @@ test('should keep the values after pressing the submit button and return to the 
     shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
     rewindOutput,
     forwardOutput,
+    rewindSecondaryInput: newPageRewindSecondaryInput,
+    forwardSecondaryInput: newPageForwardSecondaryInput,
+    rewindSecondaryOutput: newPageRewindSecondaryOutput,
+    forwardSecondaryOutput: newPageForwardSecondaryOutput,
   } = getOptionsInputs(newPage);
 
   await expect(newPageRewindSecondsInput).toHaveValue(
@@ -202,6 +312,14 @@ test('should keep the values after pressing the submit button and return to the 
   await expect(forwardOutput).toHaveText('(1h 8m 41s)');
   await expect(newPageShouldOverrideKeysCheckbox).toBeChecked();
   await expect(newPageShouldOverrideMediaKeysCheckbox).toBeChecked();
+  await expect(newPageRewindSecondaryInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.secondarySeconds.complexRewindSecondaryInput
+  );
+  await expect(newPageRewindSecondaryOutput).toHaveText('(1h 8m 41s)');
+  await expect(newPageForwardSecondaryInput).toHaveValue(
+    OPTIONS_CHANGED_VALUES.secondarySeconds.complexForwardSecondaryInput
+  );
+  await expect(newPageForwardSecondaryOutput).toHaveText('(1h 8m 41s)');
 });
 
 test('should NOT keep the values if user close the page and return to the back to it', async ({
@@ -214,13 +332,24 @@ test('should NOT keep the values if user close the page and return to the back t
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
     shouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput,
+    forwardSecondaryInput,
+    enableMoreButtonsCheckbox,
   } = getOptionsInputs(page);
+
   await fillInputsWithChangedValues(
     rewindSecondsInput,
     forwardSecondsInput,
     shouldOverrideArrowKeysCheckbox,
-    shouldOverrideMediaKeysCheckbox
+    shouldOverrideMediaKeysCheckbox,
+    true,
+    {
+      checkboxIsEnabledInput: enableMoreButtonsCheckbox,
+      forwardSecondsInput: forwardSecondaryInput,
+      rewindSecondsInput: rewindSecondaryInput,
+    }
   );
+
   const newPage = await context.newPage();
   await page.close();
 
@@ -232,15 +361,34 @@ test('should NOT keep the values if user close the page and return to the back t
     forwardSecondsInput: newPageForwardSecondsInput,
     shouldOverrideArrowKeysCheckbox: newPageShouldOverrideKeysCheckbox,
     shouldOverrideMediaKeysCheckbox: newPageShouldOverrideMediaKeysCheckbox,
+    rewindSecondaryInput: newPageRewindSecondaryInput,
+    forwardSecondaryInput: newPageForwardSecondaryInput,
+    enableMoreButtonsCheckbox: newPageEnableMoreButtonsCheckbox,
+    rewindSecondaryOutput: newPageRewindSecondaryOutput,
+    forwardSecondaryOutput: newPageForwardSecondaryOutput,
   } = getOptionsInputs(newPage);
-  expect(newPageRewindSecondsInput).toHaveValue(
+
+  await expect(newPageRewindSecondsInput).toHaveValue(
     OPTIONS_DEFAULT_VALUES.rewindSecondsInput
   );
-  expect(newPageForwardSecondsInput).toHaveValue(
+  await expect(newPageForwardSecondsInput).toHaveValue(
     OPTIONS_DEFAULT_VALUES.forwardSecondsInput
   );
-  expect(newPageShouldOverrideKeysCheckbox).not.toBeChecked();
-  expect(newPageShouldOverrideMediaKeysCheckbox).not.toBeChecked();
+  await expect(newPageShouldOverrideKeysCheckbox).not.toBeChecked();
+  await expect(newPageShouldOverrideMediaKeysCheckbox).not.toBeChecked();
+  await expect(newPageEnableMoreButtonsCheckbox).not.toBeChecked();
+  await expect(newPageRewindSecondaryInput).toHaveValue(
+    OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds
+  );
+  await expect(newPageRewindSecondaryOutput).toHaveText(
+    `(${OPTIONS_DEFAULT_VALUES.secondarySeconds.rewindSeconds} seconds)`
+  );
+  await expect(newPageForwardSecondaryInput).toHaveValue(
+    OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds
+  );
+  await expect(newPageForwardSecondaryOutput).toHaveText(
+    `(${OPTIONS_DEFAULT_VALUES.secondarySeconds.forwardSeconds} seconds)`
+  );
 });
 
 test('should open the by me coffee page when clicking on the buy me a coffee link', async ({
