@@ -33,9 +33,8 @@ export function getInputs(): InputsOptionsPage {
   const inputForwardSeconds: HTMLInputElement = document.querySelector(
     '#forward'
   ) as HTMLInputElement;
-  const inputSecondaryEnable: HTMLInputElement = document.querySelector(
-    '#enable-more-buttons'
-  ) as HTMLInputElement;
+  const enableSecondaryMoreButtonsInput: HTMLInputElement =
+    document.querySelector('#enable-more-buttons') as HTMLInputElement;
   const inputSecondaryRewindSeconds: HTMLInputElement = document.querySelector(
     '#rewind-secondary'
   ) as HTMLInputElement;
@@ -53,7 +52,7 @@ export function getInputs(): InputsOptionsPage {
     inputRewindSeconds,
     inputForwardSeconds,
     secondarySeconds: {
-      checkboxIsEnabled: inputSecondaryEnable,
+      checkboxIsEnabled: enableSecondaryMoreButtonsInput,
       inputRewindSeconds: inputSecondaryRewindSeconds,
       inputForwardSeconds: inputSecondaryForwardSeconds,
     },
@@ -211,13 +210,14 @@ function initializeSecondsInputOutputListeners(
   const value = document.querySelector(`#${id}Value`) as HTMLOutputElement;
   value.textContent = `(${numberFormat(Number(input.value))})`;
 
-  input.removeEventListener('input', () => {}); // Remove any previous listeners
-
-  input.addEventListener('input', (event: Event) => {
+  const updateValue = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const valueNumber = Number(target.value);
     value.textContent = `(${numberFormat(valueNumber)})`;
-  });
+  };
+
+  input.removeEventListener('input', updateValue); // Remove any previous listeners
+  input.addEventListener('input', updateValue);
 }
 
 function updateDisabledState() {
