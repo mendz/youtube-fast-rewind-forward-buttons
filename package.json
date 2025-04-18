@@ -95,5 +95,8 @@
       "tag": true,
       "bump": true
     }
+  },
+  "dependencies": {
+    "@picocss/pico": "^2.1.1"
   }
 }
