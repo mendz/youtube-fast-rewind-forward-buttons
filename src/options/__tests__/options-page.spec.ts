@@ -83,7 +83,7 @@ describe('Options page', () => {
 
     it('Should console info when saved', async () => {
       await saveOptions();
-      expect(console.info).toBeCalledWith('options saved!');
+      expect(console.info).toHaveBeenCalledWith('options saved!');
     });
 
     it('Should close the window after saving', async () => {

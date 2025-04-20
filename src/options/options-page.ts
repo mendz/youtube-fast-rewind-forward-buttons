@@ -1,5 +1,3 @@
-import '@picocss/pico/css/pico.colors.min.css';
-import '@picocss/pico/css/pico.min.css';
 import { numberFormat } from '../content/helper';
 import { IOptions, IStorageOptions, Prettify } from '../content/types';
 
