@@ -34,32 +34,28 @@ body {
   }
 }
 
+@media screen and (width <= 1200px) {
+  body {
+    grid-template-areas:
+      '. header header'
+      'support container container';
+  }
+  main {
+    margin-top: 1rem;
+  }
+}
+
 label > input + small {
   margin-bottom: calc(var(--pico-spacing) / 2);
 }
 
 .container {
-  display: grid;
-  grid-auto-columns: 1fr;
-  grid-template-areas:
-    'seconds'
-    'secondary-seconds'
-    'checkboxes'
-    'buttons';
+  display: flex;
+  flex-direction: column;
   gap: var(--pico-spacing);
-
-  & p:has(.icon) {
-    grid-area: information;
-  }
-}
-
-.seconds-change-container {
-  grid-area: seconds;
 }
 
 .secondary-seconds-container {
-  grid-area: secondary-seconds;
-
   & fieldset {
     margin-bottom: 0;
     border-width: 2px;
