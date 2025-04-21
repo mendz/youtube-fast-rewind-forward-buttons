@@ -39,8 +39,8 @@
       "resources": [
         "background/whats-new-page/whats-new-page.html",
         "web-components/support-links.css",
-        "pico-styles/pico.min.css",
-        "pico-styles/pico.colors.min.css"
+        "assets/pico-styles/pico.min.css",
+        "assets/pico-styles/pico.colors.min.css"
       ]
     }
   ],
