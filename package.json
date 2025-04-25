@@ -14,7 +14,8 @@
   "scripts": {
     "clean:output": "rimraf dist",
     "zip:ext": "node scripts/zip-ext.js",
-    "start": "npm run clean:output && parcel watch src/manifest.json --host localhost",
+    "parcel:dev": "parcel watch src/manifest.json --host localhost",
+    "start": "npm run clean:output && npm run parcel:dev",
     "build:ts": "tsc",
     "build": "npm run clean:output && parcel build src/manifest.json --no-source-maps --no-scope-hoist && npm run zip:ext",
     "check": "tsc --noEmit",
