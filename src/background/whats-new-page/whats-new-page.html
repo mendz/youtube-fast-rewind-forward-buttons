@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,9 @@
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="../../css/pico-styles/pico.min.css" />
+    <link rel="stylesheet" href="../../css/pico-styles/pico.colors.min.css" />
+    <link rel="stylesheet" href="whats-new-styles.css" />
     <script
       type="module"
       src="../../web-components/support-links.ts"
@@ -19,25 +21,25 @@
   </head>
 
   <body>
-    <h1>
-      <img src="../../icons/fast-forward-16.png" />
-      YouTube Rewind & Fast Forward Buttons
-    </h1>
-    <h2>Extension Updates</h2>
-    <main>
-      <p>
-        If you enjoy the extension, please consider supporting me to help
-        continue its development and improvement:
-      </p>
-      <support-links></support-links>
-
-      <h2>What's New</h2>
+    <header class="container-fluid">
+      <hgroup>
+        <h1>
+          <img src="../../icons/fast-forward-32.png" />
+          YouTube Rewind & Fast Forward Buttons - What's New
+        </h1>
+        <p>
+          If you enjoy the extension, please consider supporting me to help
+          continue its development and improvement.
+        </p>
+      </hgroup>
+    </header>
+    <support-links></support-links>
+    <main class="container-fluid">
       <div id="updates"></div>
-
       <footer>
         <hr />
         <p>Thank you!</p>
-        <p>- Mendy</p>
+        <p><cite>- Mendy</cite></p>
       </footer>
     </main>
   </body>

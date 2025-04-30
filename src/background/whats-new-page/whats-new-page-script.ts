@@ -37,7 +37,7 @@ export function setUpdates(updates: IVersionUpdates[] = versionUpdates) {
 
 export function renderUpdate(update: IUpdates): string {
   return /* html */ `
-    <div class="card">
+    <div class="update">
       <h4>${update.title}</h4>
       <p>${update.description}</p>
     </div>

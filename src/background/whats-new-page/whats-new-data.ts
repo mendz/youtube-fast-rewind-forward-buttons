@@ -11,9 +11,9 @@ export const versionUpdates: IVersionUpdates[] = [
           'Now, you can click on the extension icon in the top right corner to open a popup with a button that directs you to the options page.',
       },
       {
-        title:
+        title: 'Fixed comment changes affects the video playback.',
+        description:
           'Fixed the issue where using the arrow key while adding a comment affects the video playback.',
-        description: '',
       },
     ],
   },
