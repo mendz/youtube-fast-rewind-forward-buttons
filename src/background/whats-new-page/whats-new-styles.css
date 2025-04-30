@@ -36,3 +36,102 @@ header h1 {
   align-items: center;
   gap: var(--pico-spacing);
 }
+
+#updates {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  & article {
+    background: var(--pico-card-background-color, #fff);
+    border-radius: var(--pico-border-radius, 1rem);
+    box-shadow: var(--pico-card-box-shadow, 0 2px 8px rgba(0, 0, 0, 0.07));
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-left: 4px solid var(--pico-primary, #0172ad);
+    position: relative;
+  }
+}
+
+#updates article.latest {
+  border-left: 6px solid var(--pico-primary-hover, #79c0ff);
+  box-shadow: 0 4px 16px rgba(1, 170, 255, 0.1);
+  background: linear-gradient(
+    90deg,
+    var(--pico-blue-50, #f0f8ff) 80%,
+    var(--pico-blue-100, #eaf6fd) 100%
+  );
+
+  :is(version-date, .update h4, .update p) {
+    color: var(--pico-primary, #0172ad);
+  }
+
+  & .update {
+    background: var(--pico-neutral-0, #fff);
+    color: var(--pico-primary, #0172ad);
+    border: 1px solid var(--pico-blue-100, #eaf6fd);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  }
+}
+
+.version-date {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--pico-primary, #0172ad);
+}
+
+.update {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: var(--pico-muted-border-color, #f5f7fa);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  position: relative;
+  min-height: 4.2em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.update .badge {
+  padding: 0.45em 1.3em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: inline-block;
+  font-size: 0.75em;
+  border-radius: 1em;
+  background: var(--pico-primary, #0172ad);
+  color: #fff;
+  letter-spacing: 0.02em;
+
+  &.badge-new {
+    background: var(--pico-green-600, #2ecc40);
+  }
+
+  &.badge-fixed {
+    background: var(--pico-orange-600, #ff9800);
+  }
+
+  &.badge-improved {
+    background: var(--pico-blue-600, #0074d9);
+  }
+}
+
+/* Timeline effect */
+#updates article:not(:last-child)::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 1.1rem;
+  top: 100%;
+  width: 2px;
+  height: 2rem;
+  background: var(--pico-primary, #0172ad);
+  opacity: 0.15;
+}
+
+@media (max-width: 700px) {
+  #updates article {
+    padding: 1rem;
+  }
+}
