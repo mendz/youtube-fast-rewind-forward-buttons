@@ -7,15 +7,9 @@
   "version": "1.4.2",
   "content_scripts": [
     {
-      "matches": [
-        "https://www.youtube.com/*"
-      ],
-      "js": [
-        "content/content.ts"
-      ],
-      "css": [
-        "content/content-styles.css"
-      ],
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content/content.ts"],
+      "css": ["content/content-styles.css"],
       "run_at": "document_idle"
     }
   ],
@@ -26,9 +20,7 @@
     "60": "icons/fast-forward-60.png",
     "128": "icons/fast-forward-128.png"
   },
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": true,
@@ -39,18 +31,16 @@
   },
   "web_accessible_resources": [
     {
-      "matches": [
-        "https://www.youtube.com/*"
-      ],
+      "matches": ["https://www.youtube.com/*"],
       "resources": []
     },
     {
-      "matches": [
-        "<all_urls>"
-      ],
+      "matches": ["<all_urls>"],
       "resources": [
         "background/whats-new-page/whats-new-page.html",
-        "web-components/support-links.css"
+        "web-components/support-links.css",
+        "css/pico/pico.min.css",
+        "css/pico/pico.colors.min.css"
       ]
     }
   ],
