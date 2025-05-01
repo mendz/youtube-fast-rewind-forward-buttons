@@ -40,7 +40,7 @@ export function renderUpdate(update: IUpdates): string {
   return /* html */ `
     <div class="update">
       <h4>${update.title}</h4>
-      <p>${update.description}</p>
+      ${renderDescription(update.description)}
       ${update.type ? `<span class="${badgeClass}">${badgeLabel}</span>` : ''}
     </div>
     `;
@@ -48,4 +48,19 @@ export function renderUpdate(update: IUpdates): string {
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function renderDescription(description: string): string {
+  if (!description.includes('\n')) {
+    return `<p>${description}</p>`;
+  }
+
+  return /* html */ `
+    <ul>
+      ${description
+        .split('\n')
+        .map((item) => `<li>${item}</li>`)
+        .join('')}
+    </ul>
+  `;
 }

@@ -48,7 +48,7 @@ div.support {
   text-wrap: balance;
   padding: 1rem 1.5rem;
   margin-bottom: 2rem;
-  background: var(--pico-blue-50, #eaf6fd);
+  background: var(--pico-color-purple-50, #f8eef9);
   border-radius: 1rem;
   gap: var(--pico-spacing);
 
@@ -71,6 +71,7 @@ div.support {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  text-wrap: pretty;
 
   & article {
     background: var(--pico-card-background-color, #fff);
@@ -91,13 +92,8 @@ div.support {
     var(--pico-blue-100, #eaf6fd) 100%
   );
 
-  :is(version-date, .update h4, .update p) {
-    color: var(--pico-primary, #0172ad);
-  }
-
   & .update {
     background: var(--pico-neutral-0, #fff);
-    color: var(--pico-primary, #0172ad);
     border: 1px solid var(--pico-blue-100, #eaf6fd);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
   }
