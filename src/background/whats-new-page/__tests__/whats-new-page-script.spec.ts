@@ -1,6 +1,10 @@
 import { MOCK_HTML } from '../__utils__/whats-new-page-tests-helper';
 import { getDate } from '../whats-new-data';
-import { renderUpdate, setUpdates } from '../whats-new-page-script';
+import {
+  IVersionUpdates,
+  renderUpdate,
+  setUpdates,
+} from '../whats-new-page-script';
 
 describe('Updates page', () => {
   beforeEach(() => {
@@ -29,7 +33,7 @@ describe('Updates page', () => {
       const versionToTest = '0.0.0';
       const dateToTest = 'DATE';
 
-      const mockVersionUpdates = [
+      const mockVersionUpdates: IVersionUpdates[] = [
         {
           version: versionToTest,
           date: dateToTest,
@@ -37,11 +41,13 @@ describe('Updates page', () => {
             {
               title: titleToCheck,
               description: descToCheck,
+              type: 'new',
             },
             {
               title:
                 'Veniam officia et aute esse sint culpa in id in eiusmod ipsum dolor consectetur ea.',
               description: `Sit ad anim enim cillum.`,
+              type: 'fixed',
             },
           ],
         },
@@ -50,7 +56,7 @@ describe('Updates page', () => {
       setUpdates(mockVersionUpdates);
 
       const updatesElement = document.getElementById('updates');
-      const firstCard = updatesElement?.querySelector('div.card');
+      const firstCard = updatesElement?.querySelector('div.update');
 
       expect(updatesElement?.innerHTML?.length).not.toBe(0);
       expect(updatesElement?.querySelectorAll('h3.version-date')?.length).toBe(
@@ -59,7 +65,13 @@ describe('Updates page', () => {
       expect(
         updatesElement?.querySelector('h3.version-date')?.textContent
       ).toMatch(`${versionToTest} - ${dateToTest}`);
-      expect(updatesElement?.querySelectorAll('div.card')?.length).toBe(2);
+      expect(updatesElement?.querySelectorAll('div.update')?.length).toBe(2);
+      expect(
+        firstCard?.querySelector('span')?.classList.contains('badge-new')
+      ).toBe(true);
+      expect(
+        updatesElement?.querySelector('article')?.classList.contains('latest')
+      ).toBe(true);
       expect(firstCard?.querySelector('h4')?.textContent).toBe(titleToCheck);
       expect(firstCard?.querySelector('p')?.textContent).toBe(descToCheck);
     });
