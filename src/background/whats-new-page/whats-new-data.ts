@@ -36,8 +36,8 @@ export const versionUpdates: IVersionUpdates[] = [
         type: 'improved',
       },
       {
-        title: 'Updated button styling',
-        description: `Refreshed the buttons' appearance to better align with YouTube's design.`,
+        title: 'Updated UI Styling',
+        description: `Updated the appearance of player buttons to better align with YouTube's design.\nRefreshed the styles across the extension's pages.`,
         type: 'improved',
       },
     ],
