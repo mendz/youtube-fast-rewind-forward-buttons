@@ -67,6 +67,15 @@ div.support {
   }
 }
 
+@media (width <= 1000px) {
+  div.support {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'text'
+      'links';
+  }
+}
+
 #updates {
   display: flex;
   flex-direction: column;
