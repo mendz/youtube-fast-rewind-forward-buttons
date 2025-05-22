@@ -384,14 +384,14 @@ export function getOptionsInputs(page: Page) {
   const shouldOverrideMediaKeysCheckbox = page.locator(
     'input#override-media-keys'
   );
-  const rewindOutput = page.locator('output#rewindValue');
-  const forwardOutput = page.locator('output#forwardValue');
+  const rewindOutput = page.locator('small#rewindValue');
+  const forwardOutput = page.locator('small#forwardValue');
 
   const rewindSecondaryInput = page.locator('input#rewind-secondary');
   const forwardSecondaryInput = page.locator('input#forward-secondary');
 
-  const rewindSecondaryOutput = page.locator('output#rewind-secondaryValue');
-  const forwardSecondaryOutput = page.locator('output#forward-secondaryValue');
+  const rewindSecondaryOutput = page.locator('small#rewind-secondaryValue');
+  const forwardSecondaryOutput = page.locator('small#forward-secondaryValue');
   const enableMoreButtonsCheckbox = page.locator('input#enable-more-buttons');
 
   return {

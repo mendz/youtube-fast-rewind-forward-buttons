@@ -14,9 +14,11 @@
   "scripts": {
     "clean:output": "rimraf dist",
     "zip:ext": "node scripts/zip-ext.js",
-    "start": "npm run clean:output && parcel watch src/manifest.json --host localhost",
+    "parcel:dev": "parcel watch src/manifest.json --host localhost",
+    "fix-pico-paths": "node scripts/fix-pico-paths.mjs",
+    "start": "npm run clean:output && npm run parcel:dev && npm run fix-pico-paths",
     "build:ts": "tsc",
-    "build": "npm run clean:output && parcel build src/manifest.json --no-source-maps --no-scope-hoist && npm run zip:ext",
+    "build": "npm run clean:output && parcel build src/manifest.json --no-source-maps --no-scope-hoist && npm run fix-pico-paths && npm run zip:ext",
     "check": "tsc --noEmit",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
@@ -95,5 +97,8 @@
       "tag": true,
       "bump": true
     }
+  },
+  "dependencies": {
+    "@picocss/pico": "^2.1.1"
   }
 }
