@@ -391,7 +391,7 @@ test('should NOT keep the values if user close the page and return to the back t
   );
 });
 
-test('should open the by me coffee page when clicking on the buy me a coffee link', async ({
+test('should open the buy me a coffee page when clicking on the buy me a coffee link', async ({
   page,
   context,
 }) => {
@@ -407,7 +407,7 @@ test('should open the by me coffee page when clicking on the buy me a coffee lin
   expect(newPage).toHaveURL('https://buymeacoffee.com/leizerovich.mendy');
 });
 
-test('should open the the chrome extension page when clicking on the link', async ({
+test('should open the chrome extension page when clicking on the link', async ({
   page,
   context,
 }) => {
