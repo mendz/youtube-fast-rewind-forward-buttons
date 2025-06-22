@@ -46,22 +46,32 @@ test('should open the the chrome extension page when clicking on the link', asyn
 test('should render the amounts of list items per the version updates', async ({
   page,
 }) => {
-  const countUpdates = versionUpdates
+  const updates = versionUpdates
     .map((dateUpdates) => dateUpdates.updates)
-    .flat().length;
+    .flat();
+  const countUpdates = updates?.length;
+  const countDescriptionParagraphs = updates
+    .map((update) => update.description)
+    .filter((description) => !description.includes('\n')).length;
+  const countDescriptionLists = updates
+    .map((update) => update.description)
+    .filter((description) => description.includes('\n')).length;
 
-  const locateCards = page.locator('.card');
+  const locateCards = page.locator('.update');
   const cards = await locateCards.all();
 
   expect(cards.length).toBe(countUpdates);
 
-  const locateHeaders = page.locator('.card h4');
+  const locateHeaders = page.locator('.update h4');
   const headers = await locateHeaders.all();
-  const locateParagraphs = page.locator('.card p');
+  const locateParagraphs = page.locator('.update p');
   const paragraphs = await locateParagraphs.all();
+  const locateLists = page.locator('.update ul');
+  const lists = await locateLists.all();
 
   expect(headers.length).toBe(countUpdates);
-  expect(paragraphs.length).toBe(countUpdates);
+  expect(paragraphs.length).toBe(countDescriptionParagraphs);
+  expect(lists.length).toBe(countDescriptionLists);
 });
 
 test('should show the correct title', async ({ page }) => {
