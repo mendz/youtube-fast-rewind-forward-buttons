@@ -6,14 +6,39 @@ export const versionUpdates: IVersionUpdates[] = [
     date: getDate('2025-01-21'),
     updates: [
       {
-        title: 'New way to open the options page',
+        title: 'Easier access to the options page',
         description:
-          'Now, you can click on the extension icon in the top right corner to open a popup with a button that directs you to the options page.',
+          'Click the extension icon in the toolbar to open a popup with a button that takes you directly to the options page.',
+        type: 'new',
       },
       {
-        title:
-          'Fixed the issue where using the arrow key while adding a comment affects the video playback.',
-        description: '',
+        title: 'Fixed video playback interruption during comment editing',
+        description:
+          'Resolved an issue where pressing arrow keys while typing comments would interrupt video playback.',
+        type: 'fixed',
+      },
+    ],
+  },
+  {
+    version: 'v1.4.2',
+    date: getDate('2025-06-24'),
+    updates: [
+      {
+        title: 'Up to four buttons',
+        description:
+          'Added support for up to four customizable buttons on the player, each with its own time setting.',
+        type: 'new',
+      },
+      {
+        title: 'Extended rewind/forward range',
+        description:
+          'Expanded the rewind and forward button range from 1 to 7200 seconds.\nThe input now shows the equivalent time in minutes for clarity.',
+        type: 'improved',
+      },
+      {
+        title: 'Updated UI Styling',
+        description: `Updated the appearance of player buttons to better align with YouTube's design.\nRefreshed the styles across the extension's pages.`,
+        type: 'improved',
       },
     ],
   },

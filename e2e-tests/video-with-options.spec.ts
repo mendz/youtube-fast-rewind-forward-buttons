@@ -244,7 +244,6 @@ test('should override the ArrowLeft key when seconds set not to 5 and not overri
 
     await videoPage.keyboard.press('ArrowRight');
     currentTime = await getVideoTime(video);
-    console.log('💜 ~ await test.step ~ currentTime:', currentTime);
     await expect(animationArrow).toBeVisible();
     expect(currentTime).toBe(45);
   });
