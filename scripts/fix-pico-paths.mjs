@@ -21,8 +21,8 @@ try {
 
   let manifestText = readFileSync(manifestPath, 'utf8');
   // Replace backslashes with forward slashes in pico CSS paths
-  // Matches: "css\\pico\\..."
-  const picoPathRegex = /("css\\pico\\pico)/g;
+   // Matches any path containing "css\\pico\\"
+  const picoPathRegex = /("css\\pico\\[^"]*)/g;
   let changed = false;
   manifestText = manifestText.replaceAll(picoPathRegex, (match) => {
     changed = true;

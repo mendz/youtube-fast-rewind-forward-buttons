@@ -19,7 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 export function setUpdates(updates: IVersionUpdates[] = versionUpdates) {
   const updatesElement = document.getElementById('updates') as HTMLDivElement;
   // Find the latest version (by date, fallback to first if dates are equal)
-  const sorted = [...updates].reverse();
+  const sorted = [...updates].sort(
+    (a, b) => Date.parse(b.date) - Date.parse(a.date)
+  );
   const latestVersion = sorted[0]?.version;
   const html = sorted
     .map(
