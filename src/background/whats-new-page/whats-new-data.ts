@@ -21,10 +21,10 @@ export const versionUpdates: IVersionUpdates[] = [
   },
   {
     version: 'v1.4.2',
-    date: getDate('2025-05-01'),
+    date: getDate('2025-06-24'),
     updates: [
       {
-        title: 'Up to four extra buttons',
+        title: 'Up to four buttons',
         description:
           'Added support for up to four customizable buttons on the player, each with its own time setting.',
         type: 'new',
