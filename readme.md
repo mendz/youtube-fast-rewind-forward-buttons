@@ -5,7 +5,7 @@ Enhance your YouTube experience with the _Rewind & Fast Forward Chrome_ extensio
 ### Features:
 
 1. Customizable Time Skips:
-Choose the number of seconds you skip with each button individually, up to 4 customizable buttons.
+Choose the skip duration for each button individually, with up to four customizable buttons.
 
 2. Arrow Key Override:
 Decide whether to synchronize arrow keys with the extension buttons' seconds. (Default: No override)
