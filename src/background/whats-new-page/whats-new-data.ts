@@ -21,7 +21,7 @@ export const versionUpdates: IVersionUpdates[] = [
   },
   {
     version: 'v1.4.2',
-    date: getDate('2025-06-24'),
+    date: getDate('2025-06-25'),
     updates: [
       {
         title: 'Up to four buttons',
