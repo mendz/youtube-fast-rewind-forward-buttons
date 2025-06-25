@@ -131,7 +131,7 @@ describe('getSecondaryButtons', () => {
   it('Should get the doubleRewindButton values and the correct svg', () => {
     const rewindSvg = doubleRewindButton.querySelector('svg');
 
-    expect(doubleForwardButton.id).toBe(ButtonClassesIds.DOUBLE_FORWARD_ID);
+    expect(doubleRewindButton.id).toBe(ButtonClassesIds.DOUBLE_REWIND_ID);
     expect(doubleRewindButton.title.toLowerCase()).toContain('back');
     expect(doubleForwardButton.title.toLowerCase()).toContain('forward');
     expect(rewindSvg).not.toBeNull();
