@@ -36,7 +36,7 @@ This Agents.md file provides comprehensive guidance for OpenAI Codex and other A
 Run the following commands when updating code (not required for comment or documentation only changes):
 
 ```bash
-npm run eslint       # lint check
+npm run lint-staged  # lint staged files
 npm run check        # TypeScript type check
 npm run jest:test    # unit tests
 npm run playwright:test  # e2e tests
@@ -57,7 +57,7 @@ Use `npm run jest:test:coverage` to generate coverage when needed.
 Before submitting changes run:
 
 ```bash
-npm run eslint       # Lint check
+npm run lint-staged  # Lint staged files
 npm run check        # Type check
 npm run build        # Build the extension
 ```
