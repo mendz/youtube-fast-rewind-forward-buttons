@@ -9,7 +9,7 @@ const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
     rewindSeconds: 5,
     forwardSeconds: 5,
   },
-  shouldOverrideKeys: false, // TODO: old one, should removed in the next version
+  shouldOverrideKeys: false, // TODO: old one, should be removed in the next version
   shouldOverrideArrowKeys: false,
   shouldOverrideMediaKeys: false,
 };

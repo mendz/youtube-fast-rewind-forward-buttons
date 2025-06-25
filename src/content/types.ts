@@ -10,7 +10,7 @@ export interface IOptions {
     rewindSeconds: number;
     forwardSeconds: number;
   };
-  shouldOverrideKeys?: boolean; // TODO: old one, should removed in the next version
+  shouldOverrideKeys?: boolean; // TODO: old one, should be removed in the next version
   shouldOverrideArrowKeys: boolean;
   shouldOverrideMediaKeys: boolean;
 }
