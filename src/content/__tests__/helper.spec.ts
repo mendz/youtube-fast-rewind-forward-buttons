@@ -91,7 +91,7 @@ describe('getSeconds', () => {
 describe('createFastRewindSVG', () => {
   const rewindSvg = `
        <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36" width="36" fill="none">
-          <path id="custom-path-rewind" class="" d="M36 0L19.21 18L36 36V0ZM16.79 0L0 18L16.79 36V0Z" fill="white" transform="translate(1.44 1.44) scale(0.92)" />
+          <path id="custom-path-rewind" class="" d="M36 0L19.21 18L36 36V0ZM16.79 0L0 18L16.79 36V0Z" fill="white" transform="translate(3.60 3.60) scale(0.8)" />
     </svg>`;
   const xLinkAttrCustomId = '#custom-path-rewind';
 
@@ -166,7 +166,7 @@ describe('createFastRewindSVG', () => {
 describe('createFastForwardSVG', () => {
   const forwardSvg = `
       <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36" width="36" fill="none">
-      <path id="custom-path-fast-forward" class="" d="M0 0V36L16.71 18L0 0ZM19.29 0V36L36 18L19.29 0Z" fill="white" transform="translate(1.44 1.44) scale(0.92)" />
+      <path id="custom-path-fast-forward" class="" d="M0 0V36L16.71 18L0 0ZM19.29 0V36L36 18L19.29 0Z" fill="white" transform="translate(3.60 3.60) scale(0.8)" />
     </svg>`;
   const xLinkAttrCustomId = '#custom-path-fast-forward';
 
