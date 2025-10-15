@@ -42,12 +42,12 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
       return;
     }
 
-    const playerContainerHeight: number = mainPlayerContainer.clientHeight;
-    const bottomControlsHeight: number =
-      document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
-    const buttonHeight: number = this.clientHeight;
-    const tooltipTopPosition: number =
-      playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
+    // const playerContainerHeight: number = mainPlayerContainer.clientHeight;
+    // const bottomControlsHeight: number =
+    //   document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
+    // const buttonHeight: number = this.clientHeight;
+    // const tooltipTopPosition: number =
+    //   playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
 
     // change values to show  the tooltip
     tooltipContainer.classList.add('ytp-tooltip');
@@ -56,7 +56,7 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
     tooltipContainer.classList.remove('ytp-text-detail');
     tooltipContainer.classList.remove('ytp-has-duration');
     tooltipContainer.style.maxWidth = '300px';
-    tooltipContainer.style.top = `${tooltipTopPosition}px`;
+    // tooltipContainer.style.top = `${tooltipTopPosition}px`;
     tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
     tooltipContainer.style.display = 'block';
     tooltipContainer.setAttribute('aria-hidden', 'false');
