@@ -42,6 +42,18 @@ export const versionUpdates: IVersionUpdates[] = [
       },
     ],
   },
+  {
+    version: 'v1.4.3',
+    date: getDate('2025-10-19'),
+    updates: [
+      {
+        title: 'New YouTube UI',
+        description:
+          "Added support for YouTube's redesigned player while preserving compatibility with the previous UI.",
+        type: 'new',
+      },
+    ],
+  },
 ];
 
 export function getDate(dateStr: string) {

@@ -9,14 +9,34 @@ import {
 } from '../__utils__/tests-helper';
 import {
   createButton,
+  createFastDoubleForwardSVG,
+  createFastDoubleRewindSVG,
   createFastForwardSVG,
   createFastRewindSVG,
   createForwardButtonTitle,
   createRewindButtonTitle,
   getSeconds,
+  newUiCreateFastDoubleForwardSVG,
+  newUiCreateFastDoubleRewindSVG,
+  newUiCreateFastForwardSVG,
+  newUiCreateFastRewindSVG,
   numberFormat,
+  oldUiCreateFastDoubleForwardSVG,
+  oldUiCreateFastDoubleRewindSVG,
+  oldUiCreateFastForwardSVG,
+  oldUiCreateFastRewindSVG,
 } from '../helper';
 import { ArrowKey, ButtonClassesIds } from '../types';
+
+const MODERN_PLAYER_MARKUP = '<div class="ytp-delhi-modern"></div>';
+
+function setModernPlayerMarkup(): void {
+  document.body.innerHTML = MODERN_PLAYER_MARKUP;
+}
+
+function clearPlayerMarkup(): void {
+  document.body.innerHTML = '';
+}
 
 describe('createButton', () => {
   const testTitle = 'test-title';
@@ -89,16 +109,31 @@ describe('getSeconds', () => {
 });
 
 describe('createFastRewindSVG', () => {
-  const rewindSvg = `
-       <svg class="" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
-          <path id="custom-path-rewind" class="" d="M856-240 505.33-480 856-720v480Zm-401.33 0L104-480l350.67-240v480Z" />
-    </svg>`;
   const xLinkAttrCustomId = '#custom-path-rewind';
 
-  it('should return the correct svg', () => {
-    const newSvg: string = createFastRewindSVG([], '', []);
-    expect(removeSpaces(newSvg)).toBe(removeSpaces(rewindSvg));
+  beforeEach(() => {
+    setModernPlayerMarkup();
   });
+
+  afterEach(() => {
+    clearPlayerMarkup();
+  });
+
+  it('should return the correct svg', () => {
+    const newSvg = createFastRewindSVG([], '', []);
+    const expectedSvg = newUiCreateFastRewindSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+
+  it('should return the old svg when modern player markup is missing', () => {
+    clearPlayerMarkup();
+    const newSvg = createFastRewindSVG([], '', []);
+    const expectedSvg = oldUiCreateFastRewindSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+
   it('should populate with svgClasses', () => {
     const svgElement = createSvgMock(
       SVG_CLASSES_MOCK,
@@ -111,6 +146,7 @@ describe('createFastRewindSVG', () => {
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
+
   it('should populate with svgPathClasses', () => {
     const svgElement = createSvgMock(
       [],
@@ -127,6 +163,7 @@ describe('createFastRewindSVG', () => {
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
+
   it('should populate with svgUseHtml', () => {
     const svgElement = createSvgMock(
       [],
@@ -164,16 +201,31 @@ describe('createFastRewindSVG', () => {
 });
 
 describe('createFastForwardSVG', () => {
-  const forwardSvg = `
-      <svg class="" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 -960 960 960" width="100%" fill="#e3e3e3">
-      <path id="custom-path-fast-forward" class="" d="M102.67-240v-480l350.66 240-350.66 240Zm404.66 0v-480L858-480 507.33-240Z" />
-    </svg>`;
   const xLinkAttrCustomId = '#custom-path-fast-forward';
 
-  it('should return the correct svg', () => {
-    const newSvg: string = createFastForwardSVG([], '', []);
-    expect(removeSpaces(newSvg)).toBe(removeSpaces(forwardSvg));
+  beforeEach(() => {
+    setModernPlayerMarkup();
   });
+
+  afterEach(() => {
+    clearPlayerMarkup();
+  });
+
+  it('should return the correct svg', () => {
+    const newSvg = createFastForwardSVG([], '', []);
+    const expectedSvg = newUiCreateFastForwardSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+
+  it('should return the old svg when modern player markup is missing', () => {
+    clearPlayerMarkup();
+    const newSvg = createFastForwardSVG([], '', []);
+    const expectedSvg = oldUiCreateFastForwardSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+
   it('should populate with svgClasses', () => {
     const svgElement = createSvgMock(
       SVG_CLASSES_MOCK,
@@ -186,6 +238,7 @@ describe('createFastForwardSVG', () => {
     expect(svgElement?.querySelector('path')?.classList.length).toBeFalsy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
+
   it('should populate with svgPathClasses', () => {
     const svgElement = createSvgMock(
       [],
@@ -202,6 +255,7 @@ describe('createFastForwardSVG', () => {
     ).toBeTruthy();
     expect(svgElement?.querySelector('use')).toBeFalsy();
   });
+
   it('should populate with svgUseHtml', () => {
     const svgElement = createSvgMock(
       [],
@@ -217,6 +271,7 @@ describe('createFastForwardSVG', () => {
       xLinkAttrCustomId
     );
   });
+
   it('should populate with all values', () => {
     const svgElement = createSvgMock(
       SVG_CLASSES_MOCK,
@@ -238,6 +293,56 @@ describe('createFastForwardSVG', () => {
   });
 });
 
+describe('createFastDoubleRewindSVG', () => {
+  beforeEach(() => {
+    setModernPlayerMarkup();
+  });
+
+  afterEach(() => {
+    clearPlayerMarkup();
+  });
+
+  it('should return the correct modern svg', () => {
+    const newSvg = createFastDoubleRewindSVG([], '', []);
+    const expectedSvg = newUiCreateFastDoubleRewindSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+
+  it('should return the old svg when modern player markup is missing', () => {
+    clearPlayerMarkup();
+    const newSvg = createFastDoubleRewindSVG([], '', []);
+    const expectedSvg = oldUiCreateFastDoubleRewindSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+});
+
+describe('createFastDoubleForwardSVG', () => {
+  beforeEach(() => {
+    setModernPlayerMarkup();
+  });
+
+  afterEach(() => {
+    clearPlayerMarkup();
+  });
+
+  it('should return the correct modern svg', () => {
+    const newSvg = createFastDoubleForwardSVG([], '', []);
+    const expectedSvg = newUiCreateFastDoubleForwardSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+
+  it('should return the old svg when modern player markup is missing', () => {
+    clearPlayerMarkup();
+    const newSvg = createFastDoubleForwardSVG([], '', []);
+    const expectedSvg = oldUiCreateFastDoubleForwardSVG([], '', []);
+
+    expect(removeSpaces(newSvg)).toBe(removeSpaces(expectedSvg));
+  });
+});
+
 describe('createRewindButtonTitle return the correct text', () => {
   const fullTextFiveSeconds = 'Go back 5 seconds (left arrow)';
   const fullTextTenSeconds = 'Go back 10 seconds (left arrow)';
@@ -247,14 +352,17 @@ describe('createRewindButtonTitle return the correct text', () => {
     const result: string = createRewindButtonTitle(5, false);
     expect(result).toBe(fullTextFiveSeconds);
   });
+
   it('should return with 5 seconds & with overrideArrowKeys', () => {
     const result: string = createRewindButtonTitle(5, true);
     expect(result).toBe(fullTextFiveSeconds);
   });
+
   it('should return with 10 seconds & with overrideArrowKeys', () => {
     const result: string = createRewindButtonTitle(10, true);
     expect(result).toBe(fullTextTenSeconds);
   });
+
   it('should return with 10 seconds & without overrideArrowKeys', () => {
     const result: string = createRewindButtonTitle(10, false);
     expect(result).toBe(shortTextTenSeconds);
@@ -274,30 +382,37 @@ describe('createForwardButtonTitle return the correct text', () => {
     const result: string = createForwardButtonTitle(5, false);
     expect(result).toBe(fullTextFiveSeconds);
   });
+
   it('should return with 5 seconds & with overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(5, true);
     expect(result).toBe(fullTextFiveSeconds);
   });
+
   it('should return with 10 seconds & with overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(10, true);
     expect(result).toBe(fullTextTenSeconds);
   });
+
   it('should return with 10 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(10, false);
     expect(result).toBe(shortTextTenSeconds);
   });
+
   it('should return with 60 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(60, true);
     expect(result).toBe(fullTextMinuteSeconds);
   });
+
   it('should return with 60 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(60, false);
     expect(result).toBe(shortTextMinuteSeconds);
   });
+
   it('should return with 4121 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(4121, true);
     expect(result).toBe(fullTextComplexSeconds);
   });
+
   it('should return with 4121 seconds & without overrideArrowKeys', () => {
     const result: string = createForwardButtonTitle(4121, false);
     expect(result).toBe(shortTextComplexSeconds);
