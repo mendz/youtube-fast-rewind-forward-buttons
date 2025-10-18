@@ -10,7 +10,7 @@
   box-sizing: border-box;
 }
 
-button.ml-custom-rewind-forward-buttons {
+.ytp-delhi-modern button.ml-custom-rewind-forward-buttons {
   position: relative;
   box-sizing: border-box;
   border-radius: 50%;
@@ -74,4 +74,9 @@ button.ml-custom-rewind-forward-buttons {
     -webkit-transition: background-color 0.2s cubic-bezier(0.05, 0, 0, 1);
     transition: background-color 0.2s cubic-bezier(0.05, 0, 0, 1);
   }
+}
+
+/* fallback for the old ui */
+:not(.ytp-delhi-modern) .ml-custom-rewind-forward-buttons {
+  flex: 0 0 auto;
 }

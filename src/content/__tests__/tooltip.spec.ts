@@ -1,3 +1,12 @@
+jest.mock('../helper', () => {
+  const actual = jest.requireActual('../helper');
+  return {
+    ...actual,
+    isNewUiPlayer: jest.fn(() => false),
+  };
+});
+
+import { isNewUiPlayer } from '../helper';
 import {
   getElementsForTooltipCalculation,
   handleTooltipOnMouseLeave,
@@ -7,6 +16,10 @@ import {
   HTML_PLAYER_FULL,
   TOOLTIP_CONTAINER_WRAPPER_QUERY,
 } from '../__utils__/tests-helper';
+
+const mockIsNewUiPlayer = isNewUiPlayer as jest.MockedFunction<
+  typeof isNewUiPlayer
+>;
 
 describe('getElementsForTooltipCalculation', () => {
   const wrapperQuery = TOOLTIP_CONTAINER_WRAPPER_QUERY;
@@ -20,6 +33,7 @@ describe('getElementsForTooltipCalculation', () => {
     document.querySelector(wrapperQuery)?.remove();
     expect(getElementsForTooltipCalculation).toThrowError(error);
   });
+
   it('should fail when no wrapper parent', () => {
     document.body.innerHTML = HTML_PLAYER_FULL;
     const wrapper = document.querySelector(wrapperQuery)?.cloneNode() as Node;
@@ -27,6 +41,7 @@ describe('getElementsForTooltipCalculation', () => {
     document.querySelector(tooltipContainerQuery)?.appendChild(wrapper);
     expect(getElementsForTooltipCalculation).toThrowError(error);
   });
+
   it('should return the tooltip elements', () => {
     document.body.innerHTML = HTML_PLAYER_FULL;
     const textWrapper = document.querySelector(wrapperQuery);
@@ -49,6 +64,7 @@ describe('handleTooltipOnMouseOver', () => {
   beforeEach(async () => {
     console.error = jest.fn();
     document.body.innerHTML = HTML_PLAYER_FULL;
+    mockIsNewUiPlayer.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -92,6 +108,47 @@ describe('handleTooltipOnMouseOver', () => {
     const style = tooltipContainer.style;
     expect(style.maxWidth).toBe('300px');
     expect(style.display).toBe('block');
+  });
+
+  it('Should position the tooltip when using the legacy player', () => {
+    const playerElement = document.querySelector('ytd-player') as HTMLElement;
+    Object.defineProperty(playerElement, 'clientHeight', {
+      value: 300,
+      configurable: true,
+    });
+
+    const chromeBottom = document.querySelector(
+      'div.ytp-chrome-bottom'
+    ) as HTMLElement;
+    Object.defineProperty(chromeBottom, 'clientHeight', {
+      value: 50,
+      configurable: true,
+    });
+
+    Object.defineProperty(button, 'clientHeight', {
+      value: 20,
+      configurable: true,
+    });
+
+    handleTooltipOnMouseOver.bind(button)();
+
+    const tooltipContainer = document.querySelector(
+      TOOLTIP_CONTAINER_WRAPPER_QUERY
+    )?.parentElement as HTMLDivElement;
+
+    expect(tooltipContainer.style.top).toBe('242px');
+  });
+
+  it('Should skip positioning when using the modern player', () => {
+    const tooltipContainer = document.querySelector(
+      TOOLTIP_CONTAINER_WRAPPER_QUERY
+    )?.parentElement as HTMLDivElement;
+    tooltipContainer.style.top = '123px';
+
+    mockIsNewUiPlayer.mockReturnValue(true);
+    handleTooltipOnMouseOver.bind(button)();
+
+    expect(tooltipContainer.style.top).toBe('123px');
   });
 });
 

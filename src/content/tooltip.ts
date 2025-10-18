@@ -1,3 +1,5 @@
+import { isNewUiPlayer } from './helper';
+
 export function getElementsForTooltipCalculation(): {
   tooltipContainer: HTMLElement;
   tooltipTextSpan: HTMLSpanElement;
@@ -42,13 +44,6 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
       return;
     }
 
-    // const playerContainerHeight: number = mainPlayerContainer.clientHeight;
-    // const bottomControlsHeight: number =
-    //   document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
-    // const buttonHeight: number = this.clientHeight;
-    // const tooltipTopPosition: number =
-    //   playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
-
     // change values to show  the tooltip
     tooltipContainer.classList.add('ytp-tooltip');
     tooltipContainer.classList.add('ytp-bottom');
@@ -56,11 +51,20 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
     tooltipContainer.classList.remove('ytp-text-detail');
     tooltipContainer.classList.remove('ytp-has-duration');
     tooltipContainer.style.maxWidth = '300px';
-    // tooltipContainer.style.top = `${tooltipTopPosition}px`;
     tooltipContainer.style.left = `${this.offsetLeft - this.offsetWidth}px`;
     tooltipContainer.style.display = 'block';
     tooltipContainer.setAttribute('aria-hidden', 'false');
     textSpan.innerHTML = this.title;
+
+    if (!isNewUiPlayer()) {
+      const playerContainerHeight: number = mainPlayerContainer.clientHeight;
+      const bottomControlsHeight: number =
+        document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
+      const buttonHeight: number = this.clientHeight;
+      const tooltipTopPosition: number =
+        playerContainerHeight - bottomControlsHeight - buttonHeight + 12;
+      tooltipContainer.style.top = `${tooltipTopPosition}px`;
+    }
 
     // remove title from the button
     this.title = '';
