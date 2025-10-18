@@ -20,7 +20,9 @@ Important developer workflows (commands)
 - Build for release: `npm run build` — creates production bundle and `dist.zip`.
 - Quick zip: `npm run zip:ext` — regenerate distributable archive.
 - Typecheck & lint: `npm run check`, `npm run eslint`, `npm run prettier`.
-- Unit tests: `npm run jest:test` or `npm run jest:test:coverage` (uses `jest.setup.js` to stub Chrome APIs via `jest-chrome`).
+- Unit tests:
+  - `npm run jest:test` or `npm run jest:test:coverage` (uses `jest.setup.js` to stub Chrome APIs via `jest-chrome`).
+  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases.
 - Playwright: `npm run playwright:test` (see `playwright.config.ts`) and tests live in `e2e-tests/`.
 
 Project-specific patterns and conventions

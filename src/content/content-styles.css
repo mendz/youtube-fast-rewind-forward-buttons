@@ -11,6 +11,7 @@
 }
 
 button.ml-custom-rewind-forward-buttons {
+  position: relative;
   box-sizing: border-box;
   border-radius: 50%;
   margin-top: 8px;
@@ -35,11 +36,11 @@ button.ml-custom-rewind-forward-buttons {
   &::before {
     content: '';
     display: block;
-    width: 12px;
+    width: 10px;
     position: absolute;
     top: 5px;
     bottom: 0;
-    left: -12px;
+    left: -10px;
   }
 
   &::after {
@@ -51,15 +52,7 @@ button.ml-custom-rewind-forward-buttons {
     border-radius: 27px;
   }
 
-  &.active::before {
-    background-color: var(
-      --yt-spec-overlay-tonal-hover,
-      rgba(255, 255, 255, 0.2)
-    );
-    -webkit-transition: background-color 0.2s cubic-bezier(0.05, 0, 0, 1);
-    transition: background-color 0.2s cubic-bezier(0.05, 0, 0, 1);
-  }
-
+  &.active::before,
   &.active::after {
     background-color: var(
       --yt-spec-overlay-tonal-hover,
@@ -73,5 +66,12 @@ button.ml-custom-rewind-forward-buttons {
     opacity: 1;
     -webkit-transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
     transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+
+    background-color: var(
+      --yt-spec-overlay-button-secondary,
+      rgba(255, 255, 255, 0.1)
+    );
+    -webkit-transition: background-color 0.2s cubic-bezier(0.05, 0, 0, 1);
+    transition: background-color 0.2s cubic-bezier(0.05, 0, 0, 1);
   }
 }

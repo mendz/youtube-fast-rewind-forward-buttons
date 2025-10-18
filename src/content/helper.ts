@@ -6,6 +6,65 @@ const NORMALIZED_SVG_SCALE = 0.8;
 const NORMALIZED_SVG_TRANSLATE = ((1 - NORMALIZED_SVG_SCALE) * 36) / 2;
 const NORMALIZED_SVG_TRANSLATE_STR = NORMALIZED_SVG_TRANSLATE.toFixed(2);
 
+function isActivationKey(event: KeyboardEvent): boolean {
+  return event.key === 'Enter' || event.key === ' ';
+}
+
+function withButtonGuard<T extends Event>(
+  button: HTMLButtonElement,
+  eventHandler: (event: T) => void
+) {
+  return (event: T) => {
+    if (event.currentTarget !== button) return;
+    eventHandler(event);
+  };
+}
+
+function addPressInteractions(button: HTMLButtonElement): void {
+  const activate = () => {
+    button.classList.add('active');
+  };
+  const deactivate = () => {
+    button.classList.remove('active');
+  };
+
+  button.addEventListener(
+    'pointerdown',
+    withButtonGuard(button, () => activate())
+  );
+
+  button.addEventListener(
+    'pointerup',
+    withButtonGuard(button, () => deactivate())
+  );
+  button.addEventListener(
+    'pointerleave',
+    withButtonGuard(button, () => deactivate())
+  );
+  button.addEventListener(
+    'pointercancel',
+    withButtonGuard(button, () => deactivate())
+  );
+
+  button.addEventListener(
+    'keydown',
+    withButtonGuard(button, (event: KeyboardEvent) => {
+      if (!isActivationKey(event)) return;
+      activate();
+    })
+  );
+
+  button.addEventListener(
+    'keyup',
+    withButtonGuard(button, (event: KeyboardEvent) => {
+      if (!isActivationKey(event)) return;
+      deactivate();
+    })
+  );
+
+  button.addEventListener('blur', deactivate);
+}
+
 export function createButton({
   svg,
   title,
@@ -20,13 +79,7 @@ export function createButton({
   if (id) {
     button.id = id;
   }
-  button.addEventListener('mouseenter', (e) => {
-    (e.currentTarget as HTMLButtonElement).classList.toggle('active');
-  });
-
-  button.addEventListener('mouseleave', (e) => {
-    (e.currentTarget as HTMLButtonElement).classList.toggle('active');
-  });
+  addPressInteractions(button);
 
   return button;
 }
