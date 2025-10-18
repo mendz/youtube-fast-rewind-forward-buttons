@@ -208,7 +208,7 @@ export function newUiCreateFastDoubleForwardSVG(
   `;
 }
 
-//#region old style svg creators until all users get the new uni
+//#region old style svg creators until all users get the new UI
 export function oldUiCreateFastRewindSVG(
   svgClasses: string[],
   svgUseHtml: string,
