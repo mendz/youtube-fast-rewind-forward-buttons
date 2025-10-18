@@ -272,6 +272,7 @@ export function oldUiCreateFastDoubleForwardSVG(
   </svg>
   `;
 }
+//#endregion
 
 export function createFastRewindSVG(
   svgClasses: string[],
@@ -312,7 +313,6 @@ export function createFastDoubleForwardSVG(
     ? newUiCreateFastDoubleForwardSVG(svgClasses, svgUseHtml, svgPathClasses)
     : oldUiCreateFastDoubleForwardSVG(svgClasses, svgUseHtml, svgPathClasses);
 }
-//#endregion
 
 export function createTitle(
   seconds: number,
