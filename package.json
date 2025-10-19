@@ -1,6 +1,6 @@
 {
   "name": "youtube-rewind-fastforward-buttons",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Add Fast Rewind & Forward buttons to videos player in YouTube site, same as the Left / Right arrow keys.",
   "targets": {
     "webext-dev": {
