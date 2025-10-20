@@ -7,6 +7,7 @@ import {
   resetVideo,
   getTooltip,
   handleAds,
+  blockAds,
   YOUTUBE_URL,
   clickOnNewVideoOnMainPage,
 } from './helpers';
@@ -14,6 +15,7 @@ import {
 test.setTimeout(60 * 1000);
 
 test.beforeEach(async ({ page }) => {
+  await blockAds(page);
   await page.goto(YOUTUBE_URL);
   const video = page.locator('ytd-player video');
   // pause the video

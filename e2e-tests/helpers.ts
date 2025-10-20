@@ -293,6 +293,23 @@ export async function handleAds(page: Page) {
   }
 }
 
+export async function blockAds(page: Page) {
+  const blockedHosts = [
+    'doubleclick.net',
+    'googleads.g.doubleclick.net',
+    'pagead2.googlesyndication.com',
+    'adservice.google.com',
+    'youtube.com/api/stats/ads',
+  ];
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (blockedHosts.some((host) => url.includes(host))) {
+      return route.abort();
+    }
+    return route.continue();
+  });
+}
+
 export async function getOptionFilePath(extensionId: string): Promise<string> {
   return geFilePath(extensionId, 'options');
 }
