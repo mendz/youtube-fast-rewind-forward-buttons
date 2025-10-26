@@ -11,8 +11,7 @@ const destZipPath = './dist/youtube-rewind-fastforward-buttons.zip';
  * @returns {boolean}
  */
 function isTsFile(filename) {
-  const regexTsFiles = /.*\.ts/g;
-  return regexTsFiles.test(filename);
+  return filename.endsWith('.ts');
 }
 
 function run() {

@@ -80,9 +80,3 @@ test('should show the correct title', async ({ page }) => {
 
   expect(titleText).toBe(`${firstUpdate?.version} - ${firstUpdate?.date}`);
 });
-
-// test('should include the correct text', async ({ page }) => {});
-
-// test('should open the whats new page when update new version', async ({
-//   page,
-// }) => {});
