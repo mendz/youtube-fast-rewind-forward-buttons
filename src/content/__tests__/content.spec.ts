@@ -41,7 +41,7 @@ describe('full run', () => {
       key: ArrowKey.ARROW_LEFT_KEY,
     });
     document.dispatchEvent(event);
-    expect(overrideArrowKeysSpy).toBeCalledTimes(1); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run() if this test placed in the end
+    expect(overrideArrowKeysSpy).toHaveBeenCalledTimes(1); // TODO: continue to look over of how to clear the document listeners, it called 4 times because of the 4 run() if this test placed in the end
     overrideArrowKeysSpy.mockClear();
     overrideArrowKeysSpy.mockReset();
   });
@@ -79,7 +79,8 @@ describe('full run', () => {
   it('Should console error when there is no player button', async () => {
     const errorMessage = 'No playerNextButton';
     document.querySelector('div.ytp-left-controls a.ytp-next-button')?.remove();
-    await expect(run).rejects.toThrowError(errorMessage);
+    // run is async, call it to get the promise and use the modern matcher name
+    await expect(run()).rejects.toThrow(errorMessage);
   });
 
   it('Should pass to addButtonsToVideo options and video', async () => {
@@ -89,7 +90,10 @@ describe('full run', () => {
     const addButtonsToVideoSpy = jest.spyOn(buttons, 'addButtonsToVideo');
 
     await run();
-    expect(addButtonsToVideoSpy).toBeCalledWith(DEFAULT_OPTIONS_MOCK, video);
+    expect(addButtonsToVideoSpy).toHaveBeenCalledWith(
+      DEFAULT_OPTIONS_MOCK,
+      video
+    );
   });
 
   it('Should addEventListener when run', async () => {

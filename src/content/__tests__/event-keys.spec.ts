@@ -51,7 +51,7 @@ describe('simulateKey', () => {
     const originalConsoleError = console.error;
     console.error = jest.fn();
     simulateKey('test' as ArrowKey);
-    expect(console.error).toBeCalledTimes(1);
+    expect(console.error).toHaveBeenCalledTimes(1);
     expect(console.error).toHaveBeenLastCalledWith(
       `simulateKey failed, couldn't find body`
     );
