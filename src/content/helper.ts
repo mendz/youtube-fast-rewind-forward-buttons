@@ -81,6 +81,12 @@ export function createButton({
   }
   addPressInteractions(button);
 
+  const widthHeightStyles = getWidthHeightStyles();
+  if (widthHeightStyles) {
+    button.style.setProperty('--width', widthHeightStyles.buttonWidth);
+    button.style.setProperty('--height', widthHeightStyles.buttonHeight);
+  }
+
   return button;
 }
 
@@ -103,6 +109,30 @@ export function isNewUiPlayer(): boolean {
   return document.querySelector('.ytp-delhi-modern') !== null;
 }
 
+export function getWidthHeightStyles(): {
+  buttonWidth: string;
+  buttonHeight: string;
+} | null {
+  if (!isNewUiPlayer()) {
+    return null;
+  }
+
+  const playButton = document.querySelector('.ytp-play-button');
+  const computedStyles = playButton ? getComputedStyle(playButton) : null;
+
+  if (!computedStyles) {
+    return null;
+  }
+
+  const buttonWidth = computedStyles.getPropertyValue('width');
+  const buttonHeight = computedStyles.getPropertyValue('height');
+  return {
+    buttonWidth,
+    buttonHeight,
+  };
+}
+
+//#region new style svg creators
 export function newUiCreateFastRewindSVG(
   svgClasses: string[],
   svgUseHtml: string,
@@ -207,6 +237,7 @@ export function newUiCreateFastDoubleForwardSVG(
   </svg>
   `;
 }
+//#endregion
 
 //#region old style svg creators until all users get the new UI
 export function oldUiCreateFastRewindSVG(

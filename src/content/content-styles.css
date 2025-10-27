@@ -9,6 +9,8 @@
 }
 
 .ytp-delhi-modern button.ml-custom-rewind-forward-buttons {
+  --button-width: 56px;
+  --button-height: 56px;
   position: relative;
   box-sizing: border-box;
   border-radius: 50%;
@@ -27,8 +29,8 @@
   margin-left: 2px;
 
   &.ytp-button {
-    width: 56px;
-    height: 56px;
+    width: var(--button-width);
+    height: var(--button-height);
   }
 
   &::before {
