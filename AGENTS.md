@@ -27,6 +27,7 @@ Important developer workflows (commands)
 
 Project-specific patterns and conventions
 - TypeScript-first: prefer explicit interfaces and enums (`types.d.ts`) instead of ad-hoc objects.
+- Place shared interfaces first, then types, followed by module-level `const` declarations directly after imports and before any function bodies.
 - File naming: kebab-case for files (e.g. `buttons.ts`), PascalCase for classes/components, camelCase for variables.
 - Tests: colocate test helpers under `__utils__` and name specs `<feature>.spec.ts` or `<feature>.test.ts`.
 - Chrome API stubbing: unit tests rely on `jest.setup.js` and `jest-chrome`. Do not import real chrome APIs in unit tests.
