@@ -7,10 +7,13 @@ Keep guidance concise and actionable. If you change behavior that affects tests,
 
 Key locations and why they matter
 - `src/` — extension implementation. Important subfolders:
-  - `content/` — injected scripts that interact with the YouTube player (e.g. `content.ts`, `buttons.ts`, `handle-video-player.ts`). Changes here affect runtime behavior and E2E tests.
+  - `content/` — injected scripts that interact with the YouTube player (e.g. `content.ts`, `buttons.ts`, `handle-video-player.ts`, `event-keys.ts`, `tooltip.ts`, `helper.ts`, `types.ts`). Changes here affect runtime behavior and E2E tests.
   - `background/` — service worker logic and feature flags (see `service-worker.ts`). Use this for cross-tab state and messaging.
+    - `whats-new-page/` — changelog page shown automatically on extension updates. Includes HTML, CSS, TypeScript, tests, and test helpers.
   - `options/` — the options page implementation (`options-page.ts`, `options.html`) and CSS. This is the canonical source of user-settings handling.
+  - `popup/` — popup implementation (`popup.html`, `popup.ts`, `popup.css`) that provides a button to open the options page.
   - `web-components/` — reusable UI pieces used by popup/options.
+  - `icons/` — icon assets directory (PNG files and SVG) for extension icons.
 - `manifest.json` — permission and entry points for content/background/pages. Keep schema changes minimal and document them in PRs.
 - `scripts/` — developer utilities (e.g. `updateVersion.js`, `fix-pico-paths.mjs`, `zip-ext.js`). Use these for packaging and version bumps.
 - `e2e-tests/` — Playwright integration specs. Update when changing UI flows or DOM selectors.
@@ -22,11 +25,19 @@ Important developer workflows (commands)
 - Typecheck & lint: `npm run check`, `npm run eslint`, `npm run prettier`.
 - Unit tests:
   - `npm run jest:test` or `npm run jest:test:coverage` (uses `jest.setup.js` to stub Chrome APIs via `jest-chrome`).
-  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases.
-- Playwright: `npm run playwright:test` (see `playwright.config.ts`) and tests live in `e2e-tests/`.
+  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases. Note: `jest:test` runs with `--watchAll` for continuous testing; use the pattern above to run specific files without watch mode.
+- Playwright:
+  - `npm run playwright:test` — run E2E tests (see `playwright.config.ts`), tests live in `e2e-tests/`.
+  - `npm run playwright:test:debug` — debug Playwright tests interactively.
+  - `npm run playwright:report` — show Playwright test report.
+  - `npm run playwright:codegen` — generate Playwright test code.
+- Release workflow:
+  - `npm run release` — standard version bump (follows conventional commits).
+  - `npm run release:minor`, `npm run release:patch`, `npm run release:major` — version bump by type.
+  - `npm run updateVersion` — update version script utility.
 
 Project-specific patterns and conventions
-- TypeScript-first: prefer explicit interfaces and enums (`types.d.ts`) instead of ad-hoc objects.
+- TypeScript-first: prefer explicit interfaces and enums. Shared types are in `types.d.ts`, content-specific types are in `src/content/types.ts`.
 - Place shared interfaces first, then types, followed by module-level `const` declarations directly after imports and before any function bodies.
 - File naming: kebab-case for files (e.g. `buttons.ts`), PascalCase for classes/components, camelCase for variables.
 - Tests: colocate test helpers under `__utils__` and name specs `<feature>.spec.ts` or `<feature>.test.ts`.
@@ -47,7 +58,7 @@ Small rules for AI edits
 - Preserve public APIs (message formats, settings keys in `types.d.ts`) unless you update all callsites and tests.
 
 Where to look when debugging
-- Runtime issues on YouTube pages: `src/content/*` and `src/handle-video-player.ts`.
+- Runtime issues on YouTube pages: `src/content/*` and `src/content/handle-video-player.ts`.
 - Background messaging/state: `src/background/service-worker.ts`.
 - Options/serialization bugs: `src/options/options-page.ts`.
 - Packaging / build quirks: `scripts/fix-pico-paths.mjs` and `package.json` scripts.

@@ -1,50 +1,14 @@
 import { ArrowKey, ButtonClassesIds, CreateButtonArg, IOptions } from './types';
-
-type StylableElement = HTMLButtonElement | SVGElement;
+import {
+  isNewUiPlayer,
+  setupCustomButtonsStylesSync,
+} from './button-styles-sync';
 
 // Keep custom icons visually aligned with YouTube's native play button.
 // The shapes are normalized to a 36x36 viewBox, then uniformly scaled down a touch.
 const NORMALIZED_SVG_SCALE = 0.8;
 const NORMALIZED_SVG_TRANSLATE = ((1 - NORMALIZED_SVG_SCALE) * 36) / 2;
 const NORMALIZED_SVG_TRANSLATE_STR = NORMALIZED_SVG_TRANSLATE.toFixed(2);
-
-const SPACING_PROPERTIES = [
-  'margin',
-  'margin-top',
-  'margin-right',
-  'margin-bottom',
-  'margin-left',
-  'margin-block',
-  'margin-block-start',
-  'margin-block-end',
-  'margin-inline',
-  'margin-inline-start',
-  'margin-inline-end',
-  'padding',
-  'padding-top',
-  'padding-right',
-  'padding-bottom',
-  'padding-left',
-  'padding-block',
-  'padding-block-start',
-  'padding-block-end',
-  'padding-inline',
-  'padding-inline-start',
-  'padding-inline-end',
-] as const;
-
-const BUTTON_STYLE_PROPERTIES = [
-  'width',
-  'height',
-  ...SPACING_PROPERTIES,
-] as const;
-
-const SVG_STYLE_PROPERTIES = [
-  'width',
-  'height',
-  'box-sizing',
-  ...SPACING_PROPERTIES,
-] as const;
 
 function isActivationKey(event: KeyboardEvent): boolean {
   return event.key === 'Enter' || event.key === ' ';
@@ -105,44 +69,6 @@ function addPressInteractions(button: HTMLButtonElement): void {
   button.addEventListener('blur', deactivate);
 }
 
-function applyStyleProperties(
-  target: StylableElement,
-  sourceStyles: CSSStyleDeclaration,
-  properties: readonly string[]
-): void {
-  properties.forEach((property) => {
-    const value = sourceStyles.getPropertyValue(property);
-    if (!value) return;
-    target.style.setProperty(property, value);
-  });
-}
-
-function syncWithYouTubeButtonSpacing(button: HTMLButtonElement): void {
-  if (!isNewUiPlayer()) {
-    return;
-  }
-
-  const referenceButton = document.querySelector(
-    '.ytp-play-button'
-  ) as HTMLButtonElement | null;
-
-  if (!referenceButton) {
-    return;
-  }
-
-  const referenceButtonStyles = getComputedStyle(referenceButton);
-  applyStyleProperties(button, referenceButtonStyles, BUTTON_STYLE_PROPERTIES);
-  const referenceSvg = referenceButton.querySelector('svg');
-  const targetSvg = button.querySelector('svg');
-
-  if (!referenceSvg || !targetSvg) {
-    return;
-  }
-
-  const referenceSvgStyles = getComputedStyle(referenceSvg);
-  applyStyleProperties(targetSvg, referenceSvgStyles, SVG_STYLE_PROPERTIES);
-}
-
 export function createButton({
   svg,
   title,
@@ -158,8 +84,7 @@ export function createButton({
     button.id = id;
   }
   addPressInteractions(button);
-
-  syncWithYouTubeButtonSpacing(button);
+  setupCustomButtonsStylesSync(button);
 
   return button;
 }
@@ -173,14 +98,6 @@ export function getSeconds(updateType: string, options: IOptions): number {
     default:
       return 5;
   }
-}
-
-/**
- * Build the normalized rewind SVG. We shrink/translate the path slightly so it
- * visually aligns with YouTube's native play button size.
- */
-export function isNewUiPlayer(): boolean {
-  return document.querySelector('.ytp-delhi-modern') !== null;
 }
 
 //#region new style svg creators

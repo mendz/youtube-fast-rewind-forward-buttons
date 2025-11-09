@@ -1,12 +1,12 @@
-jest.mock('../helper', () => {
-  const actual = jest.requireActual('../helper');
+jest.mock('../button-sync', () => {
+  const actual = jest.requireActual('../button-sync');
   return {
     ...actual,
     isNewUiPlayer: jest.fn(() => false),
   };
 });
 
-import { isNewUiPlayer } from '../helper';
+import { isNewUiPlayer } from '../button-styles-sync';
 import {
   getElementsForTooltipCalculation,
   handleTooltipOnMouseLeave,
