@@ -1,4 +1,4 @@
-import { isNewUiPlayer } from './helper';
+import { isNewUiPlayer } from './button-styles-sync';
 
 export function getElementsForTooltipCalculation(): {
   tooltipContainer: HTMLElement;

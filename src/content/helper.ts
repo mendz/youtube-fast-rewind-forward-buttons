@@ -1,4 +1,8 @@
 import { ArrowKey, ButtonClassesIds, CreateButtonArg, IOptions } from './types';
+import {
+  isNewUiPlayer,
+  setupCustomButtonsStylesSync,
+} from './button-styles-sync';
 
 // Keep custom icons visually aligned with YouTube's native play button.
 // The shapes are normalized to a 36x36 viewBox, then uniformly scaled down a touch.
@@ -80,6 +84,7 @@ export function createButton({
     button.id = id;
   }
   addPressInteractions(button);
+  setupCustomButtonsStylesSync(button);
 
   return button;
 }
@@ -95,14 +100,7 @@ export function getSeconds(updateType: string, options: IOptions): number {
   }
 }
 
-/**
- * Build the normalized rewind SVG. We shrink/translate the path slightly so it
- * visually aligns with YouTube's native play button size.
- */
-export function isNewUiPlayer(): boolean {
-  return document.querySelector('.ytp-delhi-modern') !== null;
-}
-
+//#region new style svg creators
 export function newUiCreateFastRewindSVG(
   svgClasses: string[],
   svgUseHtml: string,
@@ -207,6 +205,7 @@ export function newUiCreateFastDoubleForwardSVG(
   </svg>
   `;
 }
+//#endregion
 
 //#region old style svg creators until all users get the new UI
 export function oldUiCreateFastRewindSVG(

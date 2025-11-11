@@ -1,12 +1,12 @@
-jest.mock('../helper', () => {
-  const actual = jest.requireActual('../helper');
+jest.mock('../button-sync', () => {
+  const actual = jest.requireActual('../button-sync');
   return {
     ...actual,
     isNewUiPlayer: jest.fn(() => false),
   };
 });
 
-import { isNewUiPlayer } from '../helper';
+import { isNewUiPlayer } from '../button-styles-sync';
 import {
   getElementsForTooltipCalculation,
   handleTooltipOnMouseLeave,
@@ -31,7 +31,7 @@ describe('getElementsForTooltipCalculation', () => {
   it('should fail when no wrapper', () => {
     document.body.innerHTML = HTML_PLAYER_FULL;
     document.querySelector(wrapperQuery)?.remove();
-    expect(getElementsForTooltipCalculation).toThrowError(error);
+    expect(getElementsForTooltipCalculation).toThrow(error);
   });
 
   it('should fail when no wrapper parent', () => {
@@ -39,7 +39,7 @@ describe('getElementsForTooltipCalculation', () => {
     const wrapper = document.querySelector(wrapperQuery)?.cloneNode() as Node;
     document.querySelector(wrapperParentQuery)?.remove();
     document.querySelector(tooltipContainerQuery)?.appendChild(wrapper);
-    expect(getElementsForTooltipCalculation).toThrowError(error);
+    expect(getElementsForTooltipCalculation).toThrow(error);
   });
 
   it('should return the tooltip elements', () => {

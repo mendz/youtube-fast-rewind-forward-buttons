@@ -10,6 +10,7 @@ import {
   createRewindButtonTitle,
   createTitle,
 } from './helper';
+import { teardownNativeButtonSyncIfUnused } from './button-styles-sync';
 import { handleTooltipOnMouseLeave, handleTooltipOnMouseOver } from './tooltip';
 import {
   ArrowKey,
@@ -221,6 +222,8 @@ function removeButtonsByIds(buttonIds: string[]): void {
       button.remove();
     }
   });
+
+  teardownNativeButtonSyncIfUnused();
 }
 
 export function updateButtons(
