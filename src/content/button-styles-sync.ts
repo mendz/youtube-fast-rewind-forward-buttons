@@ -2,10 +2,6 @@ import { ButtonClassesIds } from './types';
 
 type StylableElement = HTMLButtonElement | SVGElement;
 
-export function isNewUiPlayer(): boolean {
-  return document.querySelector('.ytp-delhi-modern') !== null;
-}
-
 const PARENT_PROPERTIES = ['margin'] as const;
 const BUTTON_STYLE_PROPERTIES = ['width', 'height'] as const;
 const CUSTOM_BUTTON_SELECTOR = `button.${ButtonClassesIds.CLASS}`;
@@ -16,6 +12,22 @@ let playButtonContainerObserver: MutationObserver | null = null;
 let observedPlayButtonContainer: Element | null = null;
 let hasBoundPageExitCleanup = false;
 
+// #region Utility Functions
+
+/**
+ * Checks if YouTube is using the new UI player.
+ * @returns {boolean} True if the new UI player is detected, false otherwise.
+ */
+export function isNewUiPlayer(): boolean {
+  return document.querySelector('.ytp-delhi-modern') !== null;
+}
+
+/**
+ * Applies style properties from a source element's computed styles to a target element.
+ * @param {StylableElement} target - The element to apply styles to.
+ * @param {CSSStyleDeclaration} sourceStyles - The computed styles to copy from.
+ * @param {readonly string[]} properties - Array of CSS property names to copy.
+ */
 function applyStyleProperties(
   target: StylableElement,
   sourceStyles: CSSStyleDeclaration,
@@ -28,6 +40,14 @@ function applyStyleProperties(
   });
 }
 
+// #endregion
+
+// #region Cleanup Functions
+
+/**
+ * Cleans up all play button observers (ResizeObserver, MutationObserver, and container observer).
+ * Disconnects observers and resets module-level state.
+ */
 function cleanupPlayButtonObserver(): void {
   if (playButtonResizeObserver) {
     playButtonResizeObserver.disconnect();
@@ -47,10 +67,19 @@ function cleanupPlayButtonObserver(): void {
   observedPlayButtonContainer = null;
 }
 
+/**
+ * Handles page exit events by cleaning up observers.
+ * Called when the page is being unloaded or hidden.
+ */
 function handlePageExit(): void {
   cleanupPlayButtonObserver();
 }
 
+/**
+ * Binds page exit cleanup handlers to window events.
+ * Ensures observers are cleaned up when the page is unloaded.
+ * Only binds once per page lifecycle.
+ */
 function bindPageExitCleanup(): void {
   if (hasBoundPageExitCleanup) {
     return;
@@ -64,40 +93,15 @@ function bindPageExitCleanup(): void {
   hasBoundPageExitCleanup = true;
 }
 
-function resyncCustomButtonsStyles(): void {
-  if (!isNewUiPlayer()) {
-    return;
-  }
+// #endregion
 
-  const buttons = document.querySelectorAll<HTMLButtonElement>(
-    CUSTOM_BUTTON_SELECTOR
-  );
+// #region Core Sync Functions
 
-  buttons.forEach((customButton) => {
-    syncWithYouTubeButtonStyles(customButton);
-  });
-}
-
-function tryResyncCustomButtonsStyles(): void {
-  const hasObserver = ensurePlayButtonObserver();
-  if (!hasObserver) {
-    scheduleNextAttempt();
-    return;
-  }
-  resyncCustomButtonsStyles();
-}
-
-function scheduleNextAttempt(): void {
-  if (
-    typeof window !== 'undefined' &&
-    typeof window.requestAnimationFrame === 'function'
-  ) {
-    window.requestAnimationFrame(tryResyncCustomButtonsStyles);
-  } else {
-    setTimeout(tryResyncCustomButtonsStyles, 100);
-  }
-}
-
+/**
+ * Syncs a single custom button's styles with YouTube's native button styles.
+ * Copies width, height, and margin properties from the reference mute button.
+ * @param {HTMLButtonElement} button - The custom button to sync styles for.
+ */
 function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   if (!isNewUiPlayer()) {
     return;
@@ -124,6 +128,34 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   }
 }
 
+/**
+ * Resyncs styles for all custom buttons found in the document.
+ * Only works with the new UI player.
+ */
+function resyncCustomButtonsStyles(): void {
+  if (!isNewUiPlayer()) {
+    return;
+  }
+
+  const buttons = document.querySelectorAll<HTMLButtonElement>(
+    CUSTOM_BUTTON_SELECTOR
+  );
+
+  buttons.forEach((customButton) => {
+    syncWithYouTubeButtonStyles(customButton);
+  });
+}
+
+// #endregion
+
+// #region Observer Setup
+
+/**
+ * Ensures that observers are set up for the play button to detect style changes.
+ * Sets up ResizeObserver and MutationObserver on the mute button, and a MutationObserver
+ * on its container. Also binds page exit cleanup handlers.
+ * @returns {boolean} True if observers were successfully set up, false otherwise.
+ */
 function ensurePlayButtonObserver(): boolean {
   if (!isNewUiPlayer()) {
     cleanupPlayButtonObserver();
@@ -191,6 +223,62 @@ function ensurePlayButtonObserver(): boolean {
   return true;
 }
 
+// #endregion
+
+// #region Retry Logic
+
+/**
+ * Schedules the next attempt to resync custom button styles.
+ * Uses requestAnimationFrame if available, otherwise falls back to setTimeout.
+ */
+function scheduleNextAttempt(): void {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.requestAnimationFrame === 'function'
+  ) {
+    window.requestAnimationFrame(tryResyncCustomButtonsStyles);
+  } else {
+    setTimeout(tryResyncCustomButtonsStyles, 100);
+  }
+}
+
+/**
+ * Attempts to resync custom button styles, with retry logic if observers aren't ready.
+ * If observers can't be set up, schedules another attempt.
+ */
+function tryResyncCustomButtonsStyles(): void {
+  const hasObserver = ensurePlayButtonObserver();
+  if (!hasObserver) {
+    scheduleNextAttempt();
+    return;
+  }
+  resyncCustomButtonsStyles();
+}
+
+// #endregion
+
+// #region Entry Points
+
+/**
+ * Sets up style synchronization for a custom button.
+ * Syncs the button's styles immediately and ensures observers are in place
+ * to keep styles in sync as YouTube's UI changes.
+ * @param {HTMLButtonElement} button - The custom button to set up style sync for.
+ */
+export function setupCustomButtonsStylesSync(button: HTMLButtonElement): void {
+  if (!isNewUiPlayer()) {
+    return;
+  }
+
+  syncWithYouTubeButtonStyles(button);
+  ensurePlayButtonObserver();
+  tryResyncCustomButtonsStyles();
+}
+
+/**
+ * Tears down native button sync observers if no custom buttons are present.
+ * Cleans up observers when all custom buttons have been removed from the page.
+ */
 export function teardownNativeButtonSyncIfUnused(): void {
   const hasCustomButtons =
     document.querySelector(CUSTOM_BUTTON_SELECTOR) !== null;
@@ -202,12 +290,4 @@ export function teardownNativeButtonSyncIfUnused(): void {
   cleanupPlayButtonObserver();
 }
 
-export function setupCustomButtonsStylesSync(button: HTMLButtonElement): void {
-  if (!isNewUiPlayer()) {
-    return;
-  }
-
-  syncWithYouTubeButtonStyles(button);
-  ensurePlayButtonObserver();
-  tryResyncCustomButtonsStyles();
-}
+// #endregion
