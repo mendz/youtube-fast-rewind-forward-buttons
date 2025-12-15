@@ -55,7 +55,7 @@ module.exports = defineConfig([
       semi: 2,
       'no-console': 0,
       'sonarjs/todo-tag': 1,
-
+      'sonarjs/no-commented-code': 1,
       'prettier/prettier': [
         0,
         {

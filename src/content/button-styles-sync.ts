@@ -6,61 +6,8 @@ export function isNewUiPlayer(): boolean {
   return document.querySelector('.ytp-delhi-modern') !== null;
 }
 
-const SPACING_PROPERTIES = [
-  'margin',
-  'margin-top',
-  'margin-right',
-  'margin-bottom',
-  'margin-left',
-  'margin-block',
-  'margin-block-start',
-  'margin-block-end',
-  'margin-inline',
-  'margin-inline-start',
-  'margin-inline-end',
-  'padding',
-  'padding-top',
-  'padding-right',
-  'padding-bottom',
-  'padding-left',
-  'padding-block',
-  'padding-block-start',
-  'padding-block-end',
-  'padding-inline',
-  'padding-inline-start',
-  'padding-inline-end',
-] as const;
-
-const MARGIN_PROPERTIES = [
-  'margin',
-  'margin-top',
-  'margin-right',
-  'margin-bottom',
-  'margin-left',
-  'margin-block',
-  'margin-block-start',
-  'margin-block-end',
-  'margin-inline',
-  'margin-inline-start',
-  'margin-inline-end',
-] as const;
-
-const BUTTON_STYLE_PROPERTIES = [
-  'width',
-  'height',
-  'box-sizing',
-  'line-height',
-  'padding',
-  ...MARGIN_PROPERTIES,
-] as const;
-
-const SVG_STYLE_PROPERTIES = [
-  'width',
-  'height',
-  'box-sizing',
-  ...SPACING_PROPERTIES,
-] as const;
-
+const PARENT_PROPERTIES = ['margin'] as const;
+const BUTTON_STYLE_PROPERTIES = ['width', 'height'] as const;
 const CUSTOM_BUTTON_SELECTOR = `button.${ButtonClassesIds.CLASS}`;
 
 let playButtonResizeObserver: ResizeObserver | null = null;
@@ -173,21 +120,8 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   ) as HTMLElement | null;
   if (volumeArea) {
     const volumeAreaStyles = getComputedStyle(volumeArea);
-    applyStyleProperties(button, volumeAreaStyles, [
-      ...MARGIN_PROPERTIES,
-      'height',
-    ]);
+    applyStyleProperties(button, volumeAreaStyles, [...PARENT_PROPERTIES]);
   }
-
-  const referenceSvg = referenceButton.querySelector('svg');
-  const targetSvg = button.querySelector('svg');
-
-  if (!referenceSvg || !targetSvg) {
-    return;
-  }
-
-  const referenceSvgStyles = getComputedStyle(referenceSvg);
-  applyStyleProperties(targetSvg, referenceSvgStyles, SVG_STYLE_PROPERTIES);
 }
 
 function ensurePlayButtonObserver(): boolean {
