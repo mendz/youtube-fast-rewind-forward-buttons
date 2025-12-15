@@ -31,10 +31,27 @@ const SPACING_PROPERTIES = [
   'padding-inline-end',
 ] as const;
 
+const MARGIN_PROPERTIES = [
+  'margin',
+  'margin-top',
+  'margin-right',
+  'margin-bottom',
+  'margin-left',
+  'margin-block',
+  'margin-block-start',
+  'margin-block-end',
+  'margin-inline',
+  'margin-inline-start',
+  'margin-inline-end',
+] as const;
+
 const BUTTON_STYLE_PROPERTIES = [
   'width',
   'height',
-  ...SPACING_PROPERTIES,
+  'box-sizing',
+  'line-height',
+  'padding',
+  ...MARGIN_PROPERTIES,
 ] as const;
 
 const SVG_STYLE_PROPERTIES = [
@@ -134,21 +151,13 @@ function scheduleNextAttempt(): void {
   }
 }
 
-function scheduleResyncCustomButtons(): void {
-  if (!isNewUiPlayer()) {
-    return;
-  }
-
-  tryResyncCustomButtonsStyles();
-}
-
 function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   if (!isNewUiPlayer()) {
     return;
   }
 
   const referenceButton = document.querySelector(
-    '.ytp-play-button'
+    '.ytp-left-controls .ytp-mute-button'
   ) as HTMLButtonElement | null;
 
   if (!referenceButton) {
@@ -157,6 +166,19 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
 
   const referenceButtonStyles = getComputedStyle(referenceButton);
   applyStyleProperties(button, referenceButtonStyles, BUTTON_STYLE_PROPERTIES);
+
+  // Copy margin from parent .ytp-volume-area to override button's margin
+  const volumeArea = referenceButton.closest(
+    '.ytp-volume-area'
+  ) as HTMLElement | null;
+  if (volumeArea) {
+    const volumeAreaStyles = getComputedStyle(volumeArea);
+    applyStyleProperties(button, volumeAreaStyles, [
+      ...MARGIN_PROPERTIES,
+      'height',
+    ]);
+  }
+
   const referenceSvg = referenceButton.querySelector('svg');
   const targetSvg = button.querySelector('svg');
 
@@ -175,7 +197,7 @@ function ensurePlayButtonObserver(): boolean {
   }
 
   const playButton = document.querySelector(
-    '.ytp-play-button'
+    '.ytp-mute-button'
   ) as HTMLButtonElement | null;
 
   if (!playButton) {
@@ -253,5 +275,5 @@ export function setupCustomButtonsStylesSync(button: HTMLButtonElement): void {
 
   syncWithYouTubeButtonStyles(button);
   ensurePlayButtonObserver();
-  scheduleResyncCustomButtons();
+  tryResyncCustomButtonsStyles();
 }

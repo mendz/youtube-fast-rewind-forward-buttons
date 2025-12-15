@@ -5,9 +5,9 @@ import {
 } from './button-styles-sync';
 
 // Keep custom icons visually aligned with YouTube's native play button.
-// The shapes are normalized to a 36x36 viewBox, then uniformly scaled down a touch.
+// The shapes are normalized to a 24x24 viewBox, then uniformly scaled down a touch.
 const NORMALIZED_SVG_SCALE = 0.8;
-const NORMALIZED_SVG_TRANSLATE = ((1 - NORMALIZED_SVG_SCALE) * 36) / 2;
+const NORMALIZED_SVG_TRANSLATE = ((1 - NORMALIZED_SVG_SCALE) * 24) / 2;
 const NORMALIZED_SVG_TRANSLATE_STR = NORMALIZED_SVG_TRANSLATE.toFixed(2);
 
 function isActivationKey(event: KeyboardEvent): boolean {
@@ -109,7 +109,7 @@ export function newUiCreateFastRewindSVG(
   return `
     <svg class="${svgClasses.join(
       ' '
-    )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36" width="36" fill="none">
+    )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24" fill="none">
       ${svgUseHtml.replace(
         /xlink:href="#.*"/,
         'xlink:href="#custom-path-rewind"'
@@ -117,7 +117,7 @@ export function newUiCreateFastRewindSVG(
       <path
         id="custom-path-rewind"
         class="${svgPathClasses.join(' ')}"
-        d="M36 0L19.21 18L36 36V0ZM16.79 0L0 18L16.79 36V0Z"
+        d="M24 0L12.81 12L24 24V0ZM11.19 0L0 12L11.19 24V0Z"
         fill="white"
         transform="translate(${NORMALIZED_SVG_TRANSLATE_STR} ${NORMALIZED_SVG_TRANSLATE_STR}) scale(${NORMALIZED_SVG_SCALE})"
       />
@@ -136,7 +136,7 @@ export function newUiCreateFastForwardSVG(
   return `
     <svg class="${svgClasses.join(
       ' '
-    )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36" width="36" fill="none">
+    )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24" fill="none">
       ${svgUseHtml.replace(
         /xlink:href="#.*"/,
         'xlink:href="#custom-path-fast-forward"'
@@ -144,7 +144,7 @@ export function newUiCreateFastForwardSVG(
       <path
         id="custom-path-fast-forward"
         class="${svgPathClasses.join(' ')}"
-        d="M0 0V36L16.71 18L0 0ZM19.29 0V36L36 18L19.29 0Z"
+        d="M0 0V24L11.14 12L0 0ZM12.86 0V24L24 12L12.86 0Z"
         fill="white"
         transform="translate(${NORMALIZED_SVG_TRANSLATE_STR} ${NORMALIZED_SVG_TRANSLATE_STR}) scale(${NORMALIZED_SVG_SCALE})"
       />
@@ -163,7 +163,7 @@ export function newUiCreateFastDoubleRewindSVG(
   return `
   <svg class="${svgClasses.join(
     ' '
-  )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36" width="36" fill="none">
+  )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24" fill="none">
     ${svgUseHtml.replace(
       /xlink:href="#.*"/,
       'xlink:href="#custom-path-double-rewind"'
@@ -171,7 +171,7 @@ export function newUiCreateFastDoubleRewindSVG(
     <path
       id="custom-path-double-rewind"
       class="${svgPathClasses.join(' ')}"
-      d="M15.9 0L0 18L15.9 36L18.99 32.5L6.21 18L18.99 3.5L15.9 0ZM32.91 0L17.01 18L32.91 36L36 32.5L23.21 18L36 3.5L32.91 0Z"
+      d="M10.6 0L0 12L10.6 24L12.66 21.67L4.14 12L12.66 2.33L10.6 0ZM21.94 0L11.34 12L21.94 24L24 21.67L15.47 12L24 2.33L21.94 0Z"
       fill="white"
       transform="translate(${NORMALIZED_SVG_TRANSLATE_STR} ${NORMALIZED_SVG_TRANSLATE_STR}) scale(${NORMALIZED_SVG_SCALE})"
     />
@@ -190,7 +190,7 @@ export function newUiCreateFastDoubleForwardSVG(
   return `
   <svg class="${svgClasses.join(
     ' '
-  )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36" width="36" fill="none">
+  )}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24" fill="none">
     ${svgUseHtml.replace(
       /xlink:href="#.*"/,
       'xlink:href="#custom-path-double-forward"'
@@ -198,7 +198,7 @@ export function newUiCreateFastDoubleForwardSVG(
     <path
       id="custom-path-double-forward"
       class="${svgPathClasses.join(' ')}"
-      d="M12.79 18L0 32.5L3.09 36L18.99 18L3.09 0L0 3.5L12.79 18ZM29.79 18L17.01 32.5L20.1 36L36 18L20.1 0L17.01 3.5L29.79 18Z"
+      d="M8.53 12L0 21.67L2.06 24L12.66 12L2.06 0L0 2.33L8.53 12ZM19.86 12L11.34 21.67L13.4 24L24 12L13.4 0L11.34 2.33L19.86 12Z"
       fill="white"
       transform="translate(${NORMALIZED_SVG_TRANSLATE_STR} ${NORMALIZED_SVG_TRANSLATE_STR}) scale(${NORMALIZED_SVG_SCALE})"
     />
