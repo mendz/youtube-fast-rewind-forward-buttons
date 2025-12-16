@@ -11,6 +11,29 @@ let muteButtonMutationObserver: MutationObserver | null = null;
 let muteButtonContainerObserver: MutationObserver | null = null;
 let observedMuteButtonContainer: Element | null = null;
 let hasBoundPageExitCleanup = false;
+let resyncQueued = false;
+
+function requestResyncCustomButtonsStyles(): void {
+  if (resyncQueued) {
+    return;
+  }
+  resyncQueued = true;
+
+  const run = (): void => {
+    resyncQueued = false;
+    resyncCustomButtonsStyles();
+  };
+
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.requestAnimationFrame === 'function'
+  ) {
+    window.requestAnimationFrame(run);
+    return;
+  }
+
+  setTimeout(run, 100);
+}
 
 // #region Utility Functions
 
@@ -65,6 +88,7 @@ function cleanupMuteButtonObserver(): void {
   }
 
   observedMuteButtonContainer = null;
+  resyncQueued = false;
 }
 
 /**
@@ -183,7 +207,7 @@ function ensureMuteButtonObserver(): boolean {
   if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
     if (!muteButtonResizeObserver) {
       muteButtonResizeObserver = new window.ResizeObserver(() => {
-        resyncCustomButtonsStyles();
+        requestResyncCustomButtonsStyles();
       });
     } else {
       muteButtonResizeObserver.disconnect();
@@ -193,7 +217,7 @@ function ensureMuteButtonObserver(): boolean {
 
   if (!muteButtonMutationObserver) {
     muteButtonMutationObserver = new MutationObserver(() => {
-      resyncCustomButtonsStyles();
+      requestResyncCustomButtonsStyles();
     });
   } else {
     muteButtonMutationObserver.disconnect();
@@ -210,7 +234,7 @@ function ensureMuteButtonObserver(): boolean {
     if (!muteButtonContainerObserver) {
       muteButtonContainerObserver = new MutationObserver(() => {
         ensureMuteButtonObserver();
-        resyncCustomButtonsStyles();
+        requestResyncCustomButtonsStyles();
       });
     } else {
       muteButtonContainerObserver.disconnect();
@@ -257,7 +281,7 @@ function tryResyncCustomButtonsStyles(): void {
     scheduleNextAttempt();
     return;
   }
-  resyncCustomButtonsStyles();
+  requestResyncCustomButtonsStyles();
 }
 
 // #endregion

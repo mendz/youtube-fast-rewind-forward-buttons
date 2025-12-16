@@ -1,5 +1,5 @@
-jest.mock('../button-sync', () => {
-  const actual = jest.requireActual('../button-sync');
+jest.mock('../button-styles-sync', () => {
+  const actual = jest.requireActual('../button-styles-sync');
   return {
     ...actual,
     isNewUiPlayer: jest.fn(() => false),
