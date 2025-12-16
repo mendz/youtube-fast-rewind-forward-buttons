@@ -6,10 +6,10 @@ const PARENT_PROPERTIES = ['margin'] as const;
 const BUTTON_STYLE_PROPERTIES = ['width', 'height'] as const;
 const CUSTOM_BUTTON_SELECTOR = `button.${ButtonClassesIds.CLASS}`;
 
-let playButtonResizeObserver: ResizeObserver | null = null;
-let playButtonMutationObserver: MutationObserver | null = null;
-let playButtonContainerObserver: MutationObserver | null = null;
-let observedPlayButtonContainer: Element | null = null;
+let muteButtonResizeObserver: ResizeObserver | null = null;
+let muteButtonMutationObserver: MutationObserver | null = null;
+let muteButtonContainerObserver: MutationObserver | null = null;
+let observedMuteButtonContainer: Element | null = null;
 let hasBoundPageExitCleanup = false;
 
 // #region Utility Functions
@@ -45,26 +45,26 @@ function applyStyleProperties(
 // #region Cleanup Functions
 
 /**
- * Cleans up all play button observers (ResizeObserver, MutationObserver, and container observer).
+ * Cleans up all mute button observers (ResizeObserver, MutationObserver, and container observer).
  * Disconnects observers and resets module-level state.
  */
-function cleanupPlayButtonObserver(): void {
-  if (playButtonResizeObserver) {
-    playButtonResizeObserver.disconnect();
-    playButtonResizeObserver = null;
+function cleanupMuteButtonObserver(): void {
+  if (muteButtonResizeObserver) {
+    muteButtonResizeObserver.disconnect();
+    muteButtonResizeObserver = null;
   }
 
-  if (playButtonMutationObserver) {
-    playButtonMutationObserver.disconnect();
-    playButtonMutationObserver = null;
+  if (muteButtonMutationObserver) {
+    muteButtonMutationObserver.disconnect();
+    muteButtonMutationObserver = null;
   }
 
-  if (playButtonContainerObserver) {
-    playButtonContainerObserver.disconnect();
-    playButtonContainerObserver = null;
+  if (muteButtonContainerObserver) {
+    muteButtonContainerObserver.disconnect();
+    muteButtonContainerObserver = null;
   }
 
-  observedPlayButtonContainer = null;
+  observedMuteButtonContainer = null;
 }
 
 /**
@@ -72,7 +72,7 @@ function cleanupPlayButtonObserver(): void {
  * Called when the page is being unloaded or hidden.
  */
 function handlePageExit(): void {
-  cleanupPlayButtonObserver();
+  cleanupMuteButtonObserver();
 }
 
 /**
@@ -112,6 +112,7 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   ) as HTMLButtonElement | null;
 
   if (!referenceButton) {
+    console.warn('No reference button found');
     return;
   }
 
@@ -122,10 +123,14 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   const volumeArea = referenceButton.closest(
     '.ytp-volume-area'
   ) as HTMLElement | null;
-  if (volumeArea) {
-    const volumeAreaStyles = getComputedStyle(volumeArea);
-    applyStyleProperties(button, volumeAreaStyles, [...PARENT_PROPERTIES]);
+
+  if (!volumeArea) {
+    console.warn('No volume area found');
+    return;
   }
+
+  const volumeAreaStyles = getComputedStyle(volumeArea);
+  applyStyleProperties(button, volumeAreaStyles, [...PARENT_PROPERTIES]);
 }
 
 /**
@@ -156,67 +161,67 @@ function resyncCustomButtonsStyles(): void {
  * on its container. Also binds page exit cleanup handlers.
  * @returns {boolean} True if observers were successfully set up, false otherwise.
  */
-function ensurePlayButtonObserver(): boolean {
+function ensureMuteButtonObserver(): boolean {
   if (!isNewUiPlayer()) {
-    cleanupPlayButtonObserver();
+    cleanupMuteButtonObserver();
     return false;
   }
 
-  const playButton = document.querySelector(
+  const muteButton = document.querySelector(
     '.ytp-mute-button'
   ) as HTMLButtonElement | null;
 
-  if (!playButton) {
-    cleanupPlayButtonObserver();
+  if (!muteButton) {
+    cleanupMuteButtonObserver();
     return false;
   }
 
-  if (!observedPlayButtonContainer?.isConnected) {
-    cleanupPlayButtonObserver();
+  if (!observedMuteButtonContainer?.isConnected) {
+    cleanupMuteButtonObserver();
   }
 
   if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
-    if (!playButtonResizeObserver) {
-      playButtonResizeObserver = new window.ResizeObserver(() => {
+    if (!muteButtonResizeObserver) {
+      muteButtonResizeObserver = new window.ResizeObserver(() => {
         resyncCustomButtonsStyles();
       });
     } else {
-      playButtonResizeObserver.disconnect();
+      muteButtonResizeObserver.disconnect();
     }
-    playButtonResizeObserver.observe(playButton);
+    muteButtonResizeObserver.observe(muteButton);
   }
 
-  if (!playButtonMutationObserver) {
-    playButtonMutationObserver = new MutationObserver(() => {
+  if (!muteButtonMutationObserver) {
+    muteButtonMutationObserver = new MutationObserver(() => {
       resyncCustomButtonsStyles();
     });
   } else {
-    playButtonMutationObserver.disconnect();
+    muteButtonMutationObserver.disconnect();
   }
 
-  playButtonMutationObserver.observe(playButton, {
+  muteButtonMutationObserver.observe(muteButton, {
     attributes: true,
     attributeFilter: ['class', 'style'],
   });
 
-  const playButtonContainer = playButton.parentElement;
+  const muteButtonContainer = muteButton.parentElement;
 
-  if (playButtonContainer) {
-    if (!playButtonContainerObserver) {
-      playButtonContainerObserver = new MutationObserver(() => {
-        ensurePlayButtonObserver();
+  if (muteButtonContainer) {
+    if (!muteButtonContainerObserver) {
+      muteButtonContainerObserver = new MutationObserver(() => {
+        ensureMuteButtonObserver();
         resyncCustomButtonsStyles();
       });
     } else {
-      playButtonContainerObserver.disconnect();
+      muteButtonContainerObserver.disconnect();
     }
 
-    playButtonContainerObserver.observe(playButtonContainer, {
+    muteButtonContainerObserver.observe(muteButtonContainer, {
       childList: true,
       subtree: true,
     });
 
-    observedPlayButtonContainer = playButtonContainer;
+    observedMuteButtonContainer = muteButtonContainer;
   }
 
   bindPageExitCleanup();
@@ -247,7 +252,7 @@ function scheduleNextAttempt(): void {
  * If observers can't be set up, schedules another attempt.
  */
 function tryResyncCustomButtonsStyles(): void {
-  const hasObserver = ensurePlayButtonObserver();
+  const hasObserver = ensureMuteButtonObserver();
   if (!hasObserver) {
     scheduleNextAttempt();
     return;
@@ -271,7 +276,7 @@ export function setupCustomButtonsStylesSync(button: HTMLButtonElement): void {
   }
 
   syncWithYouTubeButtonStyles(button);
-  ensurePlayButtonObserver();
+  ensureMuteButtonObserver();
   tryResyncCustomButtonsStyles();
 }
 
@@ -287,7 +292,7 @@ export function teardownNativeButtonSyncIfUnused(): void {
     return;
   }
 
-  cleanupPlayButtonObserver();
+  cleanupMuteButtonObserver();
 }
 
 // #endregion
