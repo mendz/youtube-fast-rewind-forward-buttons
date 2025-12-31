@@ -23,7 +23,7 @@
     "prepare": "husky install",
     "lint-staged": "lint-staged",
     "prettier": "prettier .",
-    "eslint": "eslint .",
+    "lint": "eslint .",
     "updateVersion": "node ./scripts/updateVersion.js",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",

@@ -57,6 +57,18 @@ export const INITIAL_HTML_PLAYER_FULL = /* html */ `
 </div>
 `;
 
+const HTML_PLAYER_NEW_UI = /* html */ `
+<div class="ytp-delhi-modern">
+  <div class="ytp-chrome-controls">
+    <div class="ytp-left-controls">
+      <div class="ytp-volume-area">
+        <button class="ytp-mute-button ytp-button"></button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 export const SVG_CLASSES_MOCK = ['test-class'];
 export const SVG_FORWARD_USE_HTML_MOCK =
   '<use class="ytp-svg-shadow" xlink:href="#custom-path-fast-forward"></use>';
@@ -103,4 +115,8 @@ export function createSvgMock(
   }
   document.body.innerHTML = newSvg;
   return document.querySelector('svg') as SVGSVGElement;
+}
+
+export function createNewUiPlayerMarkup(): void {
+  document.body.innerHTML = HTML_PLAYER_NEW_UI;
 }
