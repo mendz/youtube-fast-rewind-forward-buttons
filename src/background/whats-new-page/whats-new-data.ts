@@ -54,6 +54,18 @@ export const versionUpdates: IVersionUpdates[] = [
       },
     ],
   },
+  {
+    version: 'v1.4.4',
+    date: getDate('2026-01-19'),
+    updates: [
+      {
+        title: 'Improved button appearance in new YouTube UI',
+        description:
+          "Refined button sizing and styling to match YouTube's latest player design.\nButtons now automatically adapt to the video player changes, ensuring they always stay aligned.",
+        type: 'fixed',
+      },
+    ],
+  },
 ];
 
 export function getDate(dateStr: string) {
