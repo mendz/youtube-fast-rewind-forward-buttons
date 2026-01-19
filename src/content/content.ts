@@ -108,19 +108,25 @@ export function mergeOptions(
   currentOptions: IOptions
 ): IOptions {
   let changeForwardSeconds: Nullable<number> = parseInt(
-    newChangesOptions.forwardSeconds?.newValue,
+    newChangesOptions.forwardSeconds?.newValue as string,
     10
   );
   let changeRewindSeconds: Nullable<number> = parseInt(
-    newChangesOptions.rewindSeconds?.newValue,
+    newChangesOptions.rewindSeconds?.newValue as string,
     10
   );
   let changeSecondaryForwardSeconds: Nullable<number> = parseInt(
-    newChangesOptions.secondarySeconds?.newValue?.forwardSeconds,
+    (
+      newChangesOptions.secondarySeconds
+        ?.newValue as IStorageOptions['secondarySeconds']
+    )?.forwardSeconds,
     10
   );
   let changeSecondaryRewindSeconds: Nullable<number> = parseInt(
-    newChangesOptions.secondarySeconds?.newValue?.rewindSeconds,
+    (
+      newChangesOptions.secondarySeconds
+        ?.newValue as IStorageOptions['secondarySeconds']
+    )?.rewindSeconds,
     10
   );
 
@@ -142,7 +148,10 @@ export function mergeOptions(
     rewindSeconds: changeRewindSeconds ?? currentOptions.rewindSeconds,
     secondarySeconds: {
       checkboxIsEnabled:
-        newChangesOptions.secondarySeconds?.newValue?.checkboxIsEnabled ??
+        (
+          newChangesOptions.secondarySeconds
+            ?.newValue as IStorageOptions['secondarySeconds']
+        )?.checkboxIsEnabled ??
         currentOptions.secondarySeconds.checkboxIsEnabled,
       forwardSeconds:
         changeSecondaryForwardSeconds ??
@@ -152,10 +161,10 @@ export function mergeOptions(
         currentOptions.secondarySeconds.rewindSeconds,
     },
     shouldOverrideArrowKeys:
-      newChangesOptions.shouldOverrideArrowKeys?.newValue ??
+      (newChangesOptions.shouldOverrideArrowKeys?.newValue as boolean) ??
       currentOptions.shouldOverrideArrowKeys,
     shouldOverrideMediaKeys:
-      newChangesOptions.shouldOverrideMediaKeys?.newValue ??
+      (newChangesOptions.shouldOverrideMediaKeys?.newValue as boolean) ??
       currentOptions.shouldOverrideMediaKeys,
   };
 
