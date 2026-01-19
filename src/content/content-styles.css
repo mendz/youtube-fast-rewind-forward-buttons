@@ -42,7 +42,7 @@
   &::after {
     content: '';
     position: absolute;
-    inset: 0px;
+    inset: 4px;
     background: transparent;
     pointer-events: none;
     border-radius: 27px;
@@ -62,7 +62,9 @@
     opacity: 1;
     -webkit-transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
     transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+  }
 
+  &:hover::after {
     background-color: var(
       --yt-spec-overlay-button-secondary,
       rgba(255, 255, 255, 0.1)
