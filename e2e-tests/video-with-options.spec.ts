@@ -10,6 +10,7 @@ import {
   OPTIONS_CHANGED_VALUES,
   OPTIONS_DEFAULT_VALUES,
   resetVideo,
+  Selectors,
   setVideoTime,
   test,
   YOUTUBE_URL,
@@ -373,9 +374,8 @@ test('should options change affect new youtube page', async ({
   });
 
   await test.step('Verify navigate to another video will take and use the new options', async () => {
-    const ANOTHER_YOUTUBE_SELECTOR = 'yt-lockup-view-model';
     const newVideoContainer = videoPage
-      .locator(ANOTHER_YOUTUBE_SELECTOR)
+      .locator(Selectors.ANOTHER_YOUTUBE_SELECTOR)
       .first();
     const url: string = await newVideoContainer.evaluate(
       (newVideoContainer) => {
@@ -384,7 +384,10 @@ test('should options change affect new youtube page', async ({
         );
       }
     );
-    await videoPage.locator(`${ANOTHER_YOUTUBE_SELECTOR} a`).first().click();
+    await videoPage
+      .locator(`${Selectors.ANOTHER_YOUTUBE_SELECTOR} a`)
+      .first()
+      .click();
     expect(url).toContain(videoPage.url());
 
     const { video, rewindButton, forwardButton } =
