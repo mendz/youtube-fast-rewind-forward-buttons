@@ -13,6 +13,14 @@ let observedMuteButtonContainer: Element | null = null;
 let hasBoundPageExitCleanup = false;
 let resyncQueued = false;
 
+// Cache for isNewUiPlayer() to avoid redundant DOM queries within the same frame
+let cachedIsNewUi: boolean | null = null;
+let isNewUiCacheFrame: number | null = null;
+
+// Retry logic state
+const MAX_RETRY_ATTEMPTS = 50; // ~3 seconds with RAF at 60fps
+let retryAttempts = 0;
+
 function requestResyncCustomButtonsStyles(): void {
   if (resyncQueued) {
     return;
@@ -39,10 +47,42 @@ function requestResyncCustomButtonsStyles(): void {
 
 /**
  * Checks if YouTube is using the new UI player.
+ * Result is cached per animation frame to avoid redundant DOM queries.
  * @returns {boolean} True if the new UI player is detected, false otherwise.
  */
 export function isNewUiPlayer(): boolean {
-  return document.querySelector('.ytp-delhi-modern') !== null;
+  if (cachedIsNewUi !== null) return cachedIsNewUi;
+
+  cachedIsNewUi = document.querySelector('.ytp-delhi-modern') !== null;
+
+  // Invalidate cache on next frame
+  if (
+    isNewUiCacheFrame === null &&
+    typeof window !== 'undefined' &&
+    typeof window.requestAnimationFrame === 'function'
+  ) {
+    isNewUiCacheFrame = window.requestAnimationFrame(() => {
+      cachedIsNewUi = null;
+      isNewUiCacheFrame = null;
+    });
+  }
+
+  return cachedIsNewUi;
+}
+
+/**
+ * Resets the isNewUiPlayer cache. Exposed for testing purposes.
+ */
+export function resetIsNewUiPlayerCache(): void {
+  cachedIsNewUi = null;
+  if (
+    isNewUiCacheFrame !== null &&
+    typeof window !== 'undefined' &&
+    typeof window.cancelAnimationFrame === 'function'
+  ) {
+    window.cancelAnimationFrame(isNewUiCacheFrame);
+  }
+  isNewUiCacheFrame = null;
 }
 
 /**
@@ -154,24 +194,44 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   }
 
   const volumeAreaStyles = getComputedStyle(volumeArea);
-  applyStyleProperties(button, volumeAreaStyles, [...PARENT_PROPERTIES]);
+  applyStyleProperties(button, volumeAreaStyles, PARENT_PROPERTIES);
 }
 
 /**
  * Resyncs styles for all custom buttons found in the document.
  * Only works with the new UI player.
+ * Caches reference elements and computed styles to avoid redundant DOM queries.
  */
 function resyncCustomButtonsStyles(): void {
   if (!isNewUiPlayer()) {
     return;
   }
 
+  const referenceButton = document.querySelector(
+    '.ytp-left-controls .ytp-mute-button'
+  ) as HTMLButtonElement | null;
+  if (!referenceButton) {
+    return;
+  }
+
+  const volumeArea = referenceButton.closest(
+    '.ytp-volume-area'
+  ) as HTMLElement | null;
+  if (!volumeArea) {
+    return;
+  }
+
+  // Cache styles ONCE
+  const refStyles = getComputedStyle(referenceButton);
+  const volumeStyles = getComputedStyle(volumeArea);
+
   const buttons = document.querySelectorAll<HTMLButtonElement>(
     CUSTOM_BUTTON_SELECTOR
   );
 
-  buttons.forEach((customButton) => {
-    syncWithYouTubeButtonStyles(customButton);
+  buttons.forEach((btn) => {
+    applyStyleProperties(btn, refStyles, BUTTON_STYLE_PROPERTIES);
+    applyStyleProperties(btn, volumeStyles, PARENT_PROPERTIES);
   });
 }
 
@@ -242,7 +302,6 @@ function ensureMuteButtonObserver(): boolean {
 
     muteButtonContainerObserver.observe(muteButtonContainer, {
       childList: true,
-      subtree: true,
     });
 
     observedMuteButtonContainer = muteButtonContainer;
@@ -259,8 +318,15 @@ function ensureMuteButtonObserver(): boolean {
 /**
  * Schedules the next attempt to resync custom button styles.
  * Uses requestAnimationFrame if available, otherwise falls back to setTimeout.
+ * Stops after MAX_RETRY_ATTEMPTS to prevent infinite loops.
  */
 function scheduleNextAttempt(): void {
+  if (retryAttempts >= MAX_RETRY_ATTEMPTS) {
+    console.warn('Max retries reached for button style sync');
+    return;
+  }
+  retryAttempts++;
+
   if (
     typeof window !== 'undefined' &&
     typeof window.requestAnimationFrame === 'function'
@@ -274,6 +340,7 @@ function scheduleNextAttempt(): void {
 /**
  * Attempts to resync custom button styles, with retry logic if observers aren't ready.
  * If observers can't be set up, schedules another attempt.
+ * Resets retry counter on success.
  */
 function tryResyncCustomButtonsStyles(): void {
   const hasObserver = ensureMuteButtonObserver();
@@ -281,6 +348,7 @@ function tryResyncCustomButtonsStyles(): void {
     scheduleNextAttempt();
     return;
   }
+  retryAttempts = 0; // Reset on success
   requestResyncCustomButtonsStyles();
 }
 

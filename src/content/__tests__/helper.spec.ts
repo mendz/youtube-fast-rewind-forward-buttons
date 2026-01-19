@@ -7,6 +7,7 @@ import {
   SVG_PATH_CLASSES_MOCK,
   X_LINK_ATTR,
 } from '../__utils__/tests-helper';
+import { resetIsNewUiPlayerCache } from '../button-styles-sync';
 import {
   createButton,
   createFastDoubleForwardSVG,
@@ -31,11 +32,13 @@ import { ArrowKey, ButtonClassesIds } from '../types';
 const MODERN_PLAYER_MARKUP = '<div class="ytp-delhi-modern"></div>';
 
 function setModernPlayerMarkup(): void {
+  resetIsNewUiPlayerCache();
   document.body.innerHTML = MODERN_PLAYER_MARKUP;
 }
 
 function clearPlayerMarkup(): void {
   document.body.innerHTML = '';
+  resetIsNewUiPlayerCache();
 }
 
 describe('createButton', () => {

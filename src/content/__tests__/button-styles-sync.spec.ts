@@ -1,6 +1,7 @@
 import { createNewUiPlayerMarkup } from '../__utils__/tests-helper';
 import {
   isNewUiPlayer,
+  resetIsNewUiPlayerCache,
   setupCustomButtonsStylesSync,
   teardownNativeButtonSyncIfUnused,
 } from '../button-styles-sync';
@@ -72,6 +73,9 @@ describe('button-styles-sync', () => {
   });
 
   afterEach(() => {
+    // Reset isNewUiPlayer cache before restoring mocks
+    resetIsNewUiPlayerCache();
+
     // Restore originals
     global.ResizeObserver = originalResizeObserver;
     global.MutationObserver = originalMutationObserver;
@@ -555,7 +559,7 @@ describe('button-styles-sync', () => {
 
   describe('Retry Logic', () => {
     it('should retry when mute button is not found initially', () => {
-      // TODO: This test verifies retry logic, but the exact mechanism depends on
+      // This test verifies retry logic, but the exact mechanism depends on
       // the internal state of ensureMuteButtonObserver and tryResyncCustomButtonsStyles.
       // The retry happens via scheduleNextAttempt which uses requestAnimationFrame or setTimeout.
       // Testing this precisely requires careful orchestration of the observer setup flow.
