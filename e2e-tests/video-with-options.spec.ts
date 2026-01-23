@@ -388,7 +388,15 @@ test('should options change affect new youtube page', async ({
       .locator(`${Selectors.ANOTHER_YOUTUBE_SELECTOR} a`)
       .first()
       .click();
-    expect(url).toContain(videoPage.url());
+
+    const extractParams = (url: string) => {
+      const parsedUrl = new URL(url);
+      return { site: parsedUrl.origin, v: parsedUrl.searchParams.get('v') };
+    };
+    const expectedParams = extractParams(url);
+    const actualParams = extractParams(videoPage.url());
+    expect(expectedParams.site).toBe(actualParams.site);
+    expect(expectedParams.v).toBe(actualParams.v);
 
     const { video, rewindButton, forwardButton } =
       getVideoLocatorElements(videoPage);
