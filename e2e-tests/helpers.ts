@@ -12,6 +12,10 @@ import path from 'path';
 const EXTENSION_PATH = `../dist/webext-dev`;
 export const YOUTUBE_URL = 'https://www.youtube.com/watch?v=HGl75kurxok';
 
+export enum Selectors {
+  ANOTHER_YOUTUBE_SELECTOR = 'yt-lockup-view-model',
+}
+
 export const OPTIONS_DEFAULT_VALUES = {
   rewindSecondsInput: '5',
   forwardSecondsInput: '5',
@@ -161,15 +165,17 @@ async function isAdsInPage(page: Page): Promise<boolean> {
 
 async function isCounterSkipButton(page: Page): Promise<boolean> {
   try {
-    // eslint-disable-next-line sonarjs/no-duplicate-string
-    return !!(await page.waitForSelector(
-      '.ytp-skip-ad-button:not([style*="display: none"])',
-      {
-        state: 'attached',
-        timeout: 5000,
-        strict: false,
-      }
-    ));
+    // Check if skip button exists but has opacity (countdown in progress)
+    const skipButton = await page.waitForSelector('.ytp-skip-ad-button', {
+      state: 'attached',
+      timeout: 5000,
+      strict: false,
+    });
+    if (!skipButton) return false;
+
+    const style = await skipButton.getAttribute('style');
+    // If button has opacity styling, it's in countdown state
+    return !!style && style.includes('opacity');
     // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
@@ -178,11 +184,15 @@ async function isCounterSkipButton(page: Page): Promise<boolean> {
 
 async function isCounterSkipButtonLeave(page: Page): Promise<boolean> {
   try {
-    return !!(await page.waitForSelector('.ytp-skip-ad-button', {
-      state: 'detached',
-      timeout: 5000,
-      strict: false,
-    }));
+    // Wait for skip button to become fully clickable (no opacity styling)
+    return !!(await page.waitForSelector(
+      '.ytp-skip-ad-button:not([style*="opacity"])',
+      {
+        state: 'visible',
+        timeout: 10000, // Longer timeout to allow for ad countdown
+        strict: false,
+      }
+    ));
     // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
   } catch (error) {
     return false;
@@ -193,11 +203,12 @@ export async function getSkipAdButton(
   page: Page
 ): Promise<ElementHandle<HTMLElement | SVGElement> | null> {
   try {
+    // Wait for skip button that is fully clickable (no opacity styling)
     return await page.waitForSelector(
-      '.ytp-skip-ad-button:not([style*="display: none"])',
+      '.ytp-skip-ad-button:not([style*="opacity"])',
       {
-        state: 'attached',
-        timeout: 1000,
+        state: 'visible',
+        timeout: 10000, // Allow time for ad countdown
       }
     );
     // eslint-disable-next-line sonarjs/no-ignored-exceptions, @typescript-eslint/no-unused-vars
@@ -384,14 +395,18 @@ export function getOptionsInputs(page: Page) {
   const shouldOverrideMediaKeysCheckbox = page.locator(
     'input#override-media-keys'
   );
-  const rewindOutput = page.locator('small#rewindValue');
-  const forwardOutput = page.locator('small#forwardValue');
+  const rewindOutput = page.locator('small output#rewindValue');
+  const forwardOutput = page.locator('small output#forwardValue');
 
   const rewindSecondaryInput = page.locator('input#rewind-secondary');
   const forwardSecondaryInput = page.locator('input#forward-secondary');
 
-  const rewindSecondaryOutput = page.locator('small#rewind-secondaryValue');
-  const forwardSecondaryOutput = page.locator('small#forward-secondaryValue');
+  const rewindSecondaryOutput = page.locator(
+    'small output#rewind-secondaryValue'
+  );
+  const forwardSecondaryOutput = page.locator(
+    'small output#forward-secondaryValue'
+  );
   const enableMoreButtonsCheckbox = page.locator('input#enable-more-buttons');
 
   return {

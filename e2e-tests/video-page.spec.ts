@@ -9,6 +9,7 @@ import {
   handleAds,
   YOUTUBE_URL,
   clickOnNewVideoOnMainPage,
+  Selectors,
 } from './helpers';
 
 test.setTimeout(60 * 1000);
@@ -25,9 +26,8 @@ test('should change the video time by clicking the arrows', async ({
   page,
 }) => {
   const { forwardButton, video, rewindButton } = getVideoLocatorElements(page);
-  await handleAds(page);
 
-  await testClickingButtons(video, forwardButton, rewindButton);
+  await testClickingButtons(video, forwardButton, rewindButton, page);
 
   await test.step('Click the forward & rewind button multiply times', async () => {
     await setVideoTime(video, 0);
@@ -49,7 +49,6 @@ test('should change the video time by pressing the arrows keys', async ({
   page,
 }) => {
   const { video } = getVideoLocatorElements(page);
-  await handleAds(page);
 
   await testPressingArrowKeys(video, page);
 
@@ -73,12 +72,13 @@ test('should have the arrows and work when navigate to another video', async ({
   page,
 }) => {
   test.slow();
-  const newVideoContainer = page.locator('ytd-compact-video-renderer').first();
+  const newVideoContainer = page
+    .locator(Selectors.ANOTHER_YOUTUBE_SELECTOR)
+    .first();
   const url: string = await newVideoContainer.evaluate((newVideoContainer) => {
-    return (newVideoContainer.querySelector('a#thumbnail') as HTMLLinkElement)
-      .href;
+    return newVideoContainer.querySelector<HTMLAnchorElement>('a')?.href ?? '';
   });
-  await page.locator('ytd-compact-video-renderer img').first().click();
+  await page.locator(`${Selectors.ANOTHER_YOUTUBE_SELECTOR} a`).first().click();
 
   const extractParams = (url: string) => {
     const parsedUrl = new URL(url);
@@ -96,7 +96,7 @@ test('should have the arrows and work when navigate to another video', async ({
   await handleAds(page);
   await resetVideo(video, page);
 
-  await testClickingButtons(video, forwardButton, rewindButton);
+  await testClickingButtons(video, forwardButton, rewindButton, page);
   await testPressingArrowKeys(video, page);
 });
 
@@ -133,7 +133,7 @@ test('should add arrows when entering a video from the main page', async ({
   await resetVideo(video, newPage);
   const { forwardButton, rewindButton } = getVideoLocatorElements(newPage);
 
-  await testClickingButtons(video, forwardButton, rewindButton);
+  await testClickingButtons(video, forwardButton, rewindButton, newPage);
   await testPressingArrowKeys(video, newPage);
 });
 
@@ -197,18 +197,22 @@ test.setTimeout(30 * 1000);
 async function testClickingButtons(
   video: Locator,
   forwardButton: Locator,
-  rewindButton: Locator
+  rewindButton: Locator,
+  page: Page
 ) {
   await test.step('Click the forward button', async () => {
     await setVideoTime(video, 0);
     await forwardButton.click();
+    await page.waitForTimeout(1000);
     const currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(5);
   });
 
   await test.step('Click the rewind button', async () => {
     await setVideoTime(video, 20);
+    await page.waitForTimeout(1000);
     await rewindButton.click();
+    await page.waitForTimeout(1000);
     const currentTime = await getVideoTime(video);
     expect(currentTime).toBe(15);
   });
@@ -218,6 +222,7 @@ async function testPressingArrowKeys(video: Locator, page: Page) {
   await test.step('Pressing the ArrowRight key', async () => {
     await setVideoTime(video, 0);
     await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(1000);
     const currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(5);
   });
@@ -225,6 +230,7 @@ async function testPressingArrowKeys(video: Locator, page: Page) {
   await test.step('Pressing the ArrowLeft key', async () => {
     await setVideoTime(video, 20);
     await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(1000);
     const currentTime = await getVideoTime(video);
     expect(currentTime).toBe(15);
   });

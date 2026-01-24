@@ -10,12 +10,16 @@ import {
   OPTIONS_CHANGED_VALUES,
   OPTIONS_DEFAULT_VALUES,
   resetVideo,
+  Selectors,
   setVideoTime,
   test,
   YOUTUBE_URL,
 } from './helpers';
 
-const ANIMATION_ARROW_SELECTOR = 'ytd-player .ytp-doubletap-ui-legacy';
+const ANIMATION_ARROW_FORWARD_SELECTOR =
+  'ytd-player .ytp-seek-overlay-animation-forward .ytp-seek-overlay-arrow';
+const ANIMATION_ARROW_BACK_SELECTOR =
+  'ytd-player .ytp-seek-overlay-animation-back .ytp-seek-overlay-arrow';
 
 test.setTimeout(60 * 1000);
 test.slow();
@@ -152,12 +156,15 @@ test('should override the ArrowRight key when seconds set not to 5 and not overr
     await videoPage.keyboard.press('ArrowRight');
     let currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(50);
-    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
-    await expect(animationArrow).not.toBeVisible();
+    const animationArrowForward = videoPage.locator(
+      ANIMATION_ARROW_FORWARD_SELECTOR
+    );
+    await expect(animationArrowForward).not.toBeVisible();
 
     await videoPage.keyboard.press('ArrowLeft');
     currentTime = await getVideoTime(video);
-    await expect(animationArrow).toBeVisible();
+    const animationArrowBack = videoPage.locator(ANIMATION_ARROW_BACK_SELECTOR);
+    await expect(animationArrowBack).toBeVisible();
     expect(currentTime).toBe(45);
   });
 
@@ -182,23 +189,26 @@ test('should override the ArrowRight key when seconds set not to 5 and not overr
     await videoPage.keyboard.press('ArrowRight');
     let currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(50);
-    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
-    await expect(animationArrow).not.toBeVisible();
+    const animationArrowForward = videoPage.locator(
+      ANIMATION_ARROW_FORWARD_SELECTOR
+    );
+    await expect(animationArrowForward).not.toBeVisible();
 
     await forwardButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(100);
-    await expect(animationArrow).not.toBeVisible();
+    await expect(animationArrowForward).not.toBeVisible();
 
     await videoPage.keyboard.press('ArrowLeft');
     currentTime = await getVideoTime(video);
-    await expect(animationArrow).not.toBeVisible();
+    const animationArrowBack = videoPage.locator(ANIMATION_ARROW_BACK_SELECTOR);
+    await expect(animationArrowBack).not.toBeVisible();
     expect(currentTime).toBe(60);
 
     await rewindButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(20);
-    await expect(animationArrow).not.toBeVisible();
+    await expect(animationArrowBack).not.toBeVisible();
   });
 });
 
@@ -239,12 +249,15 @@ test('should override the ArrowLeft key when seconds set not to 5 and not overri
     await videoPage.keyboard.press('ArrowLeft');
     let currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(40);
-    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
-    await expect(animationArrow).not.toBeVisible();
+    const animationArrowBack = videoPage.locator(ANIMATION_ARROW_BACK_SELECTOR);
+    await expect(animationArrowBack).not.toBeVisible();
 
     await videoPage.keyboard.press('ArrowRight');
     currentTime = await getVideoTime(video);
-    await expect(animationArrow).toBeVisible();
+    const animationArrowForward = videoPage.locator(
+      ANIMATION_ARROW_FORWARD_SELECTOR
+    );
+    await expect(animationArrowForward).toBeVisible();
     expect(currentTime).toBe(45);
   });
 });
@@ -282,23 +295,26 @@ test('should when not set to override, arrow keys should working as normal while
     await videoPage.keyboard.press('ArrowRight');
     let currentTime: number = await getVideoTime(video);
     expect(currentTime).toBe(5);
-    const animationArrow = videoPage.locator(ANIMATION_ARROW_SELECTOR);
-    await expect(animationArrow).toBeVisible();
+    const animationArrowForward = videoPage.locator(
+      ANIMATION_ARROW_FORWARD_SELECTOR
+    );
+    await expect(animationArrowForward).toBeVisible();
 
     await forwardButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(55);
-    await expect(animationArrow).not.toBeVisible();
+    await expect(animationArrowForward).not.toBeVisible();
 
     await videoPage.keyboard.press('ArrowLeft');
     currentTime = await getVideoTime(video);
-    await expect(animationArrow).toBeVisible();
+    const animationArrowBack = videoPage.locator(ANIMATION_ARROW_BACK_SELECTOR);
+    await expect(animationArrowBack).toBeVisible();
     expect(currentTime).toBe(50);
 
     await rewindButton.click();
     currentTime = await getVideoTime(video);
     expect(currentTime).toBe(10);
-    await expect(animationArrow).not.toBeVisible();
+    await expect(animationArrowBack).not.toBeVisible();
   });
 });
 
@@ -359,18 +375,28 @@ test('should options change affect new youtube page', async ({
 
   await test.step('Verify navigate to another video will take and use the new options', async () => {
     const newVideoContainer = videoPage
-      .locator('ytd-compact-video-renderer')
+      .locator(Selectors.ANOTHER_YOUTUBE_SELECTOR)
       .first();
     const url: string = await newVideoContainer.evaluate(
       (newVideoContainer) => {
         return (
-          newVideoContainer.querySelector('a#thumbnail') as HTMLLinkElement
-        ).href;
+          newVideoContainer.querySelector<HTMLAnchorElement>('a')?.href ?? ''
+        );
       }
     );
-    await videoPage.locator('ytd-compact-video-renderer img').first().click();
-    await expect(videoPage).toHaveURL(url);
-    await videoPage.reload();
+    await videoPage
+      .locator(`${Selectors.ANOTHER_YOUTUBE_SELECTOR} a`)
+      .first()
+      .click();
+
+    const extractParams = (url: string) => {
+      const parsedUrl = new URL(url);
+      return { site: parsedUrl.origin, v: parsedUrl.searchParams.get('v') };
+    };
+    const expectedParams = extractParams(url);
+    const actualParams = extractParams(videoPage.url());
+    expect(expectedParams.site).toBe(actualParams.site);
+    expect(expectedParams.v).toBe(actualParams.v);
 
     const { video, rewindButton, forwardButton } =
       getVideoLocatorElements(videoPage);
