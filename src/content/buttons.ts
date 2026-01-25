@@ -19,6 +19,7 @@ import {
   IOptions,
   VideoTimeArg,
 } from './types';
+import { YouTubeSelectors } from './selectors';
 
 export function handleArrowButtons({
   seconds,
@@ -162,30 +163,32 @@ function createSecondaryButtons(
   return { doubleRewindButton, doubleForwardButton };
 }
 
-/**
- * @throws Error when there is no player next button
- */
 export function addButtonsToVideo(
   newOptions: IOptions,
   video: HTMLVideoElement
 ): void {
-  const playerNextButton: Nullable<HTMLButtonElement> = document.querySelector(
-    'div.ytp-left-controls a.ytp-next-button'
+  const playerControls = document.querySelector(
+    YouTubeSelectors.Player.CONTROLS_LEFT
   );
+  const playerNextButton: Nullable<HTMLButtonElement> =
+    playerControls?.querySelector(YouTubeSelectors.Player.NEXT_BUTTON) ?? null;
+  const playerPlayButton: Nullable<HTMLButtonElement> =
+    playerControls?.querySelector(YouTubeSelectors.Player.PLAY_BUTTON) ?? null;
+  const anchorButton = playerNextButton ?? playerPlayButton;
 
-  if (!playerNextButton) {
-    throw new Error('No playerNextButton');
+  if (!anchorButton) {
+    return;
   }
 
   // copy all svg values from the player button
   const svgClasses: string[] = [
-    ...(playerNextButton.querySelector('svg')?.classList ?? []),
+    ...(anchorButton.querySelector('svg')?.classList ?? []),
   ];
   const svgPathClasses: string[] = [
-    ...(playerNextButton.querySelector('svg path')?.classList ?? []),
+    ...(anchorButton.querySelector('svg path')?.classList ?? []),
   ];
   const svgUseHtml: string =
-    playerNextButton.querySelector('svg use')?.outerHTML ?? '';
+    anchorButton.querySelector('svg use')?.outerHTML ?? '';
 
   const { fastRewindButton, fastForwardButton } = exportFunctions.getButtons(
     newOptions,
@@ -205,13 +208,13 @@ export function addButtonsToVideo(
         svgPathClasses,
         svgUseHtml,
       });
-    playerNextButton.insertAdjacentElement('afterend', doubleForwardButton);
-    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
-    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
-    playerNextButton.insertAdjacentElement('afterend', doubleRewindButton);
+    anchorButton.insertAdjacentElement('afterend', doubleForwardButton);
+    anchorButton.insertAdjacentElement('afterend', fastForwardButton);
+    anchorButton.insertAdjacentElement('afterend', fastRewindButton);
+    anchorButton.insertAdjacentElement('afterend', doubleRewindButton);
   } else {
-    playerNextButton.insertAdjacentElement('afterend', fastForwardButton);
-    playerNextButton.insertAdjacentElement('afterend', fastRewindButton);
+    anchorButton.insertAdjacentElement('afterend', fastForwardButton);
+    anchorButton.insertAdjacentElement('afterend', fastRewindButton);
   }
 }
 

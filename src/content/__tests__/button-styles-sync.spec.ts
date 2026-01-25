@@ -6,6 +6,7 @@ import {
   teardownNativeButtonSyncIfUnused,
 } from '../button-styles-sync';
 import { ButtonClassesIds } from '../types';
+import { YouTubeSelectors } from '../selectors';
 
 const mockResizeObserver = {
   observe: jest.fn(),
@@ -113,11 +114,11 @@ describe('button-styles-sync', () => {
         height: '',
         margin: '',
         getPropertyValue: jest.fn((prop: string) => {
-          if (element.classList.contains('ytp-mute-button')) {
+          if (element.matches(YouTubeSelectors.Player.MUTE_BUTTON)) {
             if (prop === 'width') return width;
             if (prop === 'height') return height;
           }
-          if (element.classList.contains('ytp-volume-area')) {
+          if (element.matches(YouTubeSelectors.Player.VOLUME_AREA)) {
             if (prop === 'margin') return margin;
           }
           return '';
@@ -128,12 +129,12 @@ describe('button-styles-sync', () => {
   }
 
   describe('isNewUiPlayer', () => {
-    it('should return true when .ytp-delhi-modern element exists', () => {
+    it(`should return true when ${YouTubeSelectors.Player.NEW_UI_FLAG} element exists`, () => {
       createNewUiPlayerMarkup();
       expect(isNewUiPlayer()).toBe(true);
     });
 
-    it('should return false when .ytp-delhi-modern element is missing', () => {
+    it(`should return false when ${YouTubeSelectors.Player.NEW_UI_FLAG} element is missing`, () => {
       document.body.innerHTML = '<div>No modern UI</div>';
       expect(isNewUiPlayer()).toBe(false);
     });
@@ -159,7 +160,7 @@ describe('button-styles-sync', () => {
       expect(customButton.style.margin).toBe('0px 8px');
     });
 
-    it('should not sync when old UI is detected (no .ytp-delhi-modern)', () => {
+    it(`should not sync when old UI is detected (no ${YouTubeSelectors.Player.NEW_UI_FLAG})`, () => {
       document.body.innerHTML = '<div>Old UI</div>';
       setupMockStyles();
       const customButton = createCustomButton();
@@ -445,7 +446,9 @@ describe('button-styles-sync', () => {
       setupCustomButtonsStylesSync(customButton);
 
       // Remove mute button
-      const muteButton = document.querySelector('.ytp-mute-button');
+      const muteButton = document.querySelector(
+        YouTubeSelectors.Player.MUTE_BUTTON
+      );
       muteButton?.remove();
 
       // Trigger container mutation observer
@@ -466,7 +469,9 @@ describe('button-styles-sync', () => {
       setupCustomButtonsStylesSync(customButton);
 
       // Disconnect container
-      const container = document.querySelector('.ytp-volume-area');
+      const container = document.querySelector(
+        YouTubeSelectors.Player.VOLUME_AREA
+      );
       container?.remove();
 
       // Should clean up
@@ -766,7 +771,9 @@ describe('button-styles-sync', () => {
       setupCustomButtonsStylesSync(customButton);
 
       // Disconnect the container
-      const container = document.querySelector('.ytp-volume-area');
+      const container = document.querySelector(
+        YouTubeSelectors.Player.VOLUME_AREA
+      );
       container?.remove();
 
       // Should handle gracefully

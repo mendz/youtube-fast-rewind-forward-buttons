@@ -1,4 +1,5 @@
 import { ButtonClassesIds } from './types';
+import { YouTubeSelectors } from './selectors';
 
 type StylableElement = HTMLButtonElement | SVGElement;
 
@@ -53,7 +54,8 @@ function requestResyncCustomButtonsStyles(): void {
 export function isNewUiPlayer(): boolean {
   if (cachedIsNewUi !== null) return cachedIsNewUi;
 
-  cachedIsNewUi = document.querySelector('.ytp-delhi-modern') !== null;
+  cachedIsNewUi =
+    document.querySelector(YouTubeSelectors.Player.NEW_UI_FLAG) !== null;
 
   // Invalidate cache on next frame
   if (
@@ -172,7 +174,7 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
   }
 
   const referenceButton = document.querySelector(
-    '.ytp-left-controls .ytp-mute-button'
+    `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.MUTE_BUTTON}`
   ) as HTMLButtonElement | null;
 
   if (!referenceButton) {
@@ -185,7 +187,7 @@ function syncWithYouTubeButtonStyles(button: HTMLButtonElement): void {
 
   // Copy margin from parent .ytp-volume-area to override button's margin
   const volumeArea = referenceButton.closest(
-    '.ytp-volume-area'
+    YouTubeSelectors.Player.VOLUME_AREA
   ) as HTMLElement | null;
 
   if (!volumeArea) {
@@ -208,14 +210,14 @@ function resyncCustomButtonsStyles(): void {
   }
 
   const referenceButton = document.querySelector(
-    '.ytp-left-controls .ytp-mute-button'
+    `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.MUTE_BUTTON}`
   ) as HTMLButtonElement | null;
   if (!referenceButton) {
     return;
   }
 
   const volumeArea = referenceButton.closest(
-    '.ytp-volume-area'
+    YouTubeSelectors.Player.VOLUME_AREA
   ) as HTMLElement | null;
   if (!volumeArea) {
     return;
@@ -252,7 +254,7 @@ function ensureMuteButtonObserver(): boolean {
   }
 
   const muteButton = document.querySelector(
-    '.ytp-mute-button'
+    YouTubeSelectors.Player.MUTE_BUTTON
   ) as HTMLButtonElement | null;
 
   if (!muteButton) {

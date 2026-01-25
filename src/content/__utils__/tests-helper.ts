@@ -80,7 +80,6 @@ export const SVG_DOUBLE_REWIND_USE_HTML_MOCK =
   '<use class="ytp-svg-shadow" xlink:href="#custom-path-double-rewind"></use>';
 export const SVG_PATH_CLASSES_MOCK = ['path-test-class'];
 export const X_LINK_ATTR = 'xlink:href';
-export const TOOLTIP_CONTAINER_WRAPPER_QUERY = 'div.ytp-tooltip-text-wrapper';
 
 export const DEFAULT_OPTIONS_MOCK: IOptions = {
   forwardSeconds: 5,

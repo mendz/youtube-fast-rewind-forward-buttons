@@ -18,6 +18,7 @@ import { loadOptions } from '../content';
 import * as eventKeys from '../event-keys';
 import * as handleVideoPlayer from '../handle-video-player';
 import { ArrowKey, ButtonClassesIds } from '../types';
+import { YouTubeSelectors } from '../selectors';
 
 describe('handleArrowButtons', () => {
   const videoElement = document.createElement('video');
@@ -231,7 +232,9 @@ describe('addButtonsToVideo order insertion', () => {
   });
 
   function getSiblingsAfterNextButton(): HTMLElement[] {
-    const nextButton = document.querySelector('a.ytp-next-button');
+    const nextButton = document.querySelector(
+      YouTubeSelectors.Player.NEXT_BUTTON
+    );
     const siblings: HTMLElement[] = [];
     let el = nextButton?.nextElementSibling as HTMLElement | null;
     while (el) {

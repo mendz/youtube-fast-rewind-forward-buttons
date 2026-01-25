@@ -21,6 +21,7 @@ import {
   KEY_CODES,
   MediaTrackKey,
 } from '../types';
+import { YouTubeSelectors } from '../selectors';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -68,7 +69,7 @@ describe('full run', () => {
   });
 
   it('should have no button when there is no video', async () => {
-    document.querySelector('video')?.remove();
+    document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
     await run();
     expect(
       document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
@@ -76,16 +77,46 @@ describe('full run', () => {
     ).toEqual(0);
   });
 
-  it('Should console error when there is no player button', async () => {
-    const errorMessage = 'No playerNextButton';
-    document.querySelector('div.ytp-left-controls a.ytp-next-button')?.remove();
-    // run is async, call it to get the promise and use the modern matcher name
-    await expect(run()).rejects.toThrow(errorMessage);
+  it('Should add buttons when next button is missing', async () => {
+    document
+      .querySelector(
+        `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.NEXT_BUTTON}`
+      )
+      ?.remove();
+    const leftControls = document.querySelector(
+      YouTubeSelectors.Player.CONTROLS_LEFT
+    );
+    const playButton = document.createElement('button');
+    playButton.className = 'ytp-play-button';
+    leftControls?.appendChild(playButton);
+    await run();
+    expect(
+      document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
+        ?.length
+    ).toEqual(2);
+  });
+
+  it('Should not add buttons when there is no anchor button', async () => {
+    document
+      .querySelector(
+        `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.NEXT_BUTTON}`
+      )
+      ?.remove();
+    document
+      .querySelector(
+        `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.PLAY_BUTTON}`
+      )
+      ?.remove();
+    await run();
+    expect(
+      document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
+        ?.length
+    ).toEqual(0);
   });
 
   it('Should pass to addButtonsToVideo options and video', async () => {
     // set all the mockups
-    const video = document.querySelector('video');
+    const video = document.querySelector(YouTubeSelectors.Player.VIDEO);
     chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
     const addButtonsToVideoSpy = jest.spyOn(buttons, 'addButtonsToVideo');
 
@@ -163,7 +194,7 @@ describe('full run', () => {
     expect(runSpy).toHaveBeenCalled();
     expect(observeSpy).toHaveBeenCalled();
 
-    document.querySelector('video')!.src = 'test2';
+    document.querySelector(YouTubeSelectors.Player.VIDEO)!.src = 'test2';
 
     expect(runSpy).toHaveBeenCalled();
   });

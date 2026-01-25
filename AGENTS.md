@@ -8,6 +8,7 @@ Keep guidance concise and actionable. If you change behavior that affects tests,
 Key locations and why they matter
 - `src/` — extension implementation. Important subfolders:
   - `content/` — injected scripts that interact with the YouTube player (e.g. `content.ts`, `buttons.ts`, `handle-video-player.ts`, `event-keys.ts`, `tooltip.ts`, `helper.ts`, `types.ts`). Changes here affect runtime behavior and E2E tests.
+    - `selectors.ts` — Centralized location for all YouTube DOM selectors. Use this to maintain consistency and avoid magic strings.
   - `background/` — service worker logic and feature flags (see `service-worker.ts`). Use this for cross-tab state and messaging.
     - `whats-new-page/` — changelog page shown automatically on extension updates. Includes HTML, CSS, TypeScript, tests, and test helpers.
   - `options/` — the options page implementation (`options-page.ts`, `options.html`) and CSS. This is the canonical source of user-settings handling.
@@ -25,7 +26,7 @@ Important developer workflows (commands)
 - Typecheck & lint: `npm run check`, `npm run eslint`, `npm run prettier`.
 - Unit tests:
   - `npm run jest:test` or `npm run jest:test:coverage` (uses `jest.setup.js` to stub Chrome APIs via `jest-chrome`).
-  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases. Note: `jest:test` runs with `--watchAll` for continuous testing; use the pattern above to run specific files without watch mode.
+  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts --watchAll=false` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases. Note: `jest:test` runs with `--watchAll` for continuous testing; use `--no-coverage --watchAll=false` when running specific files to avoid waiting for watch mode to finish.
 - Playwright:
   - `npm run playwright:test` — run E2E tests (see `playwright.config.ts`), tests live in `e2e-tests/`.
   - `npm run playwright:test:debug` — debug Playwright tests interactively.

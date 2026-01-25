@@ -10,6 +10,7 @@ import {
   IOptions,
   IStorageOptions,
 } from './types';
+import { YouTubeSelectors } from './selectors';
 
 export function handleOverrideKeysMigration(
   defaultOptions: Readonly<IOptions>,
@@ -173,8 +174,19 @@ export function mergeOptions(
 
 function intervalQueryForVideo() {
   const interval = setInterval(() => {
-    const video = document.querySelector('div.ytd-player video');
-    if (video) {
+    const video = document.querySelector(
+      `${YouTubeSelectors.Player.CONTAINER_CLASS} ${YouTubeSelectors.Player.VIDEO}`
+    );
+    const playerControls = document.querySelector(
+      YouTubeSelectors.Player.CONTROLS_LEFT
+    );
+    const playerNextButton = playerControls?.querySelector(
+      YouTubeSelectors.Player.NEXT_BUTTON
+    );
+    const playerPlayButton = playerControls?.querySelector(
+      YouTubeSelectors.Player.PLAY_BUTTON
+    );
+    if (video && (playerNextButton || playerPlayButton)) {
       clearInterval(interval);
       exportFunctions.run();
       exportFunctions.observeVideoSrcChange();
@@ -183,7 +195,9 @@ function intervalQueryForVideo() {
 }
 
 function observeVideoSrcChange() {
-  const video = document.querySelector<HTMLVideoElement>('video');
+  const video = document.querySelector<HTMLVideoElement>(
+    YouTubeSelectors.Player.VIDEO
+  );
 
   const observer = new MutationObserver((mutations: MutationRecord[]) => {
     for (const mutation of mutations) {
@@ -227,13 +241,24 @@ function addEventListeners(video: HTMLVideoElement) {
 export async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
   loadedOptions = { ...options };
-  const video: Nullable<HTMLVideoElement> = document.querySelector('video');
+  const video: Nullable<HTMLVideoElement> = document.querySelector(
+    YouTubeSelectors.Player.VIDEO
+  );
   const customButton: HTMLButtonElement | null = document.querySelector(
     `button.${ButtonClassesIds.CLASS}`
   );
+  const playerControls = document.querySelector(
+    YouTubeSelectors.Player.CONTROLS_LEFT
+  );
+  const playerNextButton = playerControls?.querySelector(
+    YouTubeSelectors.Player.NEXT_BUTTON
+  );
+  const playerPlayButton = playerControls?.querySelector(
+    YouTubeSelectors.Player.PLAY_BUTTON
+  );
 
-  // check if there is no custom button already
-  if (video?.src && !customButton) {
+  // check if there is no custom button already AND player controls are ready
+  if (video?.src && !customButton && (playerNextButton || playerPlayButton)) {
     addButtonsToVideo(loadedOptions, video);
     addEventListeners(video);
   }
@@ -241,7 +266,9 @@ export async function run(): Promise<void> {
 
 // handle option update
 chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
-  const video = document.querySelector('video') as HTMLVideoElement;
+  const video = document.querySelector(
+    YouTubeSelectors.Player.VIDEO
+  ) as HTMLVideoElement;
   loadedOptions = mergeOptions(changes, loadedOptions);
 
   updateButtons(loadedOptions, video);
