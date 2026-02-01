@@ -11,6 +11,7 @@ import {
   IStorageOptions,
 } from './types';
 import { YouTubeSelectors } from './selectors';
+import { waitForPlayerElements, bindWaitCleanup } from './wait-for-player';
 
 export function handleOverrideKeysMigration(
   defaultOptions: Readonly<IOptions>,
@@ -172,26 +173,32 @@ export function mergeOptions(
   return { ...newOptions };
 }
 
-function intervalQueryForVideo() {
-  const interval = setInterval(() => {
-    const video = document.querySelector(
-      `${YouTubeSelectors.Player.CONTAINER_CLASS} ${YouTubeSelectors.Player.VIDEO}`
-    );
-    const playerControls = document.querySelector(
-      YouTubeSelectors.Player.CONTROLS_LEFT
-    );
-    const playerNextButton = playerControls?.querySelector(
-      YouTubeSelectors.Player.NEXT_BUTTON
-    );
-    const playerPlayButton = playerControls?.querySelector(
-      YouTubeSelectors.Player.PLAY_BUTTON
-    );
-    if (video && (playerNextButton || playerPlayButton)) {
-      clearInterval(interval);
-      exportFunctions.run();
-      exportFunctions.observeVideoSrcChange();
-    }
-  }, 1000);
+/**
+ * Initializes the extension by waiting for player elements and adding buttons.
+ * Uses efficient RAF-based polling instead of setInterval.
+ */
+async function initializeExtension(): Promise<void> {
+  // Bind cleanup handlers for page unload
+  bindWaitCleanup();
+
+  // First immediate attempt
+  await exportFunctions.run();
+
+  // Check if buttons were already added
+  const customButton = document.querySelector(
+    `button.${ButtonClassesIds.CLASS}`
+  );
+  if (customButton) {
+    exportFunctions.observeVideoSrcChange();
+    return;
+  }
+
+  // Wait for player elements if not ready yet
+  const elements = await waitForPlayerElements();
+  if (elements) {
+    await exportFunctions.run();
+    exportFunctions.observeVideoSrcChange();
+  }
 }
 
 function observeVideoSrcChange() {
@@ -274,13 +281,14 @@ chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
   updateButtons(loadedOptions, video);
 });
 
-run();
-intervalQueryForVideo();
-
+// Export functions for testing - defined before initialization to allow self-reference
 const exportFunctions = {
   run,
   observeVideoSrcChange,
-  intervalQueryForVideo,
+  initializeExtension,
 };
+
+// Initialize the extension
+initializeExtension();
 
 export default exportFunctions;

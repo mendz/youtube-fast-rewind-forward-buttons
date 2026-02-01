@@ -57,6 +57,72 @@ export const INITIAL_HTML_PLAYER_FULL = /* html */ `
 </div>
 `;
 
+/**
+ * Full player with div.ytd-player container (for waitForPlayerElements / selectors that use CONTAINER_CLASS).
+ * Same structure as INITIAL_HTML_PLAYER_FULL but with video present.
+ */
+export const HTML_PLAYER_READY = /* html */ `
+<div class="ytd-player">
+    <div class="html5-video-container">
+        <video class="video-stream html5-main-video" src="test"></video>
+    </div>
+    <div class="ytp-chrome-bottom">
+        <div
+            class="ytp-tooltip ytp-bottom ytp-preview ytp-has-duration ytp-text-detail"
+            >
+            <div class="ytp-tooltip-text-wrapper">
+                <div class="ytp-tooltip-title"></div>
+                <span class="ytp-tooltip-text ytp-tooltip-text-no-title"></span>
+            </div>
+            <div class="ytp-chrome-controls">
+                <div class="ytp-left-controls">
+                    <a class="ytp-next-button">
+                        <svg>
+                            <path class="ytp-svg-fill"></path>
+                            <use></use>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+`;
+
+/** Minimal DOM with no player; for tests that expect waitForPlayerElements to fail. */
+export const HTML_MINIMAL_NO_PLAYER = '<div></div>';
+
+/** Player container with video only (no controls). */
+export const HTML_PLAYER_VIDEO_ONLY = /* html */ `
+<div class="ytd-player">
+    <div class="html5-video-container">
+        <video class="video-stream html5-main-video" src="test"></video>
+    </div>
+</div>
+`;
+
+/** Player with left-controls containing only play button (no next button). */
+export const HTML_PLAYER_PLAY_BUTTON_ONLY = /* html */ `
+<div class="ytd-player">
+    <div class="html5-video-container">
+        <video class="video-stream html5-main-video" src="test"></video>
+    </div>
+    <div class="ytp-left-controls">
+        <button class="ytp-play-button"></button>
+    </div>
+</div>
+`;
+
+/** Player with left-controls but no next/play anchor button. */
+export const HTML_PLAYER_CONTROLS_NO_ANCHOR = /* html */ `
+<div class="ytd-player">
+    <div class="html5-video-container">
+        <video class="video-stream html5-main-video" src="test"></video>
+    </div>
+    <div class="ytp-left-controls"></div>
+</div>
+`;
+
 const HTML_PLAYER_NEW_UI = /* html */ `
 <div class="ytp-delhi-modern">
   <div class="ytp-chrome-controls">

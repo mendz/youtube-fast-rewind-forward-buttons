@@ -25,13 +25,17 @@ import { YouTubeSelectors } from '../selectors';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
+  let consoleWarnSpy: jest.SpyInstance;
+
   beforeEach(() => {
     document.body.innerHTML = HTML_PLAYER_FULL;
     console.error = jest.fn();
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
     console.error = originalConsoleError;
+    consoleWarnSpy.mockRestore();
   });
 
   it('Should run overrideArrowKeys when user press keydown', async () => {
@@ -173,30 +177,48 @@ describe('full run', () => {
     );
   });
 
-  it('should call run and observeVideoSrcChange after finding video element', async () => {
-    jest.useFakeTimers();
+  it('should call run and observeVideoSrcChange after finding video element via initializeExtension', async () => {
+    // Setup RAF mock
+    let rafCallbacks: FrameRequestCallback[] = [];
+    let rafId = 0;
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      rafCallbacks.push(cb);
+      return ++rafId;
+    });
+
+    const flushRAF = (count = 1): void => {
+      for (let i = 0; i < count; i++) {
+        const callbacks = [...rafCallbacks];
+        rafCallbacks = [];
+        callbacks.forEach((cb) => cb(performance.now()));
+      }
+    };
+
     document.body.innerHTML = INITIAL_HTML_PLAYER_FULL;
     const runSpy = jest.spyOn(content, 'run');
     const observeSpy = jest.spyOn(content, 'observeVideoSrcChange');
 
-    content.intervalQueryForVideo();
+    // Start initialization (will wait for elements)
+    const initPromise = content.initializeExtension();
 
-    // Fast-forward time to trigger interval
-    jest.advanceTimersByTime(1000);
+    // Flush a few RAF frames (elements not ready yet)
+    flushRAF(3);
 
+    // Add video element to DOM
     const videoMock = document.createElement('video');
     videoMock.src = 'test';
     videoMock.classList.add('video-stream', 'html5-main-video');
     document.querySelector('.html5-video-container')?.appendChild(videoMock);
 
-    jest.advanceTimersByTime(1000);
+    // Flush more RAF frames to detect elements
+    flushRAF(2);
+
+    await initPromise;
 
     expect(runSpy).toHaveBeenCalled();
     expect(observeSpy).toHaveBeenCalled();
 
-    document.querySelector(YouTubeSelectors.Player.VIDEO)!.src = 'test2';
-
-    expect(runSpy).toHaveBeenCalled();
+    jest.restoreAllMocks();
   });
 });
 
