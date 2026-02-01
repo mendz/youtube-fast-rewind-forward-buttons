@@ -44,6 +44,17 @@ Project-specific patterns and conventions
 - Tests: colocate test helpers under `__utils__` and name specs `<feature>.spec.ts` or `<feature>.test.ts`.
 - Chrome API stubbing: unit tests rely on `jest.setup.js` and `jest-chrome`. Do not import real chrome APIs in unit tests.
 - Styling: shared CSS lives under `src/css/pico/` — `scripts/fix-pico-paths.mjs` is used during builds to repatch asset paths. If you update Pico or assets, update that script.
+- **if statements:** always use curly brackets (no single-line bodies without braces).
+
+  ```ts
+  // BAD
+  if (!video?.src) return null;
+
+  // GOOD
+  if (!video?.src) {
+    return null;
+  }
+  ```
 
 Integration and messaging
 - Content scripts communicate with the background service worker via standard chrome.runtime messaging. Look for usages of `chrome.runtime.sendMessage` and `chrome.runtime.onMessage` across `content/` and `background/`.
@@ -55,7 +66,7 @@ Examples of repository-specific intents
 
 Small rules for AI edits
 - Keep changes minimal and scoped. Prefer updating or adding a single file unless a multi-file change is required.
-- Run `npm run check` and `npm run jest:test` after code changes. If adding UI or DOM changes, run Playwright tests or update `e2e-tests/` accordingly.
+- Run `npm run check` and `npm run jest:test` after code changes. If adding UI or DOM changes, remind the user to run Playwright tests or update `e2e-tests/` accordingly — do **not** run Playwright/E2E tests unless the user explicitly asks you to.
 - Preserve public APIs (message formats, settings keys in `types.d.ts`) unless you update all callsites and tests.
 
 Where to look when debugging
@@ -65,5 +76,5 @@ Where to look when debugging
 - Packaging / build quirks: `scripts/fix-pico-paths.mjs` and `package.json` scripts.
 
 If unsure or blocked
-- Run the unit tests and Playwright suites locally. Inspect `playwright-report/` and `test-results/` for failing test artifacts.
+- Run the unit tests locally; if the user asks, they can run Playwright and inspect `playwright-report/` and `test-results/` for failing test artifacts.
 - Ask for clarification and include failing test names or stack traces. Prefer concrete, small PRs for behavior changes.
