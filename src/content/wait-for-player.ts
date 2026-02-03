@@ -9,7 +9,7 @@ export interface PlayerElements {
 }
 
 export interface WaitOptions {
-  /** Maximum number of retry attempts. Default: 150 (~2.5s at 60fps) */
+  /** Maximum number of retry attempts. Default: 600 (~10s at 60fps) */
   maxRetries?: number;
   /** Optional callback invoked on each retry attempt */
   onRetry?: () => void;
@@ -19,7 +19,7 @@ export interface WaitOptions {
 
 // #region Constants
 
-const DEFAULT_MAX_RETRIES = 150; // ~2.5 seconds at 60fps
+const DEFAULT_MAX_RETRIES = 600; // ~10 seconds at 60fps
 const FALLBACK_INTERVAL_MS = 16; // ~60fps fallback for environments without RAF
 
 // #endregion
@@ -39,7 +39,8 @@ let hasBoundCleanup = false;
  */
 function queryPlayerElements(): PlayerElements | null {
   const video = document.querySelector<HTMLVideoElement>(
-    `${YouTubeSelectors.Player.CONTAINER_CLASS} ${YouTubeSelectors.Player.VIDEO}`
+    `${YouTubeSelectors.Player.CONTAINER_ELEMENT} ${YouTubeSelectors.Player.VIDEO}, ` +
+      `${YouTubeSelectors.Player.CONTAINER_CLASS} ${YouTubeSelectors.Player.VIDEO}`
   );
 
   if (!video?.src) {

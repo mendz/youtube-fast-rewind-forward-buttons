@@ -148,8 +148,8 @@ describe('waitForPlayerElements', () => {
 
       const promise = waitForPlayerElements();
 
-      // Flush 150 retries (default)
-      flushRAF(150, rafCallbacks);
+      // Flush 600 retries (default ~10s at 60fps)
+      flushRAF(600, rafCallbacks);
 
       const result = await promise;
       expect(result).toBeNull();

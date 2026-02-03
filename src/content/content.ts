@@ -31,6 +31,7 @@ export function handleOverrideKeysMigration(
 }
 
 let loadedOptions: IOptions;
+let activeVideo: HTMLVideoElement | null = null;
 /**
  * Load the extension options from the storage
  * If the option doesn't exists it will return its default values
@@ -232,17 +233,21 @@ function keyDownHandler(event: KeyboardEvent, video: HTMLVideoElement) {
   overrideArrowKeys(event, loadedOptions, video);
 }
 
+/**
+ * Stable keydown listener using module-level activeVideo reference.
+ * This allows proper removal of the listener when re-attaching.
+ */
+const keydownListener = (event: KeyboardEvent): void => {
+  if (!activeVideo || !document.contains(activeVideo)) {
+    return;
+  }
+  keyDownHandler(event, activeVideo);
+};
+
 function addEventListeners(video: HTMLVideoElement) {
-  document.removeEventListener(
-    'keydown',
-    (event) => keyDownHandler(event, video),
-    { capture: true }
-  );
-  document.addEventListener(
-    'keydown',
-    (event) => keyDownHandler(event, video),
-    { capture: true }
-  );
+  activeVideo = video;
+  document.removeEventListener('keydown', keydownListener, { capture: true });
+  document.addEventListener('keydown', keydownListener, { capture: true });
 }
 
 export async function run(): Promise<void> {
