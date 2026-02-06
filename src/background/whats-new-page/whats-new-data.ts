@@ -64,6 +64,12 @@ export const versionUpdates: IVersionUpdates[] = [
           "Refined button sizing and styling to match YouTube's latest player design.\nButtons now automatically adapt to the video player changes, ensuring they always stay aligned.",
         type: 'fixed',
       },
+      {
+        title: 'Buttons now appear more reliably',
+        description:
+          'Improved detection of the YouTube player so buttons appear even on slower loads and after in-page navigation.\nReduced cases where buttons failed to show when switching videos or playlists.',
+        type: 'fixed',
+      },
     ],
   },
 ];
