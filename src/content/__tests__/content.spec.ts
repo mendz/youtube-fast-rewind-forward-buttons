@@ -461,3 +461,222 @@ describe('handleOverrideKeysMigration', () => {
     expect(result4).toBe(false);
   });
 });
+
+describe('SPA Navigation Handling', () => {
+  let consoleWarnSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    jest.useFakeTimers();
+    content.resetNavState();
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    // Ensure cleanup before resetting timers
+    content.cleanupFallback();
+    content.resetNavState();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    consoleWarnSpy.mockRestore();
+  });
+
+  describe('hasVideoAndButtons', () => {
+    it('should return true when video with src and custom buttons exist', async () => {
+      jest.useRealTimers();
+      await run();
+      expect(content.hasVideoAndButtons()).toBe(true);
+    });
+
+    it('should return false when no video exists', () => {
+      document.body.innerHTML = '<div></div>';
+      expect(content.hasVideoAndButtons()).toBe(false);
+    });
+
+    it('should return false when video has no src', () => {
+      const video = document.querySelector(
+        YouTubeSelectors.Player.VIDEO
+      ) as HTMLVideoElement;
+      video.src = '';
+      expect(content.hasVideoAndButtons()).toBe(false);
+    });
+
+    it('should return false when custom buttons are missing', () => {
+      expect(content.hasVideoAndButtons()).toBe(false);
+    });
+  });
+
+  describe('handleSpaNavigation pending guard', () => {
+    it('should prevent double-fires when called multiple times rapidly', () => {
+      // Call handleSpaNavigation twice rapidly
+      content.handleSpaNavigation();
+
+      // Check that isInitPending is true after first call
+      expect(content.getNavState().isInitPending).toBe(true);
+
+      // Second call should be blocked by pending guard
+      content.handleSpaNavigation();
+
+      // Still only one timer should be set (first call's timer)
+      expect(content.getNavState().navFallbackTimer).not.toBeNull();
+    });
+
+    it('should allow new init after previous completes', async () => {
+      jest.useRealTimers();
+
+      // First navigation
+      content.handleSpaNavigation();
+      expect(content.getNavState().isInitPending).toBe(true);
+
+      // Wait for initializeExtension to fully complete (uses waitForPlayerElements internally)
+      // Give it enough time for all async operations
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(content.getNavState().isInitPending).toBe(false);
+
+      // Second navigation should be allowed
+      content.handleSpaNavigation();
+      expect(content.getNavState().isInitPending).toBe(true);
+    });
+  });
+
+  describe('handleSpaNavigation fallback mechanism', () => {
+    it('should set up fallback timer on navigation', () => {
+      content.handleSpaNavigation();
+
+      const state = content.getNavState();
+      expect(state.navFallbackTimer).not.toBeNull();
+    });
+
+    it('should clear existing fallback timer when new navigation occurs', async () => {
+      jest.useRealTimers();
+
+      content.handleSpaNavigation();
+      const firstTimer = content.getNavState().navFallbackTimer;
+      expect(firstTimer).not.toBeNull();
+
+      // Wait for init to complete so we can call again
+      await Promise.resolve();
+      await Promise.resolve();
+
+      content.handleSpaNavigation();
+      const secondTimer = content.getNavState().navFallbackTimer;
+
+      // Should have a new timer (old one was cleared and replaced)
+      expect(secondTimer).not.toBeNull();
+    });
+
+    it('should start MutationObserver if video/buttons not found after timeout', () => {
+      // Remove video so hasVideoAndButtons returns false
+      document.body.innerHTML = '<div></div>';
+
+      content.handleSpaNavigation();
+
+      // Fast-forward past the 2-second fallback timer
+      jest.advanceTimersByTime(2100);
+
+      const state = content.getNavState();
+      expect(state.fallbackObserver).not.toBeNull();
+
+      // Clean up observer before test ends
+      content.cleanupFallback();
+    });
+
+    it('should not start MutationObserver if video/buttons are found', async () => {
+      jest.useRealTimers();
+      // Ensure video and buttons exist
+      await run();
+
+      jest.useFakeTimers();
+
+      content.handleSpaNavigation();
+
+      // Fast-forward past the 2-second fallback timer
+      jest.advanceTimersByTime(2100);
+
+      const state = content.getNavState();
+      expect(state.fallbackObserver).toBeNull();
+    });
+  });
+
+  describe('cleanupFallback', () => {
+    it('should clear fallback timer', () => {
+      content.handleSpaNavigation();
+      expect(content.getNavState().navFallbackTimer).not.toBeNull();
+
+      content.cleanupFallback();
+      expect(content.getNavState().navFallbackTimer).toBeNull();
+    });
+
+    it('should disconnect fallback observer', () => {
+      // Set up observer by triggering fallback
+      document.body.innerHTML = '<div></div>';
+
+      content.handleSpaNavigation();
+      jest.advanceTimersByTime(2100);
+
+      expect(content.getNavState().fallbackObserver).not.toBeNull();
+
+      content.cleanupFallback();
+      expect(content.getNavState().fallbackObserver).toBeNull();
+    });
+  });
+
+  describe('cleanupNavState', () => {
+    it('should reset all navigation state', () => {
+      content.handleSpaNavigation();
+
+      content.cleanupNavState();
+
+      const state = content.getNavState();
+      expect(state.isInitPending).toBe(false);
+      expect(state.navFallbackTimer).toBeNull();
+    });
+  });
+
+  describe('bindNavListeners', () => {
+    it('should bind listeners only once', () => {
+      const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+
+      content.bindNavListeners();
+      const callCount1 = addEventListenerSpy.mock.calls.filter(
+        (call) =>
+          call[0] === 'yt-navigate-finish' || call[0] === 'yt-page-data-updated'
+      ).length;
+
+      content.bindNavListeners();
+      const callCount2 = addEventListenerSpy.mock.calls.filter(
+        (call) =>
+          call[0] === 'yt-navigate-finish' || call[0] === 'yt-page-data-updated'
+      ).length;
+
+      // Should not add more listeners on second call
+      expect(callCount2).toBe(callCount1);
+
+      addEventListenerSpy.mockRestore();
+    });
+  });
+
+  describe('YouTube SPA events trigger re-initialization', () => {
+    it('should trigger handleSpaNavigation when yt-navigate-finish fires', () => {
+      // The listeners are already bound at module load time
+      // We verify by checking that state changes when event fires
+      content.resetNavState();
+      expect(content.getNavState().isInitPending).toBe(false);
+
+      document.dispatchEvent(new Event('yt-navigate-finish'));
+
+      // handleSpaNavigation was called, so isInitPending should be true
+      expect(content.getNavState().isInitPending).toBe(true);
+    });
+
+    it('should trigger handleSpaNavigation when yt-page-data-updated fires', () => {
+      content.resetNavState();
+      expect(content.getNavState().isInitPending).toBe(false);
+
+      document.dispatchEvent(new Event('yt-page-data-updated'));
+
+      expect(content.getNavState().isInitPending).toBe(true);
+    });
+  });
+});

@@ -11,7 +11,20 @@ import {
   IStorageOptions,
 } from './types';
 import { YouTubeSelectors } from './selectors';
-import { waitForPlayerElements, bindWaitCleanup } from './wait-for-player';
+import {
+  waitForPlayerElements,
+  bindWaitCleanup,
+  abortWait,
+} from './wait-for-player';
+
+// #region SPA Navigation State
+
+let isInitPending = false;
+let navFallbackTimer: number | null = null;
+let fallbackObserver: MutationObserver | null = null;
+let hasBoundNavListeners = false;
+
+// #endregion
 
 export function handleOverrideKeysMigration(
   defaultOptions: Readonly<IOptions>,
@@ -175,12 +188,40 @@ export function mergeOptions(
 }
 
 /**
+ * Checks if video element and custom buttons already exist in the DOM.
+ */
+function hasVideoAndButtons(): boolean {
+  const video = document.querySelector<HTMLVideoElement>(
+    YouTubeSelectors.Player.VIDEO
+  );
+  const customButton = document.querySelector(
+    `button.${ButtonClassesIds.CLASS}`
+  );
+  return !!(video?.src && customButton);
+}
+
+/**
+ * Cleans up fallback observer and timer.
+ */
+function cleanupFallback(): void {
+  if (navFallbackTimer !== null) {
+    clearTimeout(navFallbackTimer);
+    navFallbackTimer = null;
+  }
+  if (fallbackObserver) {
+    fallbackObserver.disconnect();
+    fallbackObserver = null;
+  }
+}
+
+/**
  * Initializes the extension by waiting for player elements and adding buttons.
  * Uses efficient RAF-based polling instead of setInterval.
  */
 async function initializeExtension(): Promise<void> {
   // Bind cleanup handlers for page unload
   bindWaitCleanup();
+  bindNavCleanup();
 
   // First immediate attempt
   await exportFunctions.run();
@@ -200,6 +241,90 @@ async function initializeExtension(): Promise<void> {
     await exportFunctions.run();
     exportFunctions.observeVideoSrcChange();
   }
+}
+
+/**
+ * Handles SPA navigation events from YouTube.
+ * Uses a pending guard to prevent double-fires and includes a fallback
+ * MutationObserver in case YouTube events don't fire.
+ */
+function handleSpaNavigation(): void {
+  if (isInitPending) {
+    return;
+  }
+  isInitPending = true;
+
+  // Clear any existing fallback timer
+  cleanupFallback();
+
+  // Set up fallback: if video/buttons don't appear after init attempt,
+  // start a MutationObserver to detect when they do
+  navFallbackTimer = window.setTimeout(() => {
+    navFallbackTimer = null;
+    if (hasVideoAndButtons()) {
+      return;
+    }
+    // Start a scoped MutationObserver to detect player appearance
+    fallbackObserver?.disconnect();
+    fallbackObserver = new MutationObserver(() => {
+      if (hasVideoAndButtons()) {
+        fallbackObserver?.disconnect();
+        fallbackObserver = null;
+        // Re-run to ensure event listeners are attached
+        exportFunctions.run();
+      }
+    });
+    fallbackObserver.observe(document.body, { childList: true, subtree: true });
+  }, 2000);
+
+  initializeExtension().finally(() => {
+    isInitPending = false;
+  });
+}
+
+/**
+ * Binds YouTube SPA navigation event listeners.
+ * Only binds once per page lifecycle.
+ */
+function bindNavListeners(): void {
+  if (hasBoundNavListeners) {
+    return;
+  }
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  // YouTube fires these events on SPA navigations
+  document.addEventListener('yt-navigate-finish', handleSpaNavigation);
+  document.addEventListener('yt-page-data-updated', handleSpaNavigation);
+  hasBoundNavListeners = true;
+}
+
+/**
+ * Cleans up navigation-related state on page unload.
+ */
+function cleanupNavState(): void {
+  cleanupFallback();
+  abortWait();
+  isInitPending = false;
+}
+
+/**
+ * Binds cleanup handlers for navigation state.
+ * Only binds once per page lifecycle.
+ */
+let hasBoundNavCleanup = false;
+function bindNavCleanup(): void {
+  if (hasBoundNavCleanup) {
+    return;
+  }
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.addEventListener('pagehide', cleanupNavState);
+  window.addEventListener('beforeunload', cleanupNavState);
+  hasBoundNavCleanup = true;
 }
 
 function observeVideoSrcChange() {
@@ -286,14 +411,53 @@ chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
   updateButtons(loadedOptions, video);
 });
 
+/**
+ * Resets SPA navigation state. Exposed for testing purposes.
+ */
+function resetNavState(): void {
+  isInitPending = false;
+  navFallbackTimer = null;
+  fallbackObserver = null;
+  hasBoundNavListeners = false;
+  hasBoundNavCleanup = false;
+}
+
+/**
+ * Gets current SPA navigation state. Exposed for testing purposes.
+ */
+function getNavState(): {
+  isInitPending: boolean;
+  navFallbackTimer: number | null;
+  fallbackObserver: MutationObserver | null;
+  hasBoundNavListeners: boolean;
+  hasBoundNavCleanup: boolean;
+} {
+  return {
+    isInitPending,
+    navFallbackTimer,
+    fallbackObserver,
+    hasBoundNavListeners,
+    hasBoundNavCleanup,
+  };
+}
+
 // Export functions for testing - defined before initialization to allow self-reference
 const exportFunctions = {
   run,
   observeVideoSrcChange,
   initializeExtension,
+  handleSpaNavigation,
+  // Exposed for testing
+  cleanupFallback,
+  cleanupNavState,
+  hasVideoAndButtons,
+  resetNavState,
+  getNavState,
+  bindNavListeners,
 };
 
-// Initialize the extension
+// Initialize the extension and bind SPA navigation listeners
 initializeExtension();
+bindNavListeners();
 
 export default exportFunctions;
