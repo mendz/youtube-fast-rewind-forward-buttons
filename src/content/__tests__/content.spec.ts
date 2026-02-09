@@ -599,6 +599,21 @@ describe('SPA Navigation Handling', () => {
       content.handleSpaNavigation();
       expect(content.getNavState().isInitPending).toBe(true);
     });
+
+    it('should not start a second init while guarded init is in progress', () => {
+      const pendingInit = new Promise<void>(() => {});
+      const initSpy = jest
+        .spyOn(content, 'initializeExtension')
+        .mockReturnValue(pendingInit);
+
+      content.startInitialization();
+      expect(content.getNavState().isInitPending).toBe(true);
+
+      content.handleSpaNavigation();
+      expect(initSpy).toHaveBeenCalledTimes(1);
+
+      initSpy.mockRestore();
+    });
   });
 
   describe('handleSpaNavigation fallback mechanism', () => {
@@ -659,7 +674,7 @@ describe('SPA Navigation Handling', () => {
       expect(state.fallbackObserver).toBeNull();
     });
 
-    it('should call run() when player appears even without pre-existing buttons (no deadlock)', async () => {
+    it('should call run() and observeVideoSrcChange() when player appears even without pre-existing buttons (no deadlock)', async () => {
       // beforeEach already sets fake timers and resets nav state
 
       // Start with an empty DOM — no player at all
@@ -675,6 +690,7 @@ describe('SPA Navigation Handling', () => {
 
       // Spy on run before injecting player elements
       const runSpy = jest.spyOn(content, 'run');
+      const observeSpy = jest.spyOn(content, 'observeVideoSrcChange');
 
       // Inject a full player into the DOM — this triggers the MutationObserver.
       // Importantly, no custom buttons exist yet. With the fix, isPlayerReady()
@@ -687,11 +703,54 @@ describe('SPA Navigation Handling', () => {
 
       // The observer should have detected the player and called run()
       expect(runSpy).toHaveBeenCalled();
+      expect(observeSpy).toHaveBeenCalled();
 
       // And the observer should have disconnected itself
       expect(content.getNavState().fallbackObserver).toBeNull();
 
       runSpy.mockRestore();
+      observeSpy.mockRestore();
+    });
+  });
+
+  describe('observeVideoSrcChange deduplication', () => {
+    it('should disconnect previous src observer before creating a new one', () => {
+      const originalMutationObserver = global.MutationObserver;
+      const observerInstances: Array<{
+        observe: jest.Mock;
+        disconnect: jest.Mock;
+      }> = [];
+
+      const MutationObserverMock = jest.fn().mockImplementation(() => {
+        const instance = {
+          observe: jest.fn(),
+          disconnect: jest.fn(),
+        };
+        observerInstances.push(instance);
+        return instance;
+      });
+
+      Object.defineProperty(global, 'MutationObserver', {
+        configurable: true,
+        writable: true,
+        value: MutationObserverMock,
+      });
+
+      try {
+        document.body.innerHTML = HTML_PLAYER_FULL;
+        content.observeVideoSrcChange();
+        content.observeVideoSrcChange();
+
+        expect(observerInstances.length).toBe(2);
+        expect(observerInstances[0].disconnect).toHaveBeenCalledTimes(1);
+        expect(observerInstances[1].observe).toHaveBeenCalledTimes(1);
+      } finally {
+        Object.defineProperty(global, 'MutationObserver', {
+          configurable: true,
+          writable: true,
+          value: originalMutationObserver,
+        });
+      }
     });
   });
 

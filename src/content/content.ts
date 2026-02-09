@@ -22,6 +22,7 @@ import {
 let isInitPending = false;
 let navFallbackTimer: number | null = null;
 let fallbackObserver: MutationObserver | null = null;
+let videoSrcObserver: MutationObserver | null = null;
 let hasBoundNavListeners = false;
 
 // #endregion
@@ -238,6 +239,13 @@ function cleanupFallback(): void {
   }
 }
 
+function cleanupVideoSrcObserver(): void {
+  if (videoSrcObserver) {
+    videoSrcObserver.disconnect();
+    videoSrcObserver = null;
+  }
+}
+
 /**
  * Initializes the extension by waiting for player elements and adding buttons.
  * Uses efficient RAF-based polling instead of setInterval.
@@ -267,17 +275,27 @@ async function initializeExtension(): Promise<void> {
   }
 }
 
+function startInitialization(): void {
+  if (isInitPending) {
+    return;
+  }
+  isInitPending = true;
+  exportFunctions
+    .initializeExtension()
+    .finally(() => {
+      isInitPending = false;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 /**
  * Handles SPA navigation events from YouTube.
  * Uses a pending guard to prevent double-fires and includes a fallback
  * MutationObserver in case YouTube events don't fire.
  */
 function handleSpaNavigation(): void {
-  if (isInitPending) {
-    return;
-  }
-  isInitPending = true;
-
   // Clear any existing fallback timer
   cleanupFallback();
 
@@ -297,15 +315,15 @@ function handleSpaNavigation(): void {
       if (isPlayerReady()) {
         fallbackObserver?.disconnect();
         fallbackObserver = null;
-        exportFunctions.run();
+        exportFunctions.run().catch((error) => {
+          console.error(error);
+        });
+        exportFunctions.observeVideoSrcChange();
       }
     });
     fallbackObserver.observe(document.body, { childList: true, subtree: true });
   }, 2000);
-
-  initializeExtension().finally(() => {
-    isInitPending = false;
-  });
+  exportFunctions.startInitialization();
 }
 
 /**
@@ -331,6 +349,7 @@ function bindNavListeners(): void {
  */
 function cleanupNavState(): void {
   cleanupFallback();
+  cleanupVideoSrcObserver();
   abortWait();
   isInitPending = false;
 }
@@ -354,11 +373,16 @@ function bindNavCleanup(): void {
 }
 
 function observeVideoSrcChange() {
+  cleanupVideoSrcObserver();
+
   const video = document.querySelector<HTMLVideoElement>(
     YouTubeSelectors.Player.VIDEO
   );
+  if (!video) {
+    return;
+  }
 
-  const observer = new MutationObserver((mutations: MutationRecord[]) => {
+  videoSrcObserver = new MutationObserver((mutations: MutationRecord[]) => {
     for (const mutation of mutations) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
         exportFunctions.run();
@@ -366,9 +390,7 @@ function observeVideoSrcChange() {
     }
   });
 
-  if (video) {
-    observer.observe(video, { attributeFilter: ['src'] });
-  }
+  videoSrcObserver.observe(video, { attributeFilter: ['src'] });
 }
 
 function keyDownHandler(event: KeyboardEvent, video: HTMLVideoElement) {
@@ -442,6 +464,7 @@ chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
  */
 function resetNavState(): void {
   cleanupFallback();
+  cleanupVideoSrcObserver();
   abortWait();
   isInitPending = false;
   hasBoundNavListeners = false;
@@ -472,6 +495,7 @@ const exportFunctions = {
   run,
   observeVideoSrcChange,
   initializeExtension,
+  startInitialization,
   handleSpaNavigation,
   // Exposed for testing
   cleanupFallback,
@@ -484,7 +508,7 @@ const exportFunctions = {
 };
 
 // Initialize the extension and bind SPA navigation listeners
-initializeExtension();
+startInitialization();
 bindNavListeners();
 
 export default exportFunctions;
