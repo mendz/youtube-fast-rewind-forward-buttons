@@ -441,9 +441,9 @@ chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
  * Resets SPA navigation state. Exposed for testing purposes.
  */
 function resetNavState(): void {
+  cleanupFallback();
+  abortWait();
   isInitPending = false;
-  navFallbackTimer = null;
-  fallbackObserver = null;
   hasBoundNavListeners = false;
   hasBoundNavCleanup = false;
 }

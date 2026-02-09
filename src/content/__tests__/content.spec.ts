@@ -22,6 +22,7 @@ import {
   MediaTrackKey,
 } from '../types';
 import { YouTubeSelectors } from '../selectors';
+import * as waitForPlayer from '../wait-for-player';
 
 describe('full run', () => {
   const originalConsoleError = console.error;
@@ -714,6 +715,51 @@ describe('SPA Navigation Handling', () => {
 
       content.cleanupFallback();
       expect(content.getNavState().fallbackObserver).toBeNull();
+    });
+  });
+
+  describe('resetNavState', () => {
+    it('should clear active fallback timer without requiring cleanupFallback first', () => {
+      const waitSpy = jest
+        .spyOn(waitForPlayer, 'waitForPlayerElements')
+        .mockImplementation(undefined);
+
+      content.handleSpaNavigation();
+      expect(content.getNavState().navFallbackTimer).not.toBeNull();
+
+      content.resetNavState();
+      expect(content.getNavState().navFallbackTimer).toBeNull();
+
+      // If resetNavState forgot to clearTimeout, this would create fallback observer
+      jest.advanceTimersByTime(2100);
+      expect(content.getNavState().fallbackObserver).toBeNull();
+
+      waitSpy.mockRestore();
+    });
+
+    it('should disconnect active fallback observer without requiring cleanupFallback first', async () => {
+      const waitSpy = jest
+        .spyOn(waitForPlayer, 'waitForPlayerElements')
+        .mockImplementation(undefined);
+
+      document.body.innerHTML = '<div id="page"></div>';
+      content.handleSpaNavigation();
+      jest.advanceTimersByTime(2100);
+      expect(content.getNavState().fallbackObserver).not.toBeNull();
+
+      const runSpy = jest.spyOn(content, 'run');
+
+      content.resetNavState();
+      expect(content.getNavState().fallbackObserver).toBeNull();
+
+      // If resetNavState forgot to disconnect(), stale observer would call run()
+      document.getElementById('page')!.innerHTML = HTML_PLAYER_FULL;
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(runSpy).not.toHaveBeenCalled();
+
+      runSpy.mockRestore();
+      waitSpy.mockRestore();
     });
   });
 
