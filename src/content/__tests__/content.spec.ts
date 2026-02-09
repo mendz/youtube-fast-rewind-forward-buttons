@@ -506,6 +506,66 @@ describe('SPA Navigation Handling', () => {
     });
   });
 
+  describe('isPlayerReady', () => {
+    it('should return true when video with src and controls with next button exist', () => {
+      // HTML_PLAYER_FULL has video with src + left controls + next button
+      expect(content.isPlayerReady()).toBe(true);
+    });
+
+    it('should return true when video with src and controls with play button exist (no next button)', () => {
+      // Remove the next button but keep a play button
+      document
+        .querySelector(
+          `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.NEXT_BUTTON}`
+        )
+        ?.remove();
+      const leftControls = document.querySelector(
+        YouTubeSelectors.Player.CONTROLS_LEFT
+      );
+      const playButton = document.createElement('button');
+      playButton.className = 'ytp-play-button';
+      leftControls?.appendChild(playButton);
+
+      expect(content.isPlayerReady()).toBe(true);
+    });
+
+    it('should return false when no video exists', () => {
+      document.body.innerHTML = '<div></div>';
+      expect(content.isPlayerReady()).toBe(false);
+    });
+
+    it('should return false when video has no src', () => {
+      const video = document.querySelector(
+        YouTubeSelectors.Player.VIDEO
+      ) as HTMLVideoElement;
+      // Use removeAttribute because JSDOM resolves video.src = '' to the base URL
+      video.removeAttribute('src');
+      expect(content.isPlayerReady()).toBe(false);
+    });
+
+    it('should return false when controls are missing', () => {
+      document.querySelector(YouTubeSelectors.Player.CONTROLS_LEFT)?.remove();
+      expect(content.isPlayerReady()).toBe(false);
+    });
+
+    it('should return false when neither next nor play button exists', () => {
+      document
+        .querySelector(
+          `${YouTubeSelectors.Player.CONTROLS_LEFT} ${YouTubeSelectors.Player.NEXT_BUTTON}`
+        )
+        ?.remove();
+      expect(content.isPlayerReady()).toBe(false);
+    });
+
+    it('should return true even when custom buttons do not exist yet', () => {
+      // This is the key difference from hasVideoAndButtons():
+      // isPlayerReady should return true when the player is ready for
+      // button injection, even though buttons haven't been created yet.
+      expect(content.hasVideoAndButtons()).toBe(false); // no custom buttons
+      expect(content.isPlayerReady()).toBe(true); // player is ready
+    });
+  });
+
   describe('handleSpaNavigation pending guard', () => {
     it('should prevent double-fires when called multiple times rapidly', () => {
       // Call handleSpaNavigation twice rapidly
@@ -596,6 +656,41 @@ describe('SPA Navigation Handling', () => {
 
       const state = content.getNavState();
       expect(state.fallbackObserver).toBeNull();
+    });
+
+    it('should call run() when player appears even without pre-existing buttons (no deadlock)', async () => {
+      // beforeEach already sets fake timers and resets nav state
+
+      // Start with an empty DOM — no player at all
+      document.body.innerHTML = '<div id="page"></div>';
+
+      content.handleSpaNavigation();
+
+      // Advance past the 2-second fallback timer
+      jest.advanceTimersByTime(2100);
+
+      // Observer should now be active (player wasn't found)
+      expect(content.getNavState().fallbackObserver).not.toBeNull();
+
+      // Spy on run before injecting player elements
+      const runSpy = jest.spyOn(content, 'run');
+
+      // Inject a full player into the DOM — this triggers the MutationObserver.
+      // Importantly, no custom buttons exist yet. With the fix, isPlayerReady()
+      // detects the player without requiring pre-existing buttons.
+      document.getElementById('page')!.innerHTML = HTML_PLAYER_FULL;
+
+      // Flush microtasks so the MutationObserver callback fires
+      await Promise.resolve();
+      await Promise.resolve();
+
+      // The observer should have detected the player and called run()
+      expect(runSpy).toHaveBeenCalled();
+
+      // And the observer should have disconnected itself
+      expect(content.getNavState().fallbackObserver).toBeNull();
+
+      runSpy.mockRestore();
     });
   });
 

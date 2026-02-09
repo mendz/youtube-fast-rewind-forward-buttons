@@ -201,6 +201,30 @@ function hasVideoAndButtons(): boolean {
 }
 
 /**
+ * Checks if the YouTube player is ready for button injection.
+ * Unlike hasVideoAndButtons(), this does NOT require custom buttons to already
+ * exist — it only checks the prerequisites that run() needs to succeed.
+ */
+function isPlayerReady(): boolean {
+  const video = document.querySelector<HTMLVideoElement>(
+    YouTubeSelectors.Player.VIDEO
+  );
+  if (!video?.src) {
+    return false;
+  }
+  const controls = document.querySelector(
+    YouTubeSelectors.Player.CONTROLS_LEFT
+  );
+  const nextButton = controls?.querySelector(
+    YouTubeSelectors.Player.NEXT_BUTTON
+  );
+  const playButton = controls?.querySelector(
+    YouTubeSelectors.Player.PLAY_BUTTON
+  );
+  return !!(nextButton || playButton);
+}
+
+/**
  * Cleans up fallback observer and timer.
  */
 function cleanupFallback(): void {
@@ -264,13 +288,15 @@ function handleSpaNavigation(): void {
     if (hasVideoAndButtons()) {
       return;
     }
-    // Start a scoped MutationObserver to detect player appearance
+    // Start a scoped MutationObserver to detect player appearance.
+    // Uses isPlayerReady() instead of hasVideoAndButtons() to avoid a
+    // circular dependency: buttons only exist after run(), so checking
+    // for them here would deadlock the fallback.
     fallbackObserver?.disconnect();
     fallbackObserver = new MutationObserver(() => {
-      if (hasVideoAndButtons()) {
+      if (isPlayerReady()) {
         fallbackObserver?.disconnect();
         fallbackObserver = null;
-        // Re-run to ensure event listeners are attached
         exportFunctions.run();
       }
     });
@@ -451,6 +477,7 @@ const exportFunctions = {
   cleanupFallback,
   cleanupNavState,
   hasVideoAndButtons,
+  isPlayerReady,
   resetNavState,
   getNavState,
   bindNavListeners,
