@@ -383,6 +383,81 @@ describe('mergeOptions', () => {
   });
 });
 
+describe('chrome.storage.onChanged listener', () => {
+  beforeEach(() => {
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    console.error = jest.fn();
+  });
+
+  it('should load full options from storage when loadedOptions is not yet set', async () => {
+    content.clearLoadedOptions();
+    chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
+
+    const changes: ChromeStorageChanges = {
+      rewindSeconds: { oldValue: 5, newValue: 10 },
+    };
+    chrome.storage.onChanged.callListeners(changes, 'sync');
+
+    // Flush the async loadOptions() call inside the listener
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(chrome.storage.sync.get).toHaveBeenCalled();
+  });
+
+  it('should not call updateButtons when no video element exists', async () => {
+    await run();
+    document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+
+    const changes: ChromeStorageChanges = {
+      rewindSeconds: { oldValue: 5, newValue: 10 },
+    };
+    chrome.storage.onChanged.callListeners(changes, 'sync');
+
+    // Flush microtasks for the async listener
+    await Promise.resolve();
+
+    expect(updateButtonsSpy).not.toHaveBeenCalled();
+    updateButtonsSpy.mockRestore();
+  });
+
+  it('should update loadedOptions even when no video element exists', async () => {
+    await run();
+    document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+    const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
+
+    const changes: ChromeStorageChanges = {
+      rewindSeconds: { oldValue: 5, newValue: 42 },
+    };
+    chrome.storage.onChanged.callListeners(changes, 'sync');
+
+    // Flush microtasks for the async listener
+    await Promise.resolve();
+
+    // updateButtons should NOT be called (no video)
+    expect(updateButtonsSpy).not.toHaveBeenCalled();
+
+    // But options should have been updated in memory.
+    // Verify by restoring the video and triggering another change --
+    // the previous rewindSeconds=42 should be the base for the merge.
+    document.body.innerHTML = HTML_PLAYER_FULL;
+    const changes2: ChromeStorageChanges = {
+      forwardSeconds: { oldValue: 5, newValue: 99 },
+    };
+    chrome.storage.onChanged.callListeners(changes2, 'sync');
+    await Promise.resolve();
+
+    expect(updateButtonsSpy).toHaveBeenCalledTimes(1);
+    const calledOptions = updateButtonsSpy.mock.calls[0][0] as IOptions;
+    // rewindSeconds should be 42 from the first (no-video) update
+    expect(calledOptions.rewindSeconds).toBe(42);
+    expect(calledOptions.forwardSeconds).toBe(99);
+
+    updateButtonsSpy.mockRestore();
+  });
+});
+
 describe('handleOverrideKeysMigration', () => {
   it('Should return true, if the old value is true or if the old value if false/undefined and the new value is true', () => {
     const defaultOptions: Readonly<IOptions> = {

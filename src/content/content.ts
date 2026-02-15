@@ -44,7 +44,7 @@ export function handleOverrideKeysMigration(
   );
 }
 
-let loadedOptions: IOptions;
+let loadedOptions: IOptions | undefined;
 let activeVideo: HTMLVideoElement | null = null;
 /**
  * Load the extension options from the storage
@@ -397,6 +397,9 @@ function observeVideoSrcChange() {
 }
 
 function keyDownHandler(event: KeyboardEvent, video: HTMLVideoElement) {
+  if (!loadedOptions) {
+    return;
+  }
   if (shouldSkipDueToFocus()) {
     return;
   }
@@ -453,14 +456,23 @@ export async function run(): Promise<void> {
 }
 
 // handle option update
-chrome.storage.onChanged.addListener((changes: ChromeStorageChanges): void => {
-  const video = document.querySelector(
-    YouTubeSelectors.Player.VIDEO
-  ) as HTMLVideoElement;
-  loadedOptions = mergeOptions(changes, loadedOptions);
+chrome.storage.onChanged.addListener(
+  async (changes: ChromeStorageChanges): Promise<void> => {
+    if (!loadedOptions) {
+      loadedOptions = await loadOptions();
+    } else {
+      loadedOptions = mergeOptions(changes, loadedOptions);
+    }
 
-  updateButtons(loadedOptions, video);
-});
+    const video = document.querySelector<HTMLVideoElement>(
+      YouTubeSelectors.Player.VIDEO
+    );
+    if (!video) {
+      return;
+    }
+    updateButtons(loadedOptions, video);
+  }
+);
 
 /**
  * Resets SPA navigation state. Exposed for testing purposes.
@@ -472,6 +484,14 @@ function resetNavState(): void {
   isInitPending = false;
   hasBoundNavListeners = false;
   hasBoundNavCleanup = false;
+}
+
+/**
+ * Clears the loaded options. Exposed for testing purposes only,
+ * to simulate the state before the first run() completes.
+ */
+function clearLoadedOptions(): void {
+  loadedOptions = undefined;
 }
 
 /**
@@ -508,6 +528,7 @@ const exportFunctions = {
   resetNavState,
   getNavState,
   bindNavListeners,
+  clearLoadedOptions,
 };
 
 // Initialize the extension and bind SPA navigation listeners
