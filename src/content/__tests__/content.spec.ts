@@ -600,7 +600,7 @@ describe('SPA Navigation Handling', () => {
       expect(content.getNavState().isInitPending).toBe(true);
     });
 
-    it('should not start a second init while guarded init is in progress', () => {
+    it('should not start a second init when startInitialization is called directly while pending', () => {
       const pendingInit = new Promise<void>(() => {});
       const initSpy = jest
         .spyOn(content, 'initializeExtension')
@@ -609,10 +609,82 @@ describe('SPA Navigation Handling', () => {
       content.startInitialization();
       expect(content.getNavState().isInitPending).toBe(true);
 
-      content.handleSpaNavigation();
+      // Direct startInitialization should still be guarded
+      content.startInitialization();
       expect(initSpy).toHaveBeenCalledTimes(1);
 
       initSpy.mockRestore();
+    });
+
+    it('should reset isInitPending so a new init can start after SPA navigation during a pending init', () => {
+      const pendingInit = new Promise<void>(() => {});
+      const initSpy = jest
+        .spyOn(content, 'initializeExtension')
+        .mockReturnValue(pendingInit);
+
+      // First init sets isInitPending = true
+      content.startInitialization();
+      expect(content.getNavState().isInitPending).toBe(true);
+
+      // SPA navigation should reset isInitPending and allow a new init
+      content.handleSpaNavigation();
+
+      // initializeExtension should be called again (once from startInitialization, once from handleSpaNavigation)
+      expect(initSpy).toHaveBeenCalledTimes(2);
+
+      initSpy.mockRestore();
+    });
+
+    it('should disconnect videoSrcObserver when a second SPA navigation fires', () => {
+      const originalMutationObserver = global.MutationObserver;
+      const observerInstances: Array<{
+        observe: jest.Mock;
+        disconnect: jest.Mock;
+      }> = [];
+
+      const MutationObserverMock = jest.fn().mockImplementation(() => {
+        const instance = {
+          observe: jest.fn(),
+          disconnect: jest.fn(),
+        };
+        observerInstances.push(instance);
+        return instance;
+      });
+
+      Object.defineProperty(global, 'MutationObserver', {
+        configurable: true,
+        writable: true,
+        value: MutationObserverMock,
+      });
+
+      try {
+        document.body.innerHTML = HTML_PLAYER_FULL;
+
+        // Set up a src observer (simulating a completed first navigation)
+        content.observeVideoSrcChange();
+        expect(observerInstances.length).toBe(1);
+        const firstSrcObserver = observerInstances[0];
+
+        // SPA navigation should disconnect the existing src observer
+        content.handleSpaNavigation();
+        expect(firstSrcObserver.disconnect).toHaveBeenCalled();
+      } finally {
+        Object.defineProperty(global, 'MutationObserver', {
+          configurable: true,
+          writable: true,
+          value: originalMutationObserver,
+        });
+      }
+    });
+
+    it('should abort pending waitForPlayerElements when SPA navigation fires', () => {
+      const abortWaitSpy = jest.spyOn(waitForPlayer, 'abortWait');
+
+      content.handleSpaNavigation();
+
+      expect(abortWaitSpy).toHaveBeenCalled();
+
+      abortWaitSpy.mockRestore();
     });
   });
 
