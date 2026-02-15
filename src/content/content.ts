@@ -23,6 +23,7 @@ let isInitPending = false;
 let navFallbackTimer: number | null = null;
 let fallbackObserver: MutationObserver | null = null;
 let videoSrcObserver: MutationObserver | null = null;
+let srcDebounceTimer: number | null = null;
 let hasBoundNavListeners = false;
 
 // #endregion
@@ -240,6 +241,10 @@ function cleanupFallback(): void {
 }
 
 function cleanupVideoSrcObserver(): void {
+  if (srcDebounceTimer !== null) {
+    clearTimeout(srcDebounceTimer);
+    srcDebounceTimer = null;
+  }
   if (videoSrcObserver) {
     videoSrcObserver.disconnect();
     videoSrcObserver = null;
@@ -388,7 +393,14 @@ function observeVideoSrcChange() {
   videoSrcObserver = new MutationObserver((mutations: MutationRecord[]) => {
     for (const mutation of mutations) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-        exportFunctions.run();
+        if (srcDebounceTimer !== null) {
+          clearTimeout(srcDebounceTimer);
+        }
+        srcDebounceTimer = window.setTimeout(() => {
+          srcDebounceTimer = null;
+          exportFunctions.run();
+        }, 150);
+        break; // one debounced call per batch is enough
       }
     }
   });
@@ -501,6 +513,7 @@ function getNavState(): {
   isInitPending: boolean;
   navFallbackTimer: number | null;
   fallbackObserver: MutationObserver | null;
+  srcDebounceTimer: number | null;
   hasBoundNavListeners: boolean;
   hasBoundNavCleanup: boolean;
 } {
@@ -508,6 +521,7 @@ function getNavState(): {
     isInitPending,
     navFallbackTimer,
     fallbackObserver,
+    srcDebounceTimer,
     hasBoundNavListeners,
     hasBoundNavCleanup,
   };

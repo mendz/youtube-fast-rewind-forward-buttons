@@ -901,6 +901,95 @@ describe('SPA Navigation Handling', () => {
     });
   });
 
+  describe('observeVideoSrcChange debounce', () => {
+    let observerCallback: MutationCallback;
+    let originalMutationObserver: typeof MutationObserver;
+
+    beforeEach(() => {
+      originalMutationObserver = global.MutationObserver;
+
+      const MutationObserverMock = jest
+        .fn()
+        .mockImplementation((cb: MutationCallback) => {
+          observerCallback = cb;
+          return {
+            observe: jest.fn(),
+            disconnect: jest.fn(),
+          };
+        });
+
+      Object.defineProperty(global, 'MutationObserver', {
+        configurable: true,
+        writable: true,
+        value: MutationObserverMock,
+      });
+
+      document.body.innerHTML = HTML_PLAYER_FULL;
+    });
+
+    afterEach(() => {
+      Object.defineProperty(global, 'MutationObserver', {
+        configurable: true,
+        writable: true,
+        value: originalMutationObserver,
+      });
+    });
+
+    it('should debounce multiple rapid src mutations into a single run() call', () => {
+      const runSpy = jest.spyOn(content, 'run').mockResolvedValue();
+
+      content.observeVideoSrcChange();
+
+      const srcMutation = {
+        type: 'attributes',
+        attributeName: 'src',
+      } as unknown as MutationRecord;
+
+      // Fire 5 rapid src mutations
+      for (let i = 0; i < 5; i++) {
+        observerCallback([srcMutation], {} as MutationObserver);
+      }
+
+      // run() should not have been called yet (debounce pending)
+      expect(runSpy).not.toHaveBeenCalled();
+      expect(content.getNavState().srcDebounceTimer).not.toBeNull();
+
+      // Advance past the 150ms debounce window
+      jest.advanceTimersByTime(150);
+
+      // Only a single run() call should have fired
+      expect(runSpy).toHaveBeenCalledTimes(1);
+      expect(content.getNavState().srcDebounceTimer).toBeNull();
+
+      runSpy.mockRestore();
+    });
+
+    it('should clear pending debounce timer when cleanupVideoSrcObserver is called', () => {
+      const runSpy = jest.spyOn(content, 'run').mockResolvedValue();
+
+      content.observeVideoSrcChange();
+
+      const srcMutation = {
+        type: 'attributes',
+        attributeName: 'src',
+      } as unknown as MutationRecord;
+
+      // Trigger a mutation to start the debounce timer
+      observerCallback([srcMutation], {} as MutationObserver);
+      expect(content.getNavState().srcDebounceTimer).not.toBeNull();
+
+      // Cleanup should clear the pending timer
+      content.resetNavState();
+      expect(content.getNavState().srcDebounceTimer).toBeNull();
+
+      // Advancing time should NOT trigger run()
+      jest.advanceTimersByTime(200);
+      expect(runSpy).not.toHaveBeenCalled();
+
+      runSpy.mockRestore();
+    });
+  });
+
   describe('cleanupFallback', () => {
     it('should clear fallback timer', () => {
       content.handleSpaNavigation();
