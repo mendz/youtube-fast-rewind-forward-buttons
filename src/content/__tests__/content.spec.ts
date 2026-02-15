@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-nested-functions */
 import { chrome } from 'jest-chrome';
 import * as buttons from '../buttons';
 import * as eventKeys from '../event-keys';
@@ -819,6 +820,88 @@ describe('SPA Navigation Handling', () => {
 
       const state = content.getNavState();
       expect(state.fallbackObserver).toBeNull();
+    });
+
+    it('should scope fallback observer to ytd-player when it exists', () => {
+      const originalMutationObserver = global.MutationObserver;
+      let observeTarget: Node | undefined;
+
+      const MutationObserverMock = jest.fn().mockImplementation(() => {
+        return {
+          observe: jest.fn((target: Node) => {
+            observeTarget = target;
+          }),
+          disconnect: jest.fn(),
+        };
+      });
+
+      Object.defineProperty(global, 'MutationObserver', {
+        configurable: true,
+        writable: true,
+        value: MutationObserverMock,
+      });
+
+      try {
+        // HTML_PLAYER_FULL contains <ytd-player>
+        document.body.innerHTML = HTML_PLAYER_FULL;
+
+        // Remove video so hasVideoAndButtons returns false, triggering the fallback observer
+        document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+
+        content.handleSpaNavigation();
+        jest.advanceTimersByTime(2100);
+
+        const ytdPlayer = document.querySelector(
+          YouTubeSelectors.Player.CONTAINER_ELEMENT
+        );
+        expect(ytdPlayer).not.toBeNull();
+        expect(observeTarget).toBe(ytdPlayer);
+      } finally {
+        Object.defineProperty(global, 'MutationObserver', {
+          configurable: true,
+          writable: true,
+          value: originalMutationObserver,
+        });
+      }
+    });
+
+    it('should fall back to document.body when ytd-player is absent', () => {
+      const originalMutationObserver = global.MutationObserver;
+      let observeTarget: Node | undefined;
+
+      const MutationObserverMock = jest.fn().mockImplementation(() => {
+        return {
+          observe: jest.fn((target: Node) => {
+            observeTarget = target;
+          }),
+          disconnect: jest.fn(),
+        };
+      });
+
+      Object.defineProperty(global, 'MutationObserver', {
+        configurable: true,
+        writable: true,
+        value: MutationObserverMock,
+      });
+
+      try {
+        // No ytd-player element in the DOM
+        document.body.innerHTML = '<div></div>';
+
+        content.handleSpaNavigation();
+        jest.advanceTimersByTime(2100);
+
+        expect(
+          document.querySelector(YouTubeSelectors.Player.CONTAINER_ELEMENT)
+        ).toBeNull();
+        expect(observeTarget).toBe(document.body);
+      } finally {
+        Object.defineProperty(global, 'MutationObserver', {
+          configurable: true,
+          writable: true,
+          value: originalMutationObserver,
+        });
+      }
     });
 
     it('should call run() and observeVideoSrcChange() when player appears even without pre-existing buttons (no deadlock)', async () => {

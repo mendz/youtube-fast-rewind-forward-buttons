@@ -329,7 +329,10 @@ function handleSpaNavigation(): void {
         exportFunctions.observeVideoSrcChange();
       }
     });
-    fallbackObserver.observe(document.body, { childList: true, subtree: true });
+    const observeTarget =
+      document.querySelector(YouTubeSelectors.Player.CONTAINER_ELEMENT) ??
+      document.body;
+    fallbackObserver.observe(observeTarget, { childList: true, subtree: true });
   }, 2000);
   exportFunctions.startInitialization();
 }
