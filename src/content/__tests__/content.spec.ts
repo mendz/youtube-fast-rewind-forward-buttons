@@ -75,7 +75,7 @@ describe('full run', () => {
   });
 
   it('should have no button when there is no video', async () => {
-    document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+    document.querySelector(YouTubeSelectors.Player.SCOPED_VIDEO)?.remove();
     await run();
     expect(
       document.querySelectorAll('button.ml-custom-rewind-forward-buttons')
@@ -122,7 +122,7 @@ describe('full run', () => {
 
   it('Should pass to addButtonsToVideo options and video', async () => {
     // set all the mockups
-    const video = document.querySelector(YouTubeSelectors.Player.VIDEO);
+    const video = document.querySelector(YouTubeSelectors.Player.SCOPED_VIDEO);
     chrome.storage.sync.get.mockReturnValue(DEFAULT_OPTIONS_MOCK as any);
     const addButtonsToVideoSpy = jest.spyOn(buttons, 'addButtonsToVideo');
 
@@ -408,7 +408,7 @@ describe('chrome.storage.onChanged listener', () => {
 
   it('should not call updateButtons when no video element exists', async () => {
     await run();
-    document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+    document.querySelector(YouTubeSelectors.Player.SCOPED_VIDEO)?.remove();
     const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
 
     const changes: ChromeStorageChanges = {
@@ -425,7 +425,7 @@ describe('chrome.storage.onChanged listener', () => {
 
   it('should update loadedOptions even when no video element exists', async () => {
     await run();
-    document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+    document.querySelector(YouTubeSelectors.Player.SCOPED_VIDEO)?.remove();
     const updateButtonsSpy = jest.spyOn(buttons, 'updateButtons');
 
     const changes: ChromeStorageChanges = {
@@ -572,7 +572,7 @@ describe('SPA Navigation Handling', () => {
 
     it('should return false when video has no src', () => {
       const video = document.querySelector(
-        YouTubeSelectors.Player.VIDEO
+        YouTubeSelectors.Player.SCOPED_VIDEO
       ) as HTMLVideoElement;
       video.src = '';
       expect(content.hasVideoAndButtons()).toBe(false);
@@ -613,7 +613,7 @@ describe('SPA Navigation Handling', () => {
 
     it('should return false when video has no src', () => {
       const video = document.querySelector(
-        YouTubeSelectors.Player.VIDEO
+        YouTubeSelectors.Player.SCOPED_VIDEO
       ) as HTMLVideoElement;
       // Use removeAttribute because JSDOM resolves video.src = '' to the base URL
       video.removeAttribute('src');
@@ -846,7 +846,7 @@ describe('SPA Navigation Handling', () => {
         document.body.innerHTML = HTML_PLAYER_FULL;
 
         // Remove video so hasVideoAndButtons returns false, triggering the fallback observer
-        document.querySelector(YouTubeSelectors.Player.VIDEO)?.remove();
+        document.querySelector(YouTubeSelectors.Player.SCOPED_VIDEO)?.remove();
 
         content.handleSpaNavigation();
         jest.advanceTimersByTime(2100);

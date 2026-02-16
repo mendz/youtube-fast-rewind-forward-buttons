@@ -39,8 +39,7 @@ let hasBoundCleanup = false;
  */
 function queryPlayerElements(): PlayerElements | null {
   const video = document.querySelector<HTMLVideoElement>(
-    `${YouTubeSelectors.Player.CONTAINER_ELEMENT} ${YouTubeSelectors.Player.VIDEO}, ` +
-      `${YouTubeSelectors.Player.CONTAINER_CLASS} ${YouTubeSelectors.Player.VIDEO}`
+    YouTubeSelectors.Player.SCOPED_VIDEO
   );
 
   if (!video?.src) {

@@ -194,7 +194,7 @@ export function mergeOptions(
  */
 function hasVideoAndButtons(): boolean {
   const video = document.querySelector<HTMLVideoElement>(
-    YouTubeSelectors.Player.VIDEO
+    YouTubeSelectors.Player.SCOPED_VIDEO
   );
   const customButton = document.querySelector(
     `button.${ButtonClassesIds.CLASS}`
@@ -209,7 +209,7 @@ function hasVideoAndButtons(): boolean {
  */
 function isPlayerReady(): boolean {
   const video = document.querySelector<HTMLVideoElement>(
-    YouTubeSelectors.Player.VIDEO
+    YouTubeSelectors.Player.SCOPED_VIDEO
   );
   if (!video?.src) {
     return false;
@@ -387,7 +387,7 @@ function observeVideoSrcChange() {
   cleanupVideoSrcObserver();
 
   const video = document.querySelector<HTMLVideoElement>(
-    YouTubeSelectors.Player.VIDEO
+    YouTubeSelectors.Player.SCOPED_VIDEO
   );
   if (!video) {
     return;
@@ -448,7 +448,7 @@ export async function run(): Promise<void> {
   const options: IOptions = await loadOptions();
   loadedOptions = { ...options };
   const video: Nullable<HTMLVideoElement> = document.querySelector(
-    YouTubeSelectors.Player.VIDEO
+    YouTubeSelectors.Player.SCOPED_VIDEO
   );
   const customButton: HTMLButtonElement | null = document.querySelector(
     `button.${ButtonClassesIds.CLASS}`
@@ -480,7 +480,7 @@ chrome.storage.onChanged.addListener(
     }
 
     const video = document.querySelector<HTMLVideoElement>(
-      YouTubeSelectors.Player.VIDEO
+      YouTubeSelectors.Player.SCOPED_VIDEO
     );
     if (!video) {
       return;

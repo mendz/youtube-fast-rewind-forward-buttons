@@ -1,6 +1,7 @@
 export const YouTubeSelectors = {
   Player: {
     VIDEO: 'video',
+    SCOPED_VIDEO: 'ytd-player video, div.ytd-player video',
     CONTAINER_ELEMENT: 'ytd-player',
     CONTAINER_CLASS: 'div.ytd-player',
     CONTROLS_LEFT: 'div.ytp-left-controls',
