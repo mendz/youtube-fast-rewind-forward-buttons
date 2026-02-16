@@ -1,0 +1,1 @@
+When you need to research or explore the codebase, use the Task tool with `subagent_type="explore"`. Split the research into multiple parallel subagents based on different topics or main folders (e.g., one for `src/content/`, another for `src/options/`, another for `e2e-tests/`, etc.) to maximize speed and coverage.
