@@ -267,6 +267,31 @@ describe('abortWait', () => {
     const result = await waitForPlayerElements();
     expect(result).not.toBeNull();
   });
+
+  it('should invalidate the first wait when a second wait starts', async () => {
+    document.body.innerHTML = INITIAL_HTML_PLAYER_FULL;
+
+    // Start a first wait that will keep polling
+    const firstPromise = waitForPlayerElements({ maxRetries: 100 });
+
+    // Flush a couple of RAF cycles so the first wait is mid-poll
+    flushRAF(2, rafCallbacks);
+
+    // Start a second wait — this increments the generation and
+    // should cause the first wait to resolve null on its next check
+    document.body.innerHTML = HTML_PLAYER_READY;
+    const secondPromise = waitForPlayerElements();
+
+    // Flush one more so the first wait's pending RAF fires and sees stale generation
+    flushRAF(1, rafCallbacks);
+
+    const firstResult = await firstPromise;
+    const secondResult = await secondPromise;
+
+    expect(firstResult).toBeNull();
+    expect(secondResult).not.toBeNull();
+    expect(secondResult?.video).toBeInstanceOf(HTMLVideoElement);
+  });
 });
 
 describe('bindWaitCleanup', () => {

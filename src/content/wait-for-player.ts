@@ -26,7 +26,7 @@ const FALLBACK_INTERVAL_MS = 16; // ~60fps fallback for environments without RAF
 
 // #region Module State
 
-let waitAborted = false;
+let waitGeneration = 0;
 let hasBoundCleanup = false;
 
 // #endregion
@@ -104,11 +104,11 @@ export function waitForPlayerElements(
 ): Promise<PlayerElements | null> {
   const maxRetries = options?.maxRetries ?? DEFAULT_MAX_RETRIES;
   let attempts = 0;
-  waitAborted = false;
+  const myGeneration = ++waitGeneration;
 
   return new Promise((resolve) => {
     const checkElements = (): void => {
-      if (waitAborted) {
+      if (myGeneration !== waitGeneration) {
         resolve(null);
         return;
       }
@@ -144,7 +144,7 @@ export function waitForPlayerElements(
  * Should be called on page unload to prevent memory leaks.
  */
 export function abortWait(): void {
-  waitAborted = true;
+  waitGeneration++;
 }
 
 /**
@@ -168,7 +168,7 @@ export function bindWaitCleanup(): void {
  * Resets module state. Exposed for testing purposes.
  */
 export function resetWaitState(): void {
-  waitAborted = false;
+  waitGeneration = 0;
   hasBoundCleanup = false;
 }
 
