@@ -401,7 +401,9 @@ function observeVideoSrcChange() {
         }
         srcDebounceTimer = window.setTimeout(() => {
           srcDebounceTimer = null;
-          exportFunctions.run();
+          exportFunctions.run().catch((error) => {
+            console.error(error);
+          });
         }, 150);
         break; // one debounced call per batch is enough
       }
