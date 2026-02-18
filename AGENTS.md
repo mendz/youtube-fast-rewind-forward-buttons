@@ -8,6 +8,7 @@ Keep guidance concise and actionable. If you change behavior that affects tests,
 Key locations and why they matter
 - `src/` — extension implementation. Important subfolders:
   - `content/` — injected scripts that interact with the YouTube player (e.g. `content.ts`, `buttons.ts`, `handle-video-player.ts`, `event-keys.ts`, `tooltip.ts`, `helper.ts`, `types.ts`). Changes here affect runtime behavior and E2E tests.
+    - `selectors.ts` — Centralized location for all YouTube DOM selectors. Use this to maintain consistency and avoid magic strings.
   - `background/` — service worker logic and feature flags (see `service-worker.ts`). Use this for cross-tab state and messaging.
     - `whats-new-page/` — changelog page shown automatically on extension updates. Includes HTML, CSS, TypeScript, tests, and test helpers.
   - `options/` — the options page implementation (`options-page.ts`, `options.html`) and CSS. This is the canonical source of user-settings handling.
@@ -25,7 +26,7 @@ Important developer workflows (commands)
 - Typecheck & lint: `npm run check`, `npm run eslint`, `npm run prettier`.
 - Unit tests:
   - `npm run jest:test` or `npm run jest:test:coverage` (uses `jest.setup.js` to stub Chrome APIs via `jest-chrome`).
-  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases. Note: `jest:test` runs with `--watchAll` for continuous testing; use the pattern above to run specific files without watch mode.
+  - For a single file, run `npm run jest -- src/content/__tests__/your-file.test.ts --watchAll=false` (Jest accepts partial matches); combine with `-t "<name pattern>"` to target individual test cases. Note: `jest:test` runs with `--watchAll` for continuous testing; use `--no-coverage --watchAll=false` when running specific files to avoid waiting for watch mode to finish.
 - Playwright:
   - `npm run playwright:test` — run E2E tests (see `playwright.config.ts`), tests live in `e2e-tests/`.
   - `npm run playwright:test:debug` — debug Playwright tests interactively.
@@ -43,6 +44,17 @@ Project-specific patterns and conventions
 - Tests: colocate test helpers under `__utils__` and name specs `<feature>.spec.ts` or `<feature>.test.ts`.
 - Chrome API stubbing: unit tests rely on `jest.setup.js` and `jest-chrome`. Do not import real chrome APIs in unit tests.
 - Styling: shared CSS lives under `src/css/pico/` — `scripts/fix-pico-paths.mjs` is used during builds to repatch asset paths. If you update Pico or assets, update that script.
+- **if statements:** always use curly brackets (no single-line bodies without braces).
+
+  ```ts
+  // BAD
+  if (!video?.src) return null;
+
+  // GOOD
+  if (!video?.src) {
+    return null;
+  }
+  ```
 
 Integration and messaging
 - Content scripts communicate with the background service worker via standard chrome.runtime messaging. Look for usages of `chrome.runtime.sendMessage` and `chrome.runtime.onMessage` across `content/` and `background/`.
@@ -54,7 +66,7 @@ Examples of repository-specific intents
 
 Small rules for AI edits
 - Keep changes minimal and scoped. Prefer updating or adding a single file unless a multi-file change is required.
-- Run `npm run check` and `npm run jest:test` after code changes. If adding UI or DOM changes, run Playwright tests or update `e2e-tests/` accordingly.
+- Run `npm run check` and `npm run jest:test` after code changes. If adding UI or DOM changes, remind the user to run Playwright tests or update `e2e-tests/` accordingly — do **not** run Playwright/E2E tests unless the user explicitly asks you to.
 - Preserve public APIs (message formats, settings keys in `types.d.ts`) unless you update all callsites and tests.
 
 Where to look when debugging
@@ -64,5 +76,5 @@ Where to look when debugging
 - Packaging / build quirks: `scripts/fix-pico-paths.mjs` and `package.json` scripts.
 
 If unsure or blocked
-- Run the unit tests and Playwright suites locally. Inspect `playwright-report/` and `test-results/` for failing test artifacts.
+- Run the unit tests locally; if the user asks, they can run Playwright and inspect `playwright-report/` and `test-results/` for failing test artifacts.
 - Ask for clarification and include failing test names or stack traces. Prefer concrete, small PRs for behavior changes.

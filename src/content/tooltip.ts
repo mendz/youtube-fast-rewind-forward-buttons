@@ -1,11 +1,12 @@
 import { isNewUiPlayer } from './button-styles-sync';
+import { YouTubeSelectors } from './selectors';
 
 export function getElementsForTooltipCalculation(): {
   tooltipContainer: HTMLElement;
   tooltipTextSpan: HTMLSpanElement;
 } {
   const textWrapper: Nullable<Element> = document.querySelector(
-    'div.ytp-tooltip-text-wrapper'
+    YouTubeSelectors.Tooltip.WRAPPER
   );
 
   if (!textWrapper) {
@@ -14,7 +15,7 @@ export function getElementsForTooltipCalculation(): {
 
   const tooltipContainer: Nullable<HTMLElement> = textWrapper.parentElement;
   const tooltipTextSpan: Nullable<HTMLSpanElement> = textWrapper.querySelector(
-    'span.ytp-tooltip-text'
+    YouTubeSelectors.Tooltip.TEXT
   );
 
   if (!tooltipContainer || !tooltipTextSpan) {
@@ -36,8 +37,9 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
       getElementsForTooltipCalculation();
 
     // elements height for calculate the top of the button
-    const mainPlayerContainer: Nullable<Element> =
-      document.querySelector('ytd-player');
+    const mainPlayerContainer: Nullable<Element> = document.querySelector(
+      YouTubeSelectors.Player.CONTAINER_ELEMENT
+    );
 
     if (!mainPlayerContainer) {
       console.error(`Couldn't find player container`);
@@ -59,7 +61,8 @@ export function handleTooltipOnMouseOver(this: HTMLButtonElement): void {
     if (!isNewUiPlayer()) {
       const playerContainerHeight: number = mainPlayerContainer.clientHeight;
       const bottomControlsHeight: number =
-        document.querySelector('div.ytp-chrome-bottom')?.clientHeight ?? 0;
+        document.querySelector(YouTubeSelectors.Player.CHROME_BOTTOM)
+          ?.clientHeight ?? 0;
       const buttonHeight: number = this.clientHeight;
       const tooltipTopPosition: number =
         playerContainerHeight - bottomControlsHeight - buttonHeight + 12;

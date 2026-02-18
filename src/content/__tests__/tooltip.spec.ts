@@ -12,20 +12,18 @@ import {
   handleTooltipOnMouseLeave,
   handleTooltipOnMouseOver,
 } from '../tooltip';
-import {
-  HTML_PLAYER_FULL,
-  TOOLTIP_CONTAINER_WRAPPER_QUERY,
-} from '../__utils__/tests-helper';
+import { HTML_PLAYER_FULL } from '../__utils__/tests-helper';
+import { YouTubeSelectors } from '../selectors';
 
 const mockIsNewUiPlayer = isNewUiPlayer as jest.MockedFunction<
   typeof isNewUiPlayer
 >;
 
 describe('getElementsForTooltipCalculation', () => {
-  const wrapperQuery = TOOLTIP_CONTAINER_WRAPPER_QUERY;
+  const wrapperQuery = YouTubeSelectors.Tooltip.WRAPPER;
   const wrapperParentQuery = 'div.ytp-tooltip';
-  const tooltipContainerQuery = 'div.ytp-chrome-bottom';
-  const spanTextQuery = 'span.ytp-tooltip-text';
+  const tooltipContainerQuery = YouTubeSelectors.Player.CHROME_BOTTOM;
+  const spanTextQuery = YouTubeSelectors.Tooltip.TEXT;
   const error = `Couldn't find tooltip elements!`;
 
   it('should fail when no wrapper', () => {
@@ -90,7 +88,7 @@ describe('handleTooltipOnMouseOver', () => {
   it('Should change the tooltip continuer with the correct classes', () => {
     handleTooltipOnMouseOver.bind(button)();
     const tooltipContainer = document.querySelector(
-      TOOLTIP_CONTAINER_WRAPPER_QUERY
+      YouTubeSelectors.Tooltip.WRAPPER
     )?.parentElement as HTMLDivElement;
     const classList = tooltipContainer.classList;
     expect(classList.contains('ytp-tooltip')).toBe(true);
@@ -102,7 +100,7 @@ describe('handleTooltipOnMouseOver', () => {
   it('Should change the tooltip continuer with the correct styles', () => {
     handleTooltipOnMouseOver.bind(button)();
     const tooltipContainer = document.querySelector(
-      TOOLTIP_CONTAINER_WRAPPER_QUERY
+      YouTubeSelectors.Tooltip.WRAPPER
     )?.parentElement as HTMLDivElement;
 
     const style = tooltipContainer.style;
@@ -111,14 +109,16 @@ describe('handleTooltipOnMouseOver', () => {
   });
 
   it('Should position the tooltip when using the legacy player', () => {
-    const playerElement = document.querySelector('ytd-player') as HTMLElement;
+    const playerElement = document.querySelector(
+      YouTubeSelectors.Player.CONTAINER_ELEMENT
+    ) as HTMLElement;
     Object.defineProperty(playerElement, 'clientHeight', {
       value: 300,
       configurable: true,
     });
 
     const chromeBottom = document.querySelector(
-      'div.ytp-chrome-bottom'
+      YouTubeSelectors.Player.CHROME_BOTTOM
     ) as HTMLElement;
     Object.defineProperty(chromeBottom, 'clientHeight', {
       value: 50,
@@ -133,7 +133,7 @@ describe('handleTooltipOnMouseOver', () => {
     handleTooltipOnMouseOver.bind(button)();
 
     const tooltipContainer = document.querySelector(
-      TOOLTIP_CONTAINER_WRAPPER_QUERY
+      YouTubeSelectors.Tooltip.WRAPPER
     )?.parentElement as HTMLDivElement;
 
     expect(tooltipContainer.style.top).toBe('242px');
@@ -141,7 +141,7 @@ describe('handleTooltipOnMouseOver', () => {
 
   it('Should skip positioning when using the modern player', () => {
     const tooltipContainer = document.querySelector(
-      TOOLTIP_CONTAINER_WRAPPER_QUERY
+      YouTubeSelectors.Tooltip.WRAPPER
     )?.parentElement as HTMLDivElement;
     tooltipContainer.style.top = '123px';
 
@@ -176,10 +176,12 @@ describe('handleTooltipOnMouseLeave', () => {
 
   it('Should update the style and the classes', () => {
     const tooltipContainer = document.querySelector(
-      TOOLTIP_CONTAINER_WRAPPER_QUERY
+      YouTubeSelectors.Tooltip.WRAPPER
     )?.parentElement as HTMLDivElement;
     (
-      tooltipContainer.querySelector('span.ytp-tooltip-text') as HTMLSpanElement
+      tooltipContainer.querySelector(
+        YouTubeSelectors.Tooltip.TEXT
+      ) as HTMLSpanElement
     ).innerText = textTest;
     handleTooltipOnMouseLeave.bind(button)();
     expect(tooltipContainer.style.display).toBe('none');
