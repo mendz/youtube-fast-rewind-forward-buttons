@@ -692,7 +692,7 @@ describe('SPA Navigation Handling', () => {
       initSpy.mockRestore();
     });
 
-    it('should reset isInitPending so a new init can start after SPA navigation during a pending init', () => {
+    it('should not start a second init when SPA navigation fires during a pending init', () => {
       const pendingInit = new Promise<void>(() => {});
       const initSpy = jest
         .spyOn(content, 'initializeExtension')
@@ -702,11 +702,11 @@ describe('SPA Navigation Handling', () => {
       content.startInitialization();
       expect(content.getNavState().isInitPending).toBe(true);
 
-      // SPA navigation should reset isInitPending and allow a new init
+      // SPA navigation while init is pending should NOT start a second init
       content.handleSpaNavigation();
 
-      // initializeExtension should be called again (once from startInitialization, once from handleSpaNavigation)
-      expect(initSpy).toHaveBeenCalledTimes(2);
+      // initializeExtension should only have been called once (the original)
+      expect(initSpy).toHaveBeenCalledTimes(1);
 
       initSpy.mockRestore();
     });

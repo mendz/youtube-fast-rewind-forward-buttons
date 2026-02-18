@@ -305,7 +305,6 @@ function handleSpaNavigation(): void {
   cleanupFallback();
   cleanupVideoSrcObserver();
   abortWait();
-  isInitPending = false;
 
   // Set up fallback: if video/buttons don't appear after init attempt,
   // start a MutationObserver to detect when they do

@@ -36,7 +36,7 @@
    - Be specific about what changed and why
    - Focus on both technical details and user impact
 
-6. **Output in chat**: Display the complete PR description as a markdown snippet that can be copied directly into a PR description field.
+6. **Output to file**: Write the complete PR description to a markdown file (e.g., `pr-description-output.md` in the project root). This makes it easy to copy the content into a PR description field on GitHub/GitLab. Display a brief note in chat confirming the file was written and where to find it.
 
 **Guidelines:**
 - Be comprehensive but concise
