@@ -1,16 +1,16 @@
+import { ArrowKey, KEY_CODES, MediaTrackKey } from '../../shared/types';
+import {
+  DEFAULT_OPTIONS_MOCK,
+  HTML_PLAYER_FULL,
+} from '../__utils__/tests-helper';
 import {
   isShouldSkipOverrideArrowKeys,
   overrideArrowKeys,
   overrideMediaKeys,
   shouldSkipDueToFocus,
   simulateKey,
-} from '../event-keys';
-import { ArrowKey, KEY_CODES, MediaTrackKey } from '../types';
-import {
-  DEFAULT_OPTIONS_MOCK,
-  HTML_PLAYER_FULL,
-} from '../__utils__/tests-helper';
-import * as handleVideoPlayer from '../handle-video-player';
+} from '../events/event-keys';
+import * as handleVideoPlayer from '../player/handle-video-player';
 
 describe('simulateKey', () => {
   const leftKeyEvent = new KeyboardEvent('keydown', {

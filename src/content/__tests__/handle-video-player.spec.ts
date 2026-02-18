@@ -1,5 +1,5 @@
-import { updateVideoTime } from '../handle-video-player';
-import { ArrowKey } from '../types';
+import { ArrowKey } from '../../shared/types';
+import { updateVideoTime } from '../player/handle-video-player';
 
 describe('updateVideoTime', () => {
   const videoElement = document.createElement('video');

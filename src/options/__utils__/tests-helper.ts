@@ -1,4 +1,4 @@
-import { IOptions, IStorageOptions } from '../../content/types';
+import { IOptions, IStorageOptions } from '../../shared/types';
 
 export const MOCK_HTML = /* HTML */ `
   <header class="container-fluid">

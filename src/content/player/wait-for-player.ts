@@ -1,4 +1,4 @@
-import { YouTubeSelectors } from './selectors';
+import { YouTubeSelectors } from '../selectors';
 
 // #region Types
 

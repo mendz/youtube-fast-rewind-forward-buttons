@@ -1,18 +1,5 @@
 /* eslint-disable sonarjs/no-nested-functions */
 import { chrome } from 'jest-chrome';
-import * as buttons from '../buttons';
-import * as eventKeys from '../event-keys';
-import content, {
-  run,
-  loadOptions,
-  mergeOptions,
-  handleOverrideKeysMigration,
-} from '../content';
-import {
-  DEFAULT_OPTIONS_MOCK,
-  HTML_PLAYER_FULL,
-  INITIAL_HTML_PLAYER_FULL,
-} from '../__utils__/tests-helper';
 import {
   ArrowKey,
   ButtonClassesIds,
@@ -21,9 +8,22 @@ import {
   IStorageOptions,
   KEY_CODES,
   MediaTrackKey,
-} from '../types';
+} from '../../shared/types';
+import {
+  DEFAULT_OPTIONS_MOCK,
+  HTML_PLAYER_FULL,
+  INITIAL_HTML_PLAYER_FULL,
+} from '../__utils__/tests-helper';
+import * as buttons from '../buttons/buttons';
+import content, {
+  handleOverrideKeysMigration,
+  loadOptions,
+  mergeOptions,
+  run,
+} from '../content';
+import * as eventKeys from '../events/event-keys';
+import * as waitForPlayer from '../player/wait-for-player';
 import { YouTubeSelectors } from '../selectors';
-import * as waitForPlayer from '../wait-for-player';
 
 describe('full run', () => {
   const originalConsoleError = console.error;

@@ -1,4 +1,4 @@
-import { ArrowKey, VideoTimeArg } from './types';
+import { ArrowKey, VideoTimeArg } from '../../shared/types';
 
 export function updateVideoTime({
   seconds,

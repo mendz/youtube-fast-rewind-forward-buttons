@@ -1,6 +1,6 @@
 import { chrome } from 'jest-chrome';
 import { describe } from 'node:test';
-import { IStorageOptions } from '../../content/types';
+import { IStorageOptions } from '../../shared/types';
 import {
   DEFAULT_OPTIONS_MOCK,
   DEFAULT_STORAGE_OPTIONS_MOCK,
@@ -220,7 +220,7 @@ describe('Options page', () => {
     it('should if user approve confirm, should run sync.set', async () => {
       (window.confirm as jest.Mock).mockReturnValue(true);
       await resetToDefaultOptions();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       const defaultOpinions = { ...DEFAULT_OPTIONS_MOCK };
       defaultOpinions.shouldOverrideKeys = false;
       expect(chrome.storage.sync.set).toHaveBeenCalledWith(defaultOpinions);

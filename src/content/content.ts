@@ -1,21 +1,21 @@
-import { addButtonsToVideo, updateButtons } from './buttons';
-import {
-  overrideArrowKeys,
-  overrideMediaKeys,
-  shouldSkipDueToFocus,
-} from './event-keys';
 import {
   ButtonClassesIds,
   ChromeStorageChanges,
   IOptions,
   IStorageOptions,
-} from './types';
-import { YouTubeSelectors } from './selectors';
+} from '../shared/types';
+import { addButtonsToVideo, updateButtons } from './buttons/buttons';
 import {
-  waitForPlayerElements,
-  bindWaitCleanup,
+  overrideArrowKeys,
+  overrideMediaKeys,
+  shouldSkipDueToFocus,
+} from './events/event-keys';
+import {
   abortWait,
-} from './wait-for-player';
+  bindWaitCleanup,
+  waitForPlayerElements,
+} from './player/wait-for-player';
+import { YouTubeSelectors } from './selectors';
 
 // #region SPA Navigation State
 

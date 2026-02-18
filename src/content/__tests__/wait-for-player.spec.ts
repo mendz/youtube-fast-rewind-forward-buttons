@@ -1,17 +1,17 @@
 import {
-  waitForPlayerElements,
+  HTML_MINIMAL_NO_PLAYER,
+  HTML_PLAYER_CONTROLS_NO_ANCHOR,
+  HTML_PLAYER_PLAY_BUTTON_ONLY,
+  HTML_PLAYER_READY,
+  HTML_PLAYER_VIDEO_ONLY,
+  INITIAL_HTML_PLAYER_FULL,
+} from '../__utils__/tests-helper';
+import {
   abortWait,
   bindWaitCleanup,
   resetWaitState,
-} from '../wait-for-player';
-import {
-  HTML_PLAYER_READY,
-  HTML_PLAYER_VIDEO_ONLY,
-  HTML_PLAYER_PLAY_BUTTON_ONLY,
-  HTML_PLAYER_CONTROLS_NO_ANCHOR,
-  HTML_MINIMAL_NO_PLAYER,
-  INITIAL_HTML_PLAYER_FULL,
-} from '../__utils__/tests-helper';
+  waitForPlayerElements,
+} from '../player/wait-for-player';
 
 describe('waitForPlayerElements', () => {
   let rafCallbacks: FrameRequestCallback[] = [];

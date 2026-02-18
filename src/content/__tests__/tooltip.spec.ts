@@ -1,19 +1,19 @@
-jest.mock('../button-styles-sync', () => {
-  const actual = jest.requireActual('../button-styles-sync');
+jest.mock('../ui/button-styles-sync', () => {
+  const actual = jest.requireActual('../ui/button-styles-sync');
   return {
     ...actual,
     isNewUiPlayer: jest.fn(() => false),
   };
 });
 
-import { isNewUiPlayer } from '../button-styles-sync';
+import { HTML_PLAYER_FULL } from '../__utils__/tests-helper';
+import { YouTubeSelectors } from '../selectors';
+import { isNewUiPlayer } from '../ui/button-styles-sync';
 import {
   getElementsForTooltipCalculation,
   handleTooltipOnMouseLeave,
   handleTooltipOnMouseOver,
-} from '../tooltip';
-import { HTML_PLAYER_FULL } from '../__utils__/tests-helper';
-import { YouTubeSelectors } from '../selectors';
+} from '../ui/tooltip';
 
 const mockIsNewUiPlayer = isNewUiPlayer as jest.MockedFunction<
   typeof isNewUiPlayer

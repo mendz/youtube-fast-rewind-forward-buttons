@@ -2,6 +2,8 @@
 
 This document maps the trigger paths in the content script: startup init, SPA navigation, fallback recovery, `src` observer behavior, and reset/cleanup.
 
+Related modules: `content.ts` (this document), `content/player/wait-for-player.ts` (`waitForPlayerElements`, `bindWaitCleanup`, `abortWait`).
+
 ## 1) Module load startup flow
 
 ```mermaid
