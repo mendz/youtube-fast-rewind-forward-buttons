@@ -76,6 +76,12 @@ export const versionUpdates: IVersionUpdates[] = [
           'Updated option labels and descriptions for better clarity.\nImproved wording for secondary buttons, keyboard shortcuts, and media key settings.',
         type: 'improved',
       },
+      {
+        title: "What's New link in popup",
+        description:
+          "Added a link in the popup to open the What's New page on demand.\nRelease notes are now available anytime from the extension.",
+        type: 'new',
+      },
     ],
   },
 ];
