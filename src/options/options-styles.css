@@ -57,6 +57,14 @@ label > input + small {
   gap: var(--pico-spacing);
 }
 
+.buttons-row {
+  align-items: stretch;
+}
+
+.buttons-row > button {
+  height: 100%;
+}
+
 .secondary-seconds-container {
   & fieldset {
     margin-bottom: 0;

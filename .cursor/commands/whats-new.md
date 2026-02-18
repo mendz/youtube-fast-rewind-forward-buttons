@@ -6,8 +6,9 @@
 
 3. **Check version** - Read `@package.json` and determine the current version string. Verify if this version already exists in `whats-new-data.ts`.
 
-4. **Add version entry in code (if missing)**:
+4. **Add or update the version entry in code**:
    - If the version from `package.json` is not present in `whats-new-data.ts`, programmatically **append a new `IVersionUpdates` entry** to the exported `versionUpdates` array in `@src/background/whats-new-page/whats-new-data.ts`.
+   - If the version **already exists** in `whats-new-data.ts` but has no corresponding git tag yet (check with `git tag --list "vX.Y.Z"`), update the existing entry's `date` field to today's date using `getDate('YYYY-MM-DD')` format.
    - Use today's date with `getDate('YYYY-MM-DD')` format when setting the `date` field.
    - Follow the existing structure and style of the surrounding entries (ordering, indentation, and types).
 

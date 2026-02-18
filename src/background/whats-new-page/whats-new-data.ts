@@ -56,7 +56,7 @@ export const versionUpdates: IVersionUpdates[] = [
   },
   {
     version: 'v1.4.4',
-    date: getDate('2026-01-19'),
+    date: getDate('2026-02-18'),
     updates: [
       {
         title: 'Improved button appearance in new YouTube UI',
@@ -69,6 +69,18 @@ export const versionUpdates: IVersionUpdates[] = [
         description:
           'Improved detection of the YouTube player so buttons appear even on slower loads and after in-page navigation.\nReduced cases where buttons failed to show when switching videos or playlists.',
         type: 'fixed',
+      },
+      {
+        title: 'Clearer options page labels',
+        description:
+          'Updated option labels and descriptions for better clarity.\nImproved wording for secondary buttons, keyboard shortcuts, and media key settings.',
+        type: 'improved',
+      },
+      {
+        title: "What's New link in popup",
+        description:
+          "Added a link in the popup to open the What's New page on demand.\nRelease notes are now available anytime from the extension.",
+        type: 'new',
       },
     ],
   },
