@@ -77,6 +77,7 @@ export function createButton({
   const button: HTMLButtonElement = document.createElement('button');
   button.classList.add('ytp-button');
   button.classList.add(ButtonClassesIds.CLASS);
+  button.classList.add('ytp-autohide-fade-transition');
   button.innerHTML = svg;
   button.title = title;
   button.setAttribute('aria-label', title);

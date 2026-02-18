@@ -29,7 +29,7 @@ export const MOCK_HTML = /* HTML */ `
       <form class="container">
         <div class="seconds-change-container grid">
           <label class="seconds-change-label">
-            Rewind seconds (1-7200 sec):
+            Rewind amount (1–7200 sec):
             <input
               required
               type="number"
@@ -43,7 +43,7 @@ export const MOCK_HTML = /* HTML */ `
             <small id="rewindValue" for="rewind">(5 seconds)</small>
           </label>
           <label class="seconds-change-label"
-            >Forward seconds (1-7200 sec):
+            >Skip forward amount (1–7200 sec):
             <input
               required
               type="number"
@@ -64,11 +64,11 @@ export const MOCK_HTML = /* HTML */ `
               name="enable-more-buttons"
               id="enable-more-buttons"
             />
-            Enable the secondary buttons
+            Add a second pair of buttons with a different skip amount
           </label>
           <fieldset disabled class="grid">
             <label class="seconds-change-label"
-              >Rewind seconds (1-7200 sec):
+              >Rewind amount (1–7200 sec):
               <input
                 required
                 type="number"
@@ -84,7 +84,7 @@ export const MOCK_HTML = /* HTML */ `
               >
             </label>
             <label class="seconds-change-label"
-              >Forward seconds (1-7200 sec):
+              >Skip forward amount (1–7200 sec):
               <input
                 required
                 type="number"
@@ -108,7 +108,8 @@ export const MOCK_HTML = /* HTML */ `
               name="override-arrow-keys"
               id="override-arrow-keys"
             />
-            Should the options above override the native arrow keys seconds?
+            Apply my custom seconds to the ← → arrow keys (replaces YouTube's
+            default 5s)
           </label>
           <label>
             <input
@@ -116,11 +117,15 @@ export const MOCK_HTML = /* HTML */ `
               name="override-media-keys"
               id="override-media-keys"
             />
-            Should override the keyboard media keys with the above seconds to
-            behave as the arrow keys?
+            Use my keyboard's ⏮ ⏭ media keys to skip video by my custom
+            seconds
           </label>
+          <small
+            >Note: this overrides the default track-skipping behavior of those
+            keys.</small
+          >
         </div>
-        <div class="grid">
+        <div class="grid buttons-row">
           <button type="button" id="reset-values" class="secondary">
             Reset values to default
           </button>
