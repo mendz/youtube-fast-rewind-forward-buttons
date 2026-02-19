@@ -1,6 +1,92 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [1.4.4](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.4.3...1.4.4) (2026-02-19)
+
+### Features
+
+* **options:** Clearer options page labels & button transition improvements ([#94](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/94))
+
+### Bug Fixes
+
+* **player:** Buttons sometimes don't show — SPA navigation, race conditions, and reliability improvements ([#93](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/93))
+* **player:** Buttons are still misaligned in cinema mode and Fullscreen since the YouTube UI update ([#89](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/89))
+
+### Chore
+
+* **content:** Content folder restructure: Logical subfolders and shared types ([#95](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/95))
+* **dependencies:** Update dependencies ([#96](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/96))
+* **assets:** Update screenshot assets with new versions for various resolutions
+
+### [1.4.3](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.4.2...1.4.3) (2025-10-19)
+
+### Features
+
+* **player:** YouTube new UI support ([#81](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/81))
+
+### Bug Fixes
+
+* **test:** Fix `doubleRewindButtonId` expectation in a test ([#75](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/75))
+
+### Documentation
+
+* **docs:** Fix wording for deprecated option comments ([#78](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/78))
+* **docs:** Add AGENTS guide for Codex ([#74](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/74))
+
+### Chore
+
+* **dependencies:** Update dependencies ([#73](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/73))
+
+### [1.4.2](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.4.1...1.4.2) (2025-06-25)
+
+### Features
+
+* **options:** New UI using Picocss ([#68](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/68))
+* **options:** Add secondary seconds options with configuration for rewind and forward durations ([#67](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/67))
+* **icons:** Update SVG rendering for rewind and fast forward icons with new dimensions and styles ([#66](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/66))
+* **options:** Add number formatting for seconds and update options UI with few options ([#65](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/65))
+
+### Documentation
+
+* **readme:** Update readme + screenshots + icons ([#71](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/71))
+
+### Chore
+
+* **dependencies:** Update dependencies ([#62](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/62))
+
+### [1.4.1](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.4.0...1.4.1) (2025-01-24)
+
+### Bug Fixes
+
+* **manifest:** Remove tab permission ([#59](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/59))
+
+### Chore
+
+* **manifest:** Remove unnecessary 'tabs' permission from manifest.json ([#58](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/58))
+
+### [1.4.0](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.3.0...1.4.0) (2025-01-21)
+
+### Features
+
+* **options:** Update styles + add buy me coffee button ([#49](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/49))
+
+### Bug Fixes
+
+* **focus:** Fix focus issue ([#53](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/53), [#54](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/54))
+
+### Documentation
+
+* **readme:** Update README text and screenshots & improve what's new page layout ([#55](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/55))
+
+### Chore
+
+* **dependencies:** Update dependencies ([#51](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/51))
+
+### [1.3.0](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.2.1...1.3.0) (2023-11-19)
+
+### Chore
+
+* **release:** Bump to version 1.3.0 ([#44](https://github.com/mendz/youtube-fast-rewind-forward-buttons/issues/44))
 
 ### [1.2.1](https://github.com/mendz/youtube-fast-rewind-forward-buttons/compare/1.2.0...1.2.1) (2022-11-01)
 
