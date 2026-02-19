@@ -210,7 +210,6 @@ async function testClickingButtons(
 
   await test.step('Click the rewind button', async () => {
     await setVideoTime(video, 20);
-    await page.waitForTimeout(1000);
     await rewindButton.click();
     await page.waitForTimeout(1000);
     const currentTime = await getVideoTime(video);

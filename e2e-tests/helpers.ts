@@ -42,7 +42,7 @@ export const OPTIONS_CHANGED_VALUES = {
   },
 };
 
-export const BUTTON_SUBMIT_SELECTOR = 'button[type="submit"]';
+export const BUTTON_SUBMIT_SELECTOR = 'button:has-text("Save and close")';
 
 export const test = base.extend<{
   context: BrowserContext;
@@ -50,7 +50,7 @@ export const test = base.extend<{
 }>({
   // eslint-disable-next-line no-empty-pattern
   context: async ({}, use) => {
-    const pathToExtension = path.join(__dirname, EXTENSION_PATH);
+    const pathToExtension = path.resolve(__dirname, EXTENSION_PATH);
     const context = await chromium.launchPersistentContext('', {
       headless: false,
       args: [
@@ -59,8 +59,20 @@ export const test = base.extend<{
         `--headless=new`,
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
+        // Prevent Chrome from disabling unpacked extensions when Developer mode is off.
+        // Chrome 134+ does this after reload. See: https://github.com/microsoft/playwright/issues/34711
+        `--disable-features=ExtensionDisableUnsupportedDeveloper`,
       ],
     });
+
+    // Enable Developer mode so unpacked extensions stay enabled after page reload.
+    // Chrome 134+ disables them otherwise. See: https://github.com/microsoft/playwright/issues/34711
+    const devModePage = await context.newPage();
+    await devModePage.goto('chrome://extensions/');
+    await devModePage.getByLabel('Developer mode').click();
+    await devModePage.getByRole('button', { name: 'Load unpacked' }).waitFor();
+    await devModePage.close();
+
     await use(context);
     await context.close();
   },
