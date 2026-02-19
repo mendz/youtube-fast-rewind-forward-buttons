@@ -56,7 +56,7 @@ export const versionUpdates: IVersionUpdates[] = [
   },
   {
     version: 'v1.4.4',
-    date: getDate('2026-02-18'),
+    date: getDate('2026-02-20'),
     updates: [
       {
         title: 'Improved button appearance in new YouTube UI',
