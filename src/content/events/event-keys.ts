@@ -1,12 +1,12 @@
-import { getSeconds as eventKeys } from './helper';
-import { updateVideoTime } from './handle-video-player';
 import {
   ALL_ARROW_KEY_CODES,
   ArrowKey,
   IOptions,
   KEY_CODES,
   MediaTrackKey,
-} from './types';
+} from '../../shared/types';
+import { getSeconds as eventKeys } from '../buttons/helper';
+import { updateVideoTime } from '../player/handle-video-player';
 
 const MEDIA_KEYS_TO_ARROW_KEYS = {
   [MediaTrackKey.MEDIA_TRACK_PREVIOUS]: ArrowKey.ARROW_LEFT_KEY,

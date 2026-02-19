@@ -15,11 +15,10 @@ export interface IOptions {
   shouldOverrideMediaKeys: boolean;
 }
 
-export interface IStorageOptions
-  extends Omit<
-    IOptions,
-    'rewindSeconds' | 'forwardSeconds' | 'secondarySeconds'
-  > {
+export interface IStorageOptions extends Omit<
+  IOptions,
+  'rewindSeconds' | 'forwardSeconds' | 'secondarySeconds'
+> {
   rewindSeconds: string;
   forwardSeconds: string;
   secondarySeconds: {

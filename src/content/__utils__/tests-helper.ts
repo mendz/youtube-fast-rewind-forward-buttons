@@ -1,5 +1,5 @@
-import { createFastRewindSVG, createFastForwardSVG } from '../helper';
-import { IOptions } from '../types';
+import { IOptions } from '../../shared/types';
+import { createFastForwardSVG, createFastRewindSVG } from '../buttons/helper';
 
 export const HTML_PLAYER_FULL = /* html */ `
 <ytd-player>

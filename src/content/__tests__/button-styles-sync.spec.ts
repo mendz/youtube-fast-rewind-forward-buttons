@@ -1,12 +1,12 @@
+import { ButtonClassesIds } from '../../shared/types';
 import { createNewUiPlayerMarkup } from '../__utils__/tests-helper';
+import { YouTubeSelectors } from '../selectors';
 import {
   isNewUiPlayer,
   resetIsNewUiPlayerCache,
   setupCustomButtonsStylesSync,
   teardownNativeButtonSyncIfUnused,
-} from '../button-styles-sync';
-import { ButtonClassesIds } from '../types';
-import { YouTubeSelectors } from '../selectors';
+} from '../ui/button-styles-sync';
 
 const mockResizeObserver = {
   observe: jest.fn(),

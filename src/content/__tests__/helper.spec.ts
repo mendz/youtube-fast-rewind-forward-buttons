@@ -1,3 +1,4 @@
+import { ArrowKey, ButtonClassesIds } from '../../shared/types';
 import {
   createSvgMock,
   DEFAULT_OPTIONS_MOCK,
@@ -7,7 +8,6 @@ import {
   SVG_PATH_CLASSES_MOCK,
   X_LINK_ATTR,
 } from '../__utils__/tests-helper';
-import { resetIsNewUiPlayerCache } from '../button-styles-sync';
 import {
   createButton,
   createFastDoubleForwardSVG,
@@ -26,8 +26,8 @@ import {
   oldUiCreateFastDoubleRewindSVG,
   oldUiCreateFastForwardSVG,
   oldUiCreateFastRewindSVG,
-} from '../helper';
-import { ArrowKey, ButtonClassesIds } from '../types';
+} from '../buttons/helper';
+import { resetIsNewUiPlayerCache } from '../ui/button-styles-sync';
 
 const MODERN_PLAYER_MARKUP = '<div class="ytp-delhi-modern"></div>';
 

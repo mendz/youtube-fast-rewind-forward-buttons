@@ -1,8 +1,13 @@
-import { ArrowKey, ButtonClassesIds, CreateButtonArg, IOptions } from './types';
+import {
+  ArrowKey,
+  ButtonClassesIds,
+  CreateButtonArg,
+  IOptions,
+} from '../../shared/types';
 import {
   isNewUiPlayer,
   setupCustomButtonsStylesSync,
-} from './button-styles-sync';
+} from '../ui/button-styles-sync';
 
 // Keep custom icons visually aligned with YouTube's native play button.
 // The shapes are normalized to a 24x24 viewBox, then uniformly scaled down a touch.

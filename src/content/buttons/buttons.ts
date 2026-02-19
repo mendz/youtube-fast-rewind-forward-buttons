@@ -1,5 +1,18 @@
-import { simulateKey } from './event-keys';
-import { updateVideoTime } from './handle-video-player';
+import {
+  ArrowKey,
+  ButtonClassesIds,
+  ButtonExtraStylesArg,
+  IOptions,
+  VideoTimeArg,
+} from '../../shared/types';
+import { simulateKey } from '../events/event-keys';
+import { updateVideoTime } from '../player/handle-video-player';
+import { YouTubeSelectors } from '../selectors';
+import { teardownNativeButtonSyncIfUnused } from '../ui/button-styles-sync';
+import {
+  handleTooltipOnMouseLeave,
+  handleTooltipOnMouseOver,
+} from '../ui/tooltip';
 import {
   createButton,
   createFastDoubleForwardSVG,
@@ -10,16 +23,6 @@ import {
   createRewindButtonTitle,
   createTitle,
 } from './helper';
-import { teardownNativeButtonSyncIfUnused } from './button-styles-sync';
-import { handleTooltipOnMouseLeave, handleTooltipOnMouseOver } from './tooltip';
-import {
-  ArrowKey,
-  ButtonClassesIds,
-  ButtonExtraStylesArg,
-  IOptions,
-  VideoTimeArg,
-} from './types';
-import { YouTubeSelectors } from './selectors';
 
 export function handleArrowButtons({
   seconds,

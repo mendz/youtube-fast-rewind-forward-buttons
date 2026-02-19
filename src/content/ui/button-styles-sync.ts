@@ -1,5 +1,5 @@
-import { ButtonClassesIds } from './types';
-import { YouTubeSelectors } from './selectors';
+import { ButtonClassesIds } from '../../shared/types';
+import { YouTubeSelectors } from '../selectors';
 
 type StylableElement = HTMLButtonElement | SVGElement;
 

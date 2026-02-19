@@ -1,5 +1,5 @@
-import { numberFormat } from '../content/helper';
-import { IOptions, IStorageOptions, Prettify } from '../content/types';
+import { numberFormat } from '../content/buttons/helper';
+import { IOptions, IStorageOptions, Prettify } from '../shared/types';
 
 const OPTIONS_DEFAULT_VALUES: Readonly<IOptions> = {
   rewindSeconds: 5,
@@ -152,7 +152,6 @@ export async function loadInputStorageOptions(): Promise<void> {
 }
 
 export async function resetToDefaultOptions(): Promise<void> {
-  /* eslint-disable-next-line no-alert, no-restricted-globals */
   const result = window.confirm('Are you sure?');
   if (!result) {
     return;

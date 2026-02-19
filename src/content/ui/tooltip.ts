@@ -1,5 +1,5 @@
+import { YouTubeSelectors } from '../selectors';
 import { isNewUiPlayer } from './button-styles-sync';
-import { YouTubeSelectors } from './selectors';
 
 export function getElementsForTooltipCalculation(): {
   tooltipContainer: HTMLElement;

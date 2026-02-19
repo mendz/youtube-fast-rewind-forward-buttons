@@ -1,4 +1,5 @@
 import { chrome } from 'jest-chrome';
+import { ArrowKey, ButtonClassesIds } from '../../shared/types';
 import {
   DEFAULT_OPTIONS_MOCK,
   HTML_PLAYER_FULL,
@@ -13,11 +14,10 @@ import buttons, {
   addButtonsToVideo,
   handleArrowButtons,
   updateButtons,
-} from '../buttons';
+} from '../buttons/buttons';
 import { loadOptions } from '../content';
-import * as eventKeys from '../event-keys';
-import * as handleVideoPlayer from '../handle-video-player';
-import { ArrowKey, ButtonClassesIds } from '../types';
+import * as eventKeys from '../events/event-keys';
+import * as handleVideoPlayer from '../player/handle-video-player';
 import { YouTubeSelectors } from '../selectors';
 
 describe('handleArrowButtons', () => {

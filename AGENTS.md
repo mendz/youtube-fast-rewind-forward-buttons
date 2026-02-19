@@ -7,7 +7,8 @@ Keep guidance concise and actionable. If you change behavior that affects tests,
 
 Key locations and why they matter
 - `src/` — extension implementation. Important subfolders:
-  - `content/` — injected scripts that interact with the YouTube player (e.g. `content.ts`, `buttons.ts`, `handle-video-player.ts`, `event-keys.ts`, `tooltip.ts`, `helper.ts`, `types.ts`). Changes here affect runtime behavior and E2E tests.
+  - `shared/` — shared types (`types.ts`). Used by content and options.
+  - `content/` — injected scripts that interact with the YouTube player. Entry: `content.ts`. Subfolders: `buttons/` (buttons, helper), `player/` (handle-video-player, wait-for-player), `events/` (event-keys), `ui/` (tooltip, button-styles-sync). `selectors.ts` remains at root. Changes here affect runtime behavior and E2E tests.
     - `selectors.ts` — Centralized location for all YouTube DOM selectors. Use this to maintain consistency and avoid magic strings.
   - `background/` — service worker logic and feature flags (see `service-worker.ts`). Use this for cross-tab state and messaging.
     - `whats-new-page/` — changelog page shown automatically on extension updates. Includes HTML, CSS, TypeScript, tests, and test helpers.
@@ -38,7 +39,7 @@ Important developer workflows (commands)
   - `npm run updateVersion` — update version script utility.
 
 Project-specific patterns and conventions
-- TypeScript-first: prefer explicit interfaces and enums. Shared types are in `types.d.ts`, content-specific types are in `src/content/types.ts`.
+- TypeScript-first: prefer explicit interfaces and enums. Shared types are in `types.d.ts` and `src/shared/types.ts`.
 - Place shared interfaces first, then types, followed by module-level `const` declarations directly after imports and before any function bodies.
 - File naming: kebab-case for files (e.g. `buttons.ts`), PascalCase for classes/components, camelCase for variables.
 - Tests: colocate test helpers under `__utils__` and name specs `<feature>.spec.ts` or `<feature>.test.ts`.
@@ -58,7 +59,7 @@ Project-specific patterns and conventions
 
 Integration and messaging
 - Content scripts communicate with the background service worker via standard chrome.runtime messaging. Look for usages of `chrome.runtime.sendMessage` and `chrome.runtime.onMessage` across `content/` and `background/`.
-- Options page persists settings that content scripts read; the `options-page.ts` and `content/helper.ts` are good starting points to trace the settings flow.
+- Options page persists settings that content scripts read; the `options-page.ts` and `content/buttons/helper.ts` are good starting points to trace the settings flow.
 
 Examples of repository-specific intents
 - When changing a selector used by the Playwright tests, update the tests under `e2e-tests/` and update any screenshots in `screenshots/`.
@@ -70,7 +71,7 @@ Small rules for AI edits
 - Preserve public APIs (message formats, settings keys in `types.d.ts`) unless you update all callsites and tests.
 
 Where to look when debugging
-- Runtime issues on YouTube pages: `src/content/*` and `src/content/handle-video-player.ts`.
+- Runtime issues on YouTube pages: `src/content/*` and `src/content/player/handle-video-player.ts`.
 - Background messaging/state: `src/background/service-worker.ts`.
 - Options/serialization bugs: `src/options/options-page.ts`.
 - Packaging / build quirks: `scripts/fix-pico-paths.mjs` and `package.json` scripts.
