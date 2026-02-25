@@ -7,6 +7,7 @@ import {
   getVideoLocatorElements,
   getVideoTime,
   handleAds,
+  blockAds,
   OPTIONS_CHANGED_VALUES,
   OPTIONS_DEFAULT_VALUES,
   resetVideo,
@@ -23,6 +24,10 @@ const ANIMATION_ARROW_BACK_SELECTOR =
 
 test.setTimeout(60 * 1000);
 test.slow();
+
+test.beforeEach(async ({ page }) => {
+  await blockAds(page);
+});
 
 test('should changed options affect the video without refresh', async ({
   page: videoPage,
